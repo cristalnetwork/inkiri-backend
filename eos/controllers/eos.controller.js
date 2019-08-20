@@ -27,44 +27,34 @@ exports.challenge = async(req, res) => {
   })
 }
 
-/* *********************
-{
-  "signature"    : "SIG_K1_KfRwAqPFuUmKEE7JvQo6a9yfdRY6TQu4fgrKFpWLam4cgD3uKdFnDC6hKodbcaboW63dfmVGcxp723FXgYHkTvwqrMihVc"
-  , "challenge"    : "5J71N15h7KcmfSWsDYb7tPZGoURitBEkKmVTMGbVmRw2YpV1Brd"
-  , "account_name" : "inkiritoken1"
-}
-
-{
-    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWduYXR1cmUiOiJTSUdfSzFfS2ZSd0FxUEZ1VW1LRUU3SnZRbzZhOXlmZFJZNlRRdTRmZ3JLRnBXTGFtNGNnRDN1S2RGbkRDNmhLb2RiY2Fib1c2M2RmbVZHY3hwNzIzRlhnWUhrVHZ3cXJNaWhWYyIsImNoYWxsZW5nZSI6IjVKNzFOMTVoN0tjbWZTV3NEWWI3dFBaR29VUml0QkVrS21WVE1HYlZtUncyWXBWMUJyZCIsImFjY291bnRfbmFtZSI6Imlua2lyaXRva2VuMSIsInVzZXJJZCI6IjVkNTQ0MWQyOWJmZDY0NTc4NzM5YzQ2NSIsInBlcm1pc3Npb25fbGV2ZWwiOjIwNDgsInJlZnJlc2hLZXkiOiJDajZiWTVUV0grM050UnFydkRlZ0VRPT0iLCJpYXQiOjE1NjU4MDk2ODh9.fJ13PU5zJRXkYe5JDU521tKRhZRnT4nKHSVkmIJ0aO4",
-    "refreshToken": "c3hHMThmNDRxQ1JiVDVQTEFSQVlYVFFSM1JyRmhwYU5CdVJlYW9VU3MwQ2g4Q3FPOS8rRmV0TmpTS2gySzQ2WXB2MDVvNTJ0ckU1bVFjWG9uRG1zUXc9PQ=="
-}
-
-delete 5d545c2b8bb30d7d05ac2350
-********************* */
-
 exports.auth = async(req, res) => { 
-  // 1.- validamos que el challenge es el que tenemos guardado
-  // DONE en el middleware
-  // 2.- traemos la publica de la cuenta y verificamos que es el quien firmo 
+  // 1.- Lets validate the challenge token.
+  // DONE @ middleware
+  // 2.- Lets get account's public active keys and find a matching one validating signature and challenge.
   const accountInfo = await _getAccountInfo(req.body.account_name);
   const active_perm = accountInfo.permissions.filter( perm => perm.perm_name == 'active' )[0];
   const valid_perm =active_perm.required_auth.keys.filter( 
     (key) => ecc.verify(req.body.signature, req.body.challenge, key.key))
   
-  // 4.- le damos el token?
+  // 4.- Did we find a valid pub key? Shoul we give the token?
   if(!valid_perm || valid_perm.length==0)
   {
     res.status(400).send({errors: ['Something went wrong my dear friend!']});        
   }
   else{
-    let refreshId = req.body.account_name + jwtSecret;
-    let salt = crypto.randomBytes(16).toString('base64');
-    let hash = crypto.createHmac('sha512', salt).update(refreshId).digest("base64");
+     // Si, se ll
+    let refreshId       = req.body.account_name + jwtSecret;
+    let salt            = crypto.randomBytes(16).toString('base64');
+    let hash            = crypto.createHmac('sha512', salt).update(refreshId).digest("base64");
+    
     req.body.refreshKey = salt;
-    let token = jwt.sign(req.body, jwtSecret);
-    let b = new Buffer(hash);
-    let refresh_token = b.toString('base64');
-    res.status(201).send({accessToken: token, refreshToken: refresh_token});
+    req.body.expires_at = config.jwt_expiration_in_seconds + Math.floor((new Date()).getTime() / 1000);
+    
+    let token           = jwt.sign(req.body, jwtSecret);
+    let b               = new Buffer(hash);
+    let refresh_token   = b.toString('base64');
+
+    res.status(201).send({token: token, refreshToken: refresh_token, expires_at: req.body.expires_at});
     // remove challenge / to_sign
     UserModel.patchUserByAccountName(req.params.account_name, {to_sign: ''})
   }

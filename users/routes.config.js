@@ -8,27 +8,27 @@ const OPS = config.permission_levels.OPS_USER;
 const FREE = config.permission_levels.NORMAL_USER;
 
 exports.routesConfig = function (app) {
-    app.post('/users', [
+    app.post(config.api_version+'/users', [
         UsersController.insert
     ]);
-    app.get('/users', [
+    app.get(config.api_version+'/users', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.minimumPermissionLevelRequired(OPS),
         UsersController.list
     ]);
-    app.get('/users/:userId', [
+    app.get(config.api_version+'/users/:userId', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.minimumPermissionLevelRequired(FREE),
         PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         UsersController.getById
     ]);
-    app.patch('/users/:userId', [
+    app.patch(config.api_version+'/users/:userId', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.minimumPermissionLevelRequired(FREE),
         PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         UsersController.patchById
     ]);
-    app.delete('/users/:userId', [
+    app.delete(config.api_version+'/users/:userId', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.minimumPermissionLevelRequired(ADMIN),
         UsersController.removeById

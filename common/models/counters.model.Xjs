@@ -1,0 +1,86 @@
+const config = require('../config/env.config.js');
+const mongoose = require('mongoose');
+mongoose.connect(config.mongodb_uri || 'mongodb://localhost/inkiri');
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+const Schema = mongoose.Schema;
+ 
+const countersSchema = new Schema({
+    _id:           { type: String },
+    next:           { type: Number }
+  });
+
+countersSchema.virtual('id').get(function () {
+    return this._id; //.toHexString();
+});
+
+// Ensure virtual fields are serialised.
+countersSchema.set('toJSON', {
+    virtuals: true
+});
+
+countersSchema.findById = function (cb) {
+    return this.model('Counters').find({id: this.id}, cb);
+};
+
+// countersSchema.statics.findAndModify = function (query, sort, doc, options, callback) {
+//   return this.model('Counters').findAndModify(query, sort, doc, options, callback);
+// };
+
+const Counter = mongoose.model('Counters', countersSchema);
+
+
+exports.findById = (id) => {
+    return Counter.findById(id)
+        .then((result) => {
+            result = result.toJSON();
+            delete result._id;
+            delete result.__v;
+            return result;
+        });
+};
+
+exports.createCounter = (counterData) => {
+    const _counter = new Counter(counterData);
+    return _counter.save();
+};
+
+Counter.findOneAndUpdate({_id: name}, {$inc: {seq: 1}}, {new: true}, function (err, counter) {
+      //never called
+      console.log('counter.seq', counter.seq);
+      callback(null, counter.seq);
+    }
+  )
+
+exports.getNextSequence = (name) => {
+   // var ret = Counter.findAndModify(
+   //        {
+   //          query: { _id: name },
+   //          update: { $inc: { next: 1 } },
+   //          new: true
+   //        }
+   // );
+
+   // return ret.next;
+  const filter = { _id: name }
+  const update = { $inc: { next: 1 } }
+  
+  return Counter.findOneAndUpdate({ _id: name }
+    , []
+    , { $inc: { next: 1 } }
+    , {new: true, upsert: true }
+    );
+
+  /*
+  , function (err, counter) {
+        if (err) throw err;
+        console.log('updated, counter is ' + counter.next);
+      }
+      */
+  // let doc = Counter.findAndModify(filter, update, {
+  //   new: true,
+  //   upsert: true // Make this update into an upsert
+  // });
+  // return doc.next;
+}
+

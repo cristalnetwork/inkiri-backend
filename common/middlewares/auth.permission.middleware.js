@@ -22,18 +22,17 @@ exports.minimumPermissionLevelRequired = (required_permission_level) => {
 
 exports.onlySameUserOrAdminCanDoThisAction = (req, res, next) => {
 
-    let user_permission_level = parseInt(req.jwt.permission_level);
-    let userId = req.jwt.userId;
-    if (req.params && req.params.userId && userId === req.params.userId) {
-        return next();
+  let user_permission_level = parseInt(req.jwt.permission_level);
+  let userId = req.jwt.userId;
+  if (req.params && req.params.userId && userId === req.params.userId) {
+    return next();
+  } else {
+    if (user_permission_level == config.permission_levels.ADMIN) {
+      return next();
     } else {
-        if (user_permission_level == config.permission_levels.ADMIN) {
-            return next();
-        } else {
-            return res.status(403).send();
-        }
+      return res.status(403).send();
     }
-
+  }
 };
 
 exports.sameUserCantDoThisAction = (req, res, next) => {

@@ -1,6 +1,12 @@
 const config = require('../../common/config/env.config.js');
 const mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 mongoose.connect(config.mongodb_uri || 'mongodb://localhost/inkiri');
+
+const AutoIncrement = require('mongoose-sequence')(mongoose);
+// const AutoIncrementFactory = require('mongoose-sequence');
+
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -8,9 +14,14 @@ const userSchema = new Schema({
     first_name:       { type:  String },
     last_name:        { type:  String },
     email:            { type:  String  , unique : true},
-    to_sign:          { type:  String  , unique : true},
-    permission_level: { type:  Number }
-});
+    to_sign:          { type:  String },
+    permission_level: { type:  Number },
+
+    userCounterId:    { type: Number, unique : true},
+  }, 
+  { timestamps: { createdAt: 'created_at' } });
+
+//const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
 
 userSchema.virtual('id').get(function () {
     return this._id.toHexString();
@@ -24,6 +35,8 @@ userSchema.set('toJSON', {
 userSchema.findById = function (cb) {
     return this.model('Users').find({id: this.id}, cb);
 };
+
+userSchema.plugin(AutoIncrement, {inc_field: 'userCounterId'});
 
 const User = mongoose.model('Users', userSchema);
 
@@ -51,9 +64,20 @@ exports.createUser = (userData) => {
     return user.save();
 };
 
-exports.list = (perPage, page) => {
+// exports.newUser = (data) => {
+//     return CounterModel.getNextSequence("userCounterId")
+//         .then((result) => {
+//             let userData = {...data,
+//                 userCounterId : result.seq,
+//             }
+//             return User.create(userData);
+//         });
+    
+// }
+
+exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
-        User.find()
+        User.find(query)
             .limit(perPage)
             .skip(perPage * page)
             .exec(function (err, users) {

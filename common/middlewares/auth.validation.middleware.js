@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken'),
-    secret = require('../config/env.config.js').jwt_secret,
+    config = require('../config/env.config.js'),
     crypto = require('crypto');
 
 exports.verifyRefreshBodyField = (req, res, next) => {
@@ -13,7 +13,7 @@ exports.verifyRefreshBodyField = (req, res, next) => {
 exports.validRefreshNeeded = (req, res, next) => {
     let b = new Buffer(req.body.refresh_token, 'base64');
     let refresh_token = b.toString();
-    let hash = crypto.createHmac('sha512', req.jwt.refreshKey).update(req.jwt.userId + secret).digest("base64");
+    let hash = crypto.createHmac('sha512', req.jwt.refreshKey).update(req.jwt.userId + config.jwt_secret).digest("base64");
     if (hash === refresh_token) {
         req.body = req.jwt;
         return next();
@@ -30,8 +30,12 @@ exports.validJWTNeeded = (req, res, next) => {
             if (authorization[0] !== 'Bearer') {
                 return res.status(401).send({error:'no bearer'});
             } else {
-                req.jwt = jwt.verify(authorization[1], secret);
-                console.log('validJWTNeeded >> decoded >>', JSON.stringify(req.jwt));
+                req.jwt = jwt.verify(authorization[1], config.jwt_secret);
+                
+                if (req.jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
+                    return res.status(401).send({error:'expired token'});                    
+                }
+                // console.log('validJWTNeeded >> decoded >>', JSON.stringify(req.jwt));
                 return next();
             }
 

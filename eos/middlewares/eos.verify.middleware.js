@@ -8,9 +8,22 @@ exports.hasChallengeValidFields = (req, res, next) => {
         errors.push('Missing account_name field');
     }
     if (errors.length) {
-        return res.status(400).send({errors: errors.join(',')});
+      // console.log(' **************** ERROR #1')
+      return res.status(400).send({errors: errors.join(',')});
     } else {
-        return next();
+        // return next();
+      UserModel.findByAccountName(req.params.account_name)
+        .then((user)=>{
+            if(!user[0]){
+              return res.status(404).send({error:'Account not found man!'});
+            }else{
+              return next();
+            }
+        },
+        (error) => {
+          // console.log(' **************** ERROR #2', error)
+          return res.status(400).send({errors: ['Something went wrong my dear friend!']});        
+        });
     }
     
 };
@@ -29,6 +42,7 @@ exports.hasAuthValidFields = (req, res, next) => {
             errors.push('Missing signature field');
         }
         if (errors.length) {
+            // console.log(' **************** ERROR #3', errors.join(','))
             return res.status(400).send({errors: errors.join(',')});
         } else {
             return next();
@@ -40,22 +54,22 @@ exports.hasAuthValidFields = (req, res, next) => {
 
 exports.isChallengeAndUserMatch = (req, res, next) => {
     UserModel.findByAccountName(req.body.account_name)
-        .then((user)=>{
-            if(!user[0]){
-              res.status(404).send({});
-            }else{
-              let challenge = user[0].to_sign;
-              if (challenge != req.body.challenge) {
-                return res.status(400).send({errors: ['Invalid something']});
-              }
-              else{    
-                req.body.userId           = user[0]._id;
-                req.body.permission_level = user[0].permission_level;
-                return next();
-              }
+      .then((user)=>{
+          if(!user[0]){
+            return res.status(404).send({error:'Account not found man!'});
+          }else{
+            let challenge = user[0].to_sign;
+            if (challenge != req.body.challenge) {
+              return res.status(400).send({errors: ['Invalid something']});
             }
-        },
-        (error) => {
-          return res.status(400).send({errors: ['Something went wrong my dear friend!']});        
-        });
+            else{    
+              req.body.userId           = user[0]._id;
+              req.body.permission_level = user[0].permission_level;
+              return next();
+            }
+          }
+      },
+      (error) => {
+        return res.status(400).send({errors: ['Something went wrong my dear friend!']});        
+      });
 };

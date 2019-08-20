@@ -14,6 +14,7 @@ exports.insert = (req, res) => {
         .then((result) => {
             res.status(201).send({id: result._id});
         }, (err)=>{
+            console.log(' ERROR# 1', JSON.stringify(err))
             res.status(400).send({error:err.errmsg});            
         });
 };
@@ -21,13 +22,20 @@ exports.insert = (req, res) => {
 exports.list = (req, res) => {
     let limit = req.query.limit && req.query.limit <= 100 ? parseInt(req.query.limit) : 10;
     let page = 0;
+    let filter = {};
     if (req.query) {
         if (req.query.page) {
             req.query.page = parseInt(req.query.page);
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
+        if (req.query.email) {
+            filter = {...filter, email: req.query.email};
+        }
+        if (req.query.account_name) {
+            filter = {...filter, account_name: req.query.account_name};
+        }
     }
-    UserModel.list(limit, page)
+    UserModel.list(limit, page, filter)
         .then((result) => {
             res.status(200).send(result);
         })
@@ -39,6 +47,7 @@ exports.getById = (req, res) => {
             res.status(200).send(result);
         });
 };
+
 exports.patchById = (req, res) => {
     // if (req.body.password) {
     //     let salt = crypto.randomBytes(16).toString('base64');
