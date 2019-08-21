@@ -13,7 +13,7 @@ exports.routesConfig = function (app) {
     ]);
     app.get(config.api_version+'/users', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.minimumPermissionLevelRequired(OPS),
+        // PermissionMiddleware.minimumPermissionLevelRequired(OPS),
         UsersController.list
     ]);
     app.get(config.api_version+'/users/:userId', [

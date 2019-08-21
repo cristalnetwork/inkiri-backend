@@ -6,11 +6,12 @@ exports.insert = (req, res) => {
   
   req.body.state = RequestModel.STATE_REQUESTED;
   // res.status(201).send({'res':'exports.insert', received: req.body});
-
+  console.log(' request.Controller::ABOUT TO SAVE')
   RequestModel.createRequest(req.body)
   .then((result) => {
       res.status(201).send({id: result._id});
   }, (err)=>{
+      console.log(' request.Controller::ERROR', JSON.stringify(err));
       res.status(400).send({error:err.errmsg});            
   });
 };
@@ -24,14 +25,17 @@ exports.list = (req, res) => {
             req.query.page = parseInt(req.query.page);
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
-        if (req.query.requested_by) {
-            filter = {...filter, requested_by: req.query.requested_by};
+        if (req.query.from) {
+            filter = {...filter, from: req.query.from};
         }
-        if (req.query.requested_to) {
-            filter = {...filter, requested_to: req.query.requested_to};
+        if (req.query.to) {
+            filter = {...filter, to: req.query.to};
         }
         if (req.query.state) {
             filter = {...filter, state: req.query.state};
+        }
+        if (req.query.requested_type) {
+            filter = {...filter, requested_type: req.query.requested_type};
         }
     }
     

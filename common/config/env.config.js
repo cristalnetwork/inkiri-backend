@@ -15,8 +15,8 @@ module.exports = {
             "code": "INK"
         },
         "bank": {
-            "contract":        "ikmasterooo1",
-            "account":         "ikmasterooo1",
+            "contract":        "inkirimaster",
+            "account":         "inkirimaster",
             "table_accounts":  "ikaccounts"
         },
         "dfuse" : {

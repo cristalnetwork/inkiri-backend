@@ -43,7 +43,6 @@ exports.validRequiredFields = async(req, res, next) => {
   if(!req.body.state)
     req.body.state = RequestModel.STATE_REQUESTED;
 
-
   if(validStates.indexOf(req.body.state)<0)
   {
     return res.status(404).send({error:'not a valid state'});
@@ -119,10 +118,17 @@ exports.validAccountReferences = async(req, res, next) => {
           req.body.requested_by   = values[1][req.body.from]
         }
       }
+
+      if(!req.body.from)
+      {
+        req.body.from           = req.jwt.account_name
+        req.body.from_id        = req.body.created_by
+        req.body.requested_by   = req.body.created_by
+      }
       console.log(' >> body.to?');      
       if(req.body.to && (!values[2] || values[2]===undefined)) 
       {  
-        console.log(' >> OK');      
+        console.log(' >> body.to ERROR');      
         return res.status(404).send({error:'not a valid receiver'});
       }
       else{
@@ -133,7 +139,7 @@ exports.validAccountReferences = async(req, res, next) => {
         }
       }
       
-      // console.log(JSON.stringify(req.body));      
+      // console.log( ' validAccountReferences OK >>' , JSON.stringify(req.body));      
       // return res.status(200).send({'resp': req.body});
       return next();
       
