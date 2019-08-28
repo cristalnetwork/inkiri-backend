@@ -1,5 +1,5 @@
 {
-  "name": "rest-api-tutorial",
+  "name": "inkiri-backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/makinhs/rest-api-tutorial.git"
+    "url": "git+https://github.com/cristalnetwork/inkiri-backend.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/makinhs/rest-api-tutorial/issues"
+    "url": "https://github.com/cristalnetwork/inkiri-backend/issues"
   },
-  "homepage": "https://github.com/makinhs/rest-api-tutorial#readme",
+  "homepage": "https://github.com/cristalnetwork/inkiri-backend",
   "dependencies": {
     "@dfuse/client": "^0.2.10",
     "body-parser": "1.7.0",

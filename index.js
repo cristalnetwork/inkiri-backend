@@ -28,6 +28,7 @@ UsersRouter.routesConfig(app);
 EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
 
-app.listen(config.port, function () {
+app.listen(config.port, '0.0.0.0', function () {
     console.log('app listening at port %s', config.port);
 });
+

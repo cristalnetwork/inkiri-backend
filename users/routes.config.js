@@ -8,6 +8,12 @@ const OPS = config.permission_levels.OPS_USER;
 const FREE = config.permission_levels.NORMAL_USER;
 
 exports.routesConfig = function (app) {
+    app.get('/ping', [
+        UsersController.ping
+    ]);
+    app.get(config.api_version+'/ping', [
+        UsersController.ping
+    ]);
     app.post(config.api_version+'/users', [
         UsersController.insert
     ]);
