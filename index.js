@@ -28,17 +28,17 @@ UsersRouter.routesConfig(app);
 EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
 
+const PORT = process.env.PORT || config.port || 5000
 
-if(process.env.MONGODB_URI)
-    app.listen(80, function () {
-        console.log('app listening at port %s', config.port);
-    });
-else
-    app.listen(config.port, '0.0.0.0', function () {
-        console.log('app listening at port %s', config.port);
-    });
+app.listen(PORT, function () {
+    console.log('app listening at port %s', config.port);
+});
 
-/*
-git remote add heroku https://git.heroku.com/agile-bayou-71239.git
-heroku git:remote -a cristal-backend
-*/
+// if(process.env.MONGODB_URI)
+    // app.listen(PORT, function () {
+    //     console.log('app listening at port %s', config.port);
+    // });
+// else
+//     app.listen(PORT, '0.0.0.0', function () {
+//         console.log('app listening at port %s', config.port);
+//     });
