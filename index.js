@@ -30,7 +30,7 @@ RequestsRouter.routesConfig(app);
 
 
 if(process.env.MONGODB_URI)
-    app.listen(config.port, function () {
+    app.listen(80, function () {
         console.log('app listening at port %s', config.port);
     });
 else
