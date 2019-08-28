@@ -28,8 +28,8 @@ exports.routesConfig = function (app) {
     ]);
     app.patch(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-        PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
+        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.patchById
     ]);
     app.delete(config.api_version+'/requests/:requestId', [

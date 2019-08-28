@@ -40,8 +40,8 @@ exports.validJWTNeeded = (req, res, next) => {
             }
 
         } catch (err) {
-            // console.log('validJWTNeeded?? >> ', JSON.stringify(err));
-            return res.status(403).send();
+            console.log('validJWTNeeded?? >> ', JSON.stringify(err));
+            return res.status(403).send(err);
         }
     } else {
         // console.log('validJWTNeeded?? >> 401' );

@@ -51,7 +51,7 @@ exports.auth = async(req, res) => {
     req.body.expires_at = config.jwt_expiration_in_seconds + Math.floor((new Date()).getTime() / 1000);
     
     let token           = jwt.sign(req.body, jwtSecret);
-    let b               = new Buffer(hash);
+    let b               = new Buffer.from(hash);
     let refresh_token   = b.toString('base64');
 
     res.status(201).send({token: token, refreshToken: refresh_token, expires_at: req.body.expires_at});

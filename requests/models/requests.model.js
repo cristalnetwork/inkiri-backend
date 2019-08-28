@@ -111,7 +111,7 @@ toUIDict = (request) => {
     ...request._doc
     // , block_time   : request.updatedAt.toString().split('.')[0]
     , block_time   : request.created_at.toISOString().split('.')[0]
-    , sub_header : 'Solicitaste  '+request.requested_type
+    , sub_header : 'Solicitud de '+request.requested_type
     , quantity   : request.amount
     , tx_type    : request.requested_type  
     // , tx_name

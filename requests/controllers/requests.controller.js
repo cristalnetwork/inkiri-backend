@@ -34,11 +34,20 @@ exports.list = (req, res) => {
         if (req.query.state) {
             filter = {...filter, state: req.query.state};
         }
-        if (req.query.requested_type) {
+        if (req.query.requested_type && !req.query.requested_type.includes('|')) {
             filter = {...filter, requested_type: req.query.requested_type};
         }
+        else
+          if (req.query.requested_type && req.query.requested_type.includes('|')) {
+            filter = {...filter,  $or : req.query.requested_type.split('|').map(req_item=> {return { requested_type: req_item}}) };
+          }
     }
-    
+    // console.log(req.query.requested_type.split('|').map(req_item=> {return { requested_type: req_item}}))
+    // console.log(filter)
+    // db.requests.find({requested_type:{$or:['type_deposit']}})
+    // db.requests.find( { $or: [ { requested_type: "type_deposit" }, { requested_type: "type_withdraw" } ] } )
+    // query.or([{ color: 'red' }, { status: 'emergency' }])
+            
     RequestModel
     .list(limit, page, filter)
     .then((result) => {
@@ -65,7 +74,8 @@ exports.patchById = (req, res) => {
 
     RequestModel.patchRequest(req.params.requestId, req.body)
         .then((result) => {
-            res.status(204).send({});
+            // res.status(204).send({});
+            res.status(200).send({});
         });
 
 };
@@ -73,6 +83,7 @@ exports.patchById = (req, res) => {
 exports.removeById = (req, res) => {
     RequestModel.removeById(req.params.requestId)
         .then((result)=>{
-            res.status(204).send({});
+            // res.status(204).send({});
+            res.status(200).send({});
         });
 };
