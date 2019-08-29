@@ -17,6 +17,8 @@ const userSchema = new Schema({
     to_sign:          { type:  String },
     permission_level: { type:  Number },
 
+    self_created:     { type:  Boolean, default: true },
+
     userCounterId:    { type: Number, unique : true},
   }, 
   { timestamps: { createdAt: 'created_at' } });

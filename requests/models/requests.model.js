@@ -47,21 +47,34 @@ requestSchema.plugin(AutoIncrement, {inc_field: 'requestCounterId'});
 
 const Request = mongoose.model('Requests', requestSchema);
 
-exports.TYPE_DEPOSIT     = 'type_deposit';
-exports.TYPE_EXCHANGE    = 'type_exchange';
-exports.TYPE_PAYMENT     = 'type_payment';
-exports.TYPE_PROVIDER    = 'type_provider'; 
-exports.TYPE_SEND        = 'type_send';
-exports.TYPE_WITHDRAW    = 'type_withdraw'; 
-exports.TYPE_SERVICE     = 'type_service';
+const TYPE_DEPOSIT     = 'type_deposit';
+const TYPE_EXCHANGE    = 'type_exchange';
+const TYPE_PAYMENT     = 'type_payment';
+const TYPE_PROVIDER    = 'type_provider'; 
+const TYPE_SEND        = 'type_send';
+const TYPE_WITHDRAW    = 'type_withdraw'; 
+const TYPE_SERVICE     = 'type_service';
 
-exports.STATE_REQUESTED  = 'state_requested';
-exports.STATE_PROCESSING = 'state_processing';
-exports.STATE_REJECTED   = 'state_rejected';
-exports.STATE_ACCEPTED   = 'state_accepted';
-exports.STATE_ERROR      = 'state_error';
-exports.STATE_CONCLUDED  = 'state_concluded';
+const STATE_REQUESTED  = 'state_requested';
+const STATE_PROCESSING = 'state_processing';
+const STATE_REJECTED   = 'state_rejected';
+const STATE_ACCEPTED   = 'state_accepted';
+const STATE_ERROR      = 'state_error';
+const STATE_CONCLUDED  = 'state_concluded';
 
+exports.TYPE_DEPOSIT;
+exports.TYPE_EXCHANGE;
+exports.TYPE_PAYMENT;
+exports.TYPE_PROVIDER;
+exports.TYPE_SEND;
+exports.TYPE_WITHDRAW;
+exports.TYPE_SERVICE;
+exports.STATE_REQUESTED;
+exports.STATE_PROCESSING;
+exports.STATE_REJECTED;
+exports.STATE_ACCEPTED;
+exports.STATE_ERROR;
+exports.STATE_CONCLUDED;
 exports.findById = (id) => {
     return Request.findById(id)
         .then((result) => {
@@ -105,22 +118,42 @@ exports.list = (perPage, page, query) => {
     });
 };
 
+getHeader = (request) => {
+    if(request.state==STATE_REQUESTED)
+        return {
+            sub_header:'You have requested a '+request.requested_type
+            , sub_header_admin:request.requested_by.account_name + ' has requested a ' + request.requested_type}
+    if(request.state==STATE_CONCLUDED)
+        return {
+            sub_header:'You '+request.requested_type + ' request concluded succesfully!'
+            , sub_header_admin:request.requested_type + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
+    
+    // if(request.state==STATE_PROCESSING)
+    // if(request.state==STATE_REJECTED)
+    // if(request.state==STATE_ACCEPTED)
+    // if(request.state==STATE_ERROR)
+    return {
+        sub_header:'You have requested a '+request.requested_type
+        , sub_header_admin:request.requested_by.account_name + ' has requested a ' + request.requested_type}
 
-toUIDict = (request) => {
+}
+toUIDict  = (request) => {
+  const headers = getHeader(request)
   return{
     ...request._doc
-    // , block_time   : request.updatedAt.toString().split('.')[0]
-    , block_time   : request.created_at.toISOString().split('.')[0]
-    , sub_header : 'Solicitud de '+request.requested_type
-    , quantity   : request.amount
-    , tx_type    : request.requested_type  
+    , ...headers
+    , block_time        : request.created_at.toISOString().split('.')[0]
+    // , sub_header        : 'You have requested a '+request.requested_type
+    // , sub_header_admin  : request.requested_by.account_name + ' has requested a ' + request.requested_type
+    , quantity          : request.amount
+    , tx_type           : request.requested_type  
     // , tx_name
     // , tx_code
     // , tx_subcode
-    , i_sent     : true
-    , id         : request._id 
+    , i_sent            : true
+    , id                : request._id 
     // , header
-    , quantity_txt : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
+    , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
   }
 }
 // [{"nota_fiscal_url":"","comprobante_url":"","deposit_currency":"IK$","_id":"5d5c152c8c3a466b65e3c2f3","requested_type":"type_deposit","amount":"44.00","created_by":{"_id":"5d5bf05ffe092b38101f018f","account_name":"inkpersonal1","first_name":"fn","last_name":"ln","email":"inkpersonal1@gmail.com","created_at":"2019-08-20T13:06:39.506Z","updatedAt":"2019-08-20T14:08:04.153Z","userCounterId":6,"__v":0,"to_sign":"5KHxDfqZBrHgR5i1Nw82LB8J2TcyveRh9ZndzaMhzUvyQEwiaW7","id":"5d5bf05ffe092b38101f018f"},"from":"inkpersonal1","requested_by":{"_id":"5d5bf05ffe092b38101f018f","account_name":"inkpersonal1","first_name":"fn","last_name":"ln","email":"inkpersonal1@gmail.com","created_at":"2019-08-20T13:06:39.506Z","updatedAt":"2019-08-20T14:08:04.153Z","userCounterId":6,"__v":0,"to_sign":"5KHxDfqZBrHgR5i1Nw82LB8J2TcyveRh9ZndzaMhzUvyQEwiaW7","id":"5d5bf05ffe092b38101f018f"},"state":"state_requested","created_at":"2019-08-20T15:43:40.266Z","updatedAt":"2019-08-20T15:43:40.266Z","requestCounterId":1,"__v":0,"id":"5d5c152c8c3a466b65e3c2f3"}]
@@ -143,4 +176,3 @@ exports.removeById = (requestId) => {
         });
     });
 };
-

@@ -7,9 +7,7 @@ exports.ping = (req, res) => {
     res.status(200).send({ping:'pong'});
 }
 exports.insert = (req, res) => {
-    // let salt = crypto.randomBytes(16).toString('base64');
-    // let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
-    // req.body.password = salt + "$" + hash;
+    // ToDo: validate is a valid EOS account and a Valid Customer.
     if(req.body.account_name=='inkiritoken1' || req.body.account_name=='inkirimaster')
         req.body.permission_level = config.ADMIN;
     else

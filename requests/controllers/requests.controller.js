@@ -6,7 +6,7 @@ exports.insert = (req, res) => {
   
   req.body.state = RequestModel.STATE_REQUESTED;
   // res.status(201).send({'res':'exports.insert', received: req.body});
-  console.log(' request.Controller::ABOUT TO SAVE')
+//   console.log(' request.Controller::ABOUT TO SAVE')
   RequestModel.createRequest(req.body)
   .then((result) => {
       res.status(201).send({id: result._id});
