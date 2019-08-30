@@ -16,7 +16,7 @@ const requestSchema = new Schema({
     requested_to:         { type: Schema.Types.ObjectId, ref: 'Users'},   // AccountName or Schema.Types.ObjectId
     to:                   { type: String },
     state:                { type: String },   // 1.- requested, 2.- processing, 4.- rejected, 8.- accepted, 16.- error, 32.- concluded
-    tx_id:                { type: String , unique : true},
+    tx_id:                { type: String },
     description:          { type: String },    // FOR: provider, payment, send, 
     nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
     comprobante_url:      { type: String , default:'' },    // FOR exchange, provider
@@ -54,7 +54,6 @@ const TYPE_PROVIDER    = 'type_provider';
 const TYPE_SEND        = 'type_send';
 const TYPE_WITHDRAW    = 'type_withdraw'; 
 const TYPE_SERVICE     = 'type_service';
-
 const STATE_REQUESTED  = 'state_requested';
 const STATE_PROCESSING = 'state_processing';
 const STATE_REJECTED   = 'state_rejected';
@@ -62,19 +61,19 @@ const STATE_ACCEPTED   = 'state_accepted';
 const STATE_ERROR      = 'state_error';
 const STATE_CONCLUDED  = 'state_concluded';
 
-exports.TYPE_DEPOSIT;
-exports.TYPE_EXCHANGE;
-exports.TYPE_PAYMENT;
-exports.TYPE_PROVIDER;
-exports.TYPE_SEND;
-exports.TYPE_WITHDRAW;
-exports.TYPE_SERVICE;
-exports.STATE_REQUESTED;
-exports.STATE_PROCESSING;
-exports.STATE_REJECTED;
-exports.STATE_ACCEPTED;
-exports.STATE_ERROR;
-exports.STATE_CONCLUDED;
+exports.TYPE_DEPOSIT     = 'type_deposit';
+exports.TYPE_EXCHANGE    = 'type_exchange';
+exports.TYPE_PAYMENT     = 'type_payment';
+exports.TYPE_PROVIDER    = 'type_provider'; 
+exports.TYPE_SEND        = 'type_send';
+exports.TYPE_WITHDRAW    = 'type_withdraw'; 
+exports.TYPE_SERVICE     = 'type_service';
+exports.STATE_REQUESTED  = 'state_requested';
+exports.STATE_PROCESSING = 'state_processing';
+exports.STATE_REJECTED   = 'state_rejected';
+exports.STATE_ACCEPTED   = 'state_accepted';
+exports.STATE_ERROR      = 'state_error';
+exports.STATE_CONCLUDED  = 'state_concluded';
 exports.findById = (id) => {
     return Request.findById(id)
         .then((result) => {

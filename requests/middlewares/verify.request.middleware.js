@@ -37,6 +37,7 @@ exports.validRequiredFields = async(req, res, next) => {
 
   if(validRequests.indexOf(req.body.requested_type)<0)
   {
+    console.log( ' NOT A VALID STATE')
     return res.status(404).send({error:'not a valid request type ', valid_types:validRequests});
   }  
   
