@@ -87,10 +87,21 @@ exports.list = (perPage, page, query) => {
                     reject(err);
                 } else {
                     resolve(users);
+                    // const x = users.map(user => toUIDict(user))
+                    // resolve(x);
                 }
             })
     });
 };
+
+toUIDict  = (user) => {
+  return{
+    ...user
+    , key               : user._id
+    , block_time        : user.created_at.toISOString().split('.')[0]
+  }
+}
+
 
 // exports.patchUser = (id, userData) => {
 //     return new Promise((resolve, reject) => {

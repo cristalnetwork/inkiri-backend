@@ -104,6 +104,7 @@ exports.list = (perPage, page, query) => {
             .populate('requested_to')
             .limit(perPage)
             .skip(perPage * page)
+            .sort({requestCounterId: -1 })
             .exec(function (err, requests) {
                 if (err) {
                     reject(err);
@@ -120,20 +121,21 @@ exports.list = (perPage, page, query) => {
 getHeader = (request) => {
     if(request.state==STATE_REQUESTED)
         return {
-            sub_header:'You have requested a '+request.requested_type
-            , sub_header_admin:request.requested_by.account_name + ' has requested a ' + request.requested_type}
+                sub_header:         'You have requested a '+request.requested_type
+            ,   sub_header_admin:   request.requested_by.account_name + ' has requested a ' + request.requested_type}
     if(request.state==STATE_CONCLUDED)
         return {
-            sub_header:'You '+request.requested_type + ' request concluded succesfully!'
-            , sub_header_admin:request.requested_type + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
+                sub_header:         'You '+request.requested_type + ' request concluded succesfully!'
+            ,   sub_header_admin:   request.requested_type + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
     
     // if(request.state==STATE_PROCESSING)
     // if(request.state==STATE_REJECTED)
     // if(request.state==STATE_ACCEPTED)
     // if(request.state==STATE_ERROR)
     return {
-        sub_header:'You have requested a '+request.requested_type
-        , sub_header_admin:request.requested_by.account_name + ' has requested a ' + request.requested_type}
+        sub_header:          'You have requested a '+request.requested_type
+        , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + request.requested_type
+    }
 
 }
 toUIDict  = (request) => {
@@ -141,6 +143,7 @@ toUIDict  = (request) => {
   return{
     ...request._doc
     , ...headers
+    , key               : request._id
     , block_time        : request.created_at.toISOString().split('.')[0]
     // , sub_header        : 'You have requested a '+request.requested_type
     // , sub_header_admin  : request.requested_by.account_name + ' has requested a ' + request.requested_type
