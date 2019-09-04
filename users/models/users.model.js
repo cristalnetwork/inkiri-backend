@@ -14,6 +14,16 @@ const userSchema = new Schema({
     first_name:       { type:  String },
     last_name:        { type:  String },
     email:            { type:  String  , unique : true},
+    legal_id:         { type:  String },
+    birthday:         { type:  Date },
+    phone:            { type:  String },
+    address:          { 
+                        street:   { type:String}, // Street and Number, Apt, Suite, Unit, Building
+                        city:     { type:String}, //
+                        state:    { type:String}, // State /Province
+                        zip:      { type:String}, // Postal Code
+                        country:  { type:String}
+                      },
     to_sign:          { type:  String },
     permission_level: { type:  Number },
 
