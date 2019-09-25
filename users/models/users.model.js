@@ -29,6 +29,13 @@ const userSchema = new Schema({
 
     self_created:     { type:  Boolean, default: true },
 
+    account_type:     { type:  String ,
+                        enum: ['none', 'personal', 'business', 'foundation', 'bankadmin']
+                      }, 
+    business_name:    { type:  String,
+                        required: function() {
+                            return this.account_type == 'business';
+                        } },
     userCounterId:    { type: Number, unique : true},
   }, 
   { timestamps: { createdAt: 'created_at' } });
@@ -72,7 +79,9 @@ exports.findById = (id) => {
 };
 
 exports.createUser = (userData) => {
-    const user = new User(userData);
+    let user = new User(userData);
+    if(!user.email)
+        user.email = `${user.account_name}@inkiri.com`;
     return user.save();
 };
 

@@ -8,6 +8,8 @@ const AuthorizationRouter = require('./authorization/routes.config');
 const UsersRouter = require('./users/routes.config');
 const EosRouter = require('./eos/routes.config');
 const RequestsRouter = require('./requests/routes.config');
+const ProvidersRouter = require('./providers/routes.config');
+const BankAccountsRouter = require('./bank_accounts/routes.config');
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -27,6 +29,8 @@ AuthorizationRouter.routesConfig(app);
 UsersRouter.routesConfig(app);
 EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
+ProvidersRouter.routesConfig(app);
+BankAccountsRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
 
