@@ -4,26 +4,85 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://localhost/inkiri');
 
+const TYPE_DEPOSIT     = 'type_deposit';
+const TYPE_EXCHANGE    = 'type_exchange';
+const TYPE_PAYMENT     = 'type_payment';
+const TYPE_PROVIDER    = 'type_provider'; 
+const TYPE_SEND        = 'type_send';
+const TYPE_WITHDRAW    = 'type_withdraw'; 
+const TYPE_SERVICE     = 'type_service';
+const STATE_REQUESTED  = 'state_requested';
+const STATE_PROCESSING = 'state_processing';
+const STATE_REJECTED   = 'state_rejected';
+const STATE_ACCEPTED   = 'state_accepted';
+const STATE_ERROR      = 'state_error';
+const STATE_CONCLUDED  = 'state_concluded';
+
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
  
 const requestSchema = new Schema({
     created_by:           { type: Schema.Types.ObjectId, ref: 'Users', required : true},
+    
     requested_by:         { type: Schema.Types.ObjectId, ref: 'Users', required : true},
     from:                 { type: String, required : true},
-    requested_type:       { type: String },    // deposit, exchange, payment, provider, send, withdraw; service
+    
+    requested_type:       { 
+                            type: String 
+                            , enum: [TYPE_DEPOSIT, TYPE_EXCHANGE, TYPE_PAYMENT, TYPE_PROVIDER, TYPE_SEND, TYPE_WITHDRAW, TYPE_SERVICE]  
+                          },
+                            
+    
     amount:               { type: String },
-    requested_to:         { type: Schema.Types.ObjectId, ref: 'Users'},   // AccountName or Schema.Types.ObjectId
+    
+    requested_to:         { 
+                            type: Schema.Types.ObjectId
+                            , ref: 'Users'
+                            , required: function() {
+                              return (this.requested_type == TYPE_SEND || this.requested_type == TYPE_PAYMENT || this.requested_type == TYPE_SERVICE);
+                            }
+                          },
     to:                   { type: String },
-    state:                { type: String },   // 1.- requested, 2.- processing, 4.- rejected, 8.- accepted, 16.- error, 32.- concluded
+
+    state:                { 
+                            type: String 
+                            , enum: [STATE_REQUESTED, STATE_PROCESSING, STATE_REJECTED, STATE_ACCEPTED, STATE_ERROR, STATE_CONCLUDED]
+                          },
+    
     tx_id:                { type: String },
-    description:          { type: String },    // FOR: provider, payment, send, 
+    
+    requestCounterId:     { type: Number,  unique : true},
+
+    description:          { type: String },    
+    
     nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
     comprobante_url:      { type: String , default:'' },    // FOR exchange, provider
     
-    deposit_currency:     { type: String , default:'' },
-    requestCounterId:     { type: Number,  unique : true},
-    // bank_account:         { type: Schema.Types.ObjectId, ref: 'BankAccounts'}, // FOR exchange
+    //deposit
+    deposit_currency:     { 
+                            type: String,
+                            required: function() {
+                              return this.requested_type == TYPE_DEPOSIT;
+                            }
+                          },
+    
+    // User Exchange
+    bank_account:         { 
+                            type: Schema.Types.ObjectId
+                            , ref: 'BankAccounts'
+                            , required: function() {
+                              return this.requested_type == TYPE_EXCHANGE;
+                            }
+                          },
+    
+    // Provider payment
+    provider:             { 
+                            type: Schema.Types.ObjectId, 
+                            ref: 'Providers',
+                            required: function() {
+                              return this.requested_type == TYPE_PROVIDER;
+                            }
+                          }, // FOR exchange
     // service:              { type: Schema.Types.ObjectId, ref: 'Services'}, // FOR service
 
   }, 
@@ -64,20 +123,6 @@ requestSchema.findById = function (cb) {
 requestSchema.plugin(AutoIncrement, {inc_field: 'requestCounterId'});
 
 const Request = mongoose.model('Requests', requestSchema);
-
-const TYPE_DEPOSIT     = 'type_deposit';
-const TYPE_EXCHANGE    = 'type_exchange';
-const TYPE_PAYMENT     = 'type_payment';
-const TYPE_PROVIDER    = 'type_provider'; 
-const TYPE_SEND        = 'type_send';
-const TYPE_WITHDRAW    = 'type_withdraw'; 
-const TYPE_SERVICE     = 'type_service';
-const STATE_REQUESTED  = 'state_requested';
-const STATE_PROCESSING = 'state_processing';
-const STATE_REJECTED   = 'state_rejected';
-const STATE_ACCEPTED   = 'state_accepted';
-const STATE_ERROR      = 'state_error';
-const STATE_CONCLUDED  = 'state_concluded';
 
 exports.TYPE_DEPOSIT     = 'type_deposit';
 exports.TYPE_EXCHANGE    = 'type_exchange';
