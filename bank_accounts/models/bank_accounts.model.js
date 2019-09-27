@@ -70,14 +70,14 @@ exports.list = (perPage, page, query, populateProvider, populateUser) => {
                     reject(err);
                 } else {
                     resolve(bank_accounts);
-                    // const x = bank_accounts.map(bank_account => toUIDict(bank_account))
+                    // const x = bank_accounts.map(bank_account => bank_accountToUIDict(bank_account))
                     // resolve(x);
                 }
             })
     });
 };
 
-toUIDict  = (bank_account) => {
+bank_accountToUIDict  = (bank_account) => {
   return{
     ...bank_account
     , key               : bank_account._id

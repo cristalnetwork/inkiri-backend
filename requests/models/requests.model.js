@@ -36,8 +36,26 @@ requestSchema.virtual('id').get(function () {
 
 // Ensure virtual fields are serialised.
 requestSchema.set('toJSON', {
-    virtuals: true
+    virtuals: true,
+    transform: function(doc, ret, options) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+    }
 });
+
+// /**
+//  * toJSON implementation
+//  */
+// requestSchema.options.toJSON = {
+//     transform: function(doc, ret, options) {
+//         ret.id = ret._id;
+//         delete ret._id;
+//         delete ret.__v;
+//         return ret;
+//     }
+// };
 
 requestSchema.findById = function (cb) {
     return this.model('Requests').find({id: this.id}, cb);
@@ -78,11 +96,12 @@ exports.findById = (id) => {
     return Request.findById(id)
         .then((result) => {
             result = result.toJSON();
-            delete result._id;
-            delete result.__v;
+            // delete result._id;
+            // delete result.__v;
             return result;
         });
 };
+
 
 exports.createRequest = (requestData) => {
     const _request = new Request(requestData);
@@ -109,10 +128,14 @@ exports.list = (perPage, page, query) => {
                 if (err) {
                     reject(err);
                 } else {
-                  const x = requests.map(req => toUIDict(req))
-                  // console.log(' ** requests:', requests)
-                  // console.log(' ** mapped:', x)
-                  resolve(x);
+                //   resolve(requests);  
+                //   const x = requests.map(req => toUIDict(req))
+                    const x = requests.map((req) => {
+                        const req_json  = req.toJSON();
+                        let xxx         = requestToUIDict(req);
+                        return Object.assign(req_json, xxx);
+                    })
+                    resolve(x);
                 }
             })
     });
@@ -138,24 +161,19 @@ getHeader = (request) => {
     }
 
 }
-toUIDict  = (request) => {
+requestToUIDict  = (request) => {
   const headers = getHeader(request)
-  return{
-    ...request._doc
-    , ...headers
-    , key               : request._id
-    , block_time        : request.created_at.toISOString().split('.')[0]
-    // , sub_header        : 'You have requested a '+request.requested_type
-    // , sub_header_admin  : request.requested_by.account_name + ' has requested a ' + request.requested_type
-    , quantity          : request.amount
-    , tx_type           : request.requested_type  
+  return {
+     ...headers
+    , key               : request.id
+     , block_time        : request.created_at.toISOString().split('.')[0]
+     , quantity          : request.amount
+     , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
+     , tx_type           : request.requested_type  
+     , i_sent            : true
     // , tx_name
     // , tx_code
     // , tx_subcode
-    , i_sent            : true
-    , id                : request._id 
-    // , header
-    , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
   }
 }
 // [{"nota_fiscal_url":"","comprobante_url":"","deposit_currency":"IK$","_id":"5d5c152c8c3a466b65e3c2f3","requested_type":"type_deposit","amount":"44.00","created_by":{"_id":"5d5bf05ffe092b38101f018f","account_name":"inkpersonal1","first_name":"fn","last_name":"ln","email":"inkpersonal1@gmail.com","created_at":"2019-08-20T13:06:39.506Z","updatedAt":"2019-08-20T14:08:04.153Z","userCounterId":6,"__v":0,"to_sign":"5KHxDfqZBrHgR5i1Nw82LB8J2TcyveRh9ZndzaMhzUvyQEwiaW7","id":"5d5bf05ffe092b38101f018f"},"from":"inkpersonal1","requested_by":{"_id":"5d5bf05ffe092b38101f018f","account_name":"inkpersonal1","first_name":"fn","last_name":"ln","email":"inkpersonal1@gmail.com","created_at":"2019-08-20T13:06:39.506Z","updatedAt":"2019-08-20T14:08:04.153Z","userCounterId":6,"__v":0,"to_sign":"5KHxDfqZBrHgR5i1Nw82LB8J2TcyveRh9ZndzaMhzUvyQEwiaW7","id":"5d5bf05ffe092b38101f018f"},"state":"state_requested","created_at":"2019-08-20T15:43:40.266Z","updatedAt":"2019-08-20T15:43:40.266Z","requestCounterId":1,"__v":0,"id":"5d5c152c8c3a466b65e3c2f3"}]

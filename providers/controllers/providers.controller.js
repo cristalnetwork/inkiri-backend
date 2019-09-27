@@ -3,9 +3,6 @@ const ProviderModel = require('../models/providers.model');
 const crypto = require('crypto');
 
 
-exports.ping = (req, res) => {
-    res.status(200).send({ping:'pong'});
-}
 exports.insert = (req, res) => {
     ProviderModel.createProvider(req.body)
         .then((result) => {

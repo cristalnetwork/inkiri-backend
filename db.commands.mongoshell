@@ -1,3 +1,5 @@
+$ mongo ds253857.mlab.com:53857/heroku_01chvkx6 -u <dbuser> -p <dbpassword>
+
 db.users.updateMany(
    {},
    { $set: { account_type: "personal" , business_name:""}}

@@ -31,7 +31,13 @@ const providerSchema = new Schema({
                         enum: ['ok', 'disabled', 'deleted']
                       }, 
 
-    bank_accounts:    [{ type: Schema.Types.ObjectId, ref: 'BankAccounts' }],
+    // bank_accounts:    [{ type: Schema.Types.ObjectId, ref: 'BankAccounts' }],
+    bank_accounts:    [
+            { 
+                bank_name:        { type:  String},
+                agency:           { type:  String },
+                cc:               { type:  String }, 
+            }],
 
     providerCounterId:    { type: Number, unique : true},
   }, 
@@ -94,7 +100,9 @@ exports.createProvider = (providerData) => {
 exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
         Provider.find(query)
-            .populate('bank_accounts')
+            // .populate('bank_accounts')
+            .populate('updated_by')
+            .populate('created_by')
             .limit(perPage)
             .skip(perPage * page)
             .exec(function (err, providers) {
@@ -102,14 +110,14 @@ exports.list = (perPage, page, query) => {
                     reject(err);
                 } else {
                     resolve(providers);
-                    // const x = users.map(user => toUIDict(user))
+                    // const x = users.map(user => providerToUIDict(user))
                     // resolve(x);
                 }
             })
     });
 };
 
-toUIDict  = (provider) => {
+providerToUIDict  = (provider) => {
   return{
     ...provider
     , key               : provider._id

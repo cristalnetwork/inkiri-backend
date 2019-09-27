@@ -48,7 +48,14 @@ userSchema.virtual('id').get(function () {
 
 // Ensure virtual fields are serialised.
 userSchema.set('toJSON', {
-    virtuals: true
+    virtuals: true,
+    transform: function(doc, ret, options) {
+        // ret.id = ret._id;
+        // delete ret._id;
+        delete ret.to_sign;
+        delete ret.__v;
+        return ret;
+    }
 });
 
 userSchema.findById = function (cb) {
@@ -105,21 +112,22 @@ exports.list = (perPage, page, query) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(users);
-                    // const x = users.map(user => toUIDict(user))
-                    // resolve(x);
+                    // resolve(users);
+                    // const x = users.map(user => userToUIDict(user))
+                    const x = users.map(user => user.toJSON() )
+                    resolve(x);
                 }
             })
     });
 };
 
-toUIDict  = (user) => {
-  return{
-    ...user
-    , key               : user._id
-    , block_time        : user.created_at.toISOString().split('.')[0]
-  }
-}
+// userToUIDict  = (user) => {
+//   return{
+//     ...user
+//     , key               : user._id
+//     , block_time        : user.created_at.toISOString().split('.')[0]
+//   }
+// }
 
 
 // exports.patchUser = (id, userData) => {
