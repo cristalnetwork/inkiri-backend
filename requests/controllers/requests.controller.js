@@ -25,15 +25,22 @@ exports.list = (req, res) => {
             req.query.page = parseInt(req.query.page);
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
+        
+        // From & To, Provider and Excchanges
         if (req.query.from) {
             filter = {...filter, from: req.query.from};
         }
         if (req.query.to) {
             filter = {...filter, to: req.query.to};
         }
+        if (req.query.provider_id) {
+            filter = {...filter, provider: req.query.provider_id};
+        }
+
         if (req.query.state) {
             filter = {...filter, state: req.query.state};
         }
+
         if (req.query.requested_type && !req.query.requested_type.includes('|')) {
             filter = {...filter, requested_type: req.query.requested_type};
         }

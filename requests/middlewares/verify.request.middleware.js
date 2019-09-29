@@ -11,7 +11,6 @@ const getAccountId = (account_name) =>   new Promise((res,rej)=> {
     return;
   }
 
-
   UserModel.findByAccountName(account_name)
   .then((user)=>{
     if(!user[0]){
@@ -147,7 +146,7 @@ exports.validAccountReferences = async(req, res, next) => {
     }
     catch(err){
       console.log(' -- ERROR #4')
-      return res.status(200).send({error:err});
+      return res.status(404).send({error:err});
     }
     
 };

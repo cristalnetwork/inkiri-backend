@@ -62,7 +62,7 @@ exports.validAccountReferences = async(req, res, next) => {
     }
     catch(err){
       console.log(' -- ERROR #4')
-      return res.status(200).send({error:err});
+      return res.status(404).send({error:err});
     }
     
 };
