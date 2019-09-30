@@ -17,7 +17,7 @@ exports.routesConfig = function (app) {
         ProvidersController.insert
     ]);
     app.get(config.api_version+'/providers', [
-        ValidationMiddleware.validJWTNeeded,
+        // ValidationMiddleware.validJWTNeeded,
         // PermissionMiddleware.minimumPermissionLevelRequired(OPS),
         ProvidersController.list
     ]);

@@ -25,8 +25,27 @@ exports.list = (req, res) => {
         if (req.query.email) {
             filter = {...filter, email: req.query.email};
         }
-        if (req.query.name) {
-            filter = {...filter, name: new RegExp('^'+name+'$', "i")};
+        console.log(' ** PROVIDERS :: Filtering by .....')
+        if (req.query.name && req.query.cnpj) {
+            console.log('Filtering by NAME or CNPJ')
+            // filter = {...filter, $or: [ { name: new RegExp('^'+req.query.name+'$', "i") }, { cnpj: new RegExp('^'+req.query.cnpj+'$', "i") } ] } 
+            filter = {...filter, $or: [ { name: { $regex: new RegExp('.*' + req.query.name + '.*' , "i") } }, { cnpj: { $regex: new RegExp('.*' + req.query.cnpj + '.*' , "i") } } ] } 
+            
+        }
+        else
+        {
+            if (req.query.name) {
+                console.log('Filtering by NAME ONLY')
+                filter = {...filter, name: { $regex: new RegExp('.*' + req.query.name + '.*' , "i") } };
+                
+                // db.providers.find()
+                // db.providers.find( {name:  { $regex: new RegExp('.*' + "veed" + '.*' , "i") } } )
+                // ! db.providers.find( {name:  { $regex: new RegExp("^" + "pro"          , "i")  } } )
+            }
+            if (req.query.cnpj) {
+                console.log('Filtering by CNPJ ONLY')
+                filter = {...filter, cnpj: { $regex: new RegExp('.*' + req.query.cnpj + '.*' , "i") }};
+            }
         }
     }
     ProviderModel.list(limit, page, filter)

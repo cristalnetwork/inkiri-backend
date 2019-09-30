@@ -51,7 +51,13 @@ providerSchema.virtual('id').get(function () {
 
 // Ensure virtual fields are serialised.
 providerSchema.set('toJSON', {
-    virtuals: true
+    virtuals: true,
+    transform: function(doc, ret, options) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+    }
 });
 
 providerSchema.findById = function (cb) {
@@ -109,9 +115,9 @@ exports.list = (perPage, page, query) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(providers);
-                    // const x = users.map(user => providerToUIDict(user))
-                    // resolve(x);
+                    // resolve(providers);
+                    const x = providers.map(provider => provider.toJSON())
+                    resolve(x);
                 }
             })
     });

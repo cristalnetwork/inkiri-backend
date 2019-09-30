@@ -1,7 +1,7 @@
 const config = require('../../common/config/env.config.js');
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify', false);
+mongoose.set('useFindAndModify', false);    
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://localhost/inkiri');
 
 const TYPE_DEPOSIT     = 'type_deposit';
@@ -56,6 +56,7 @@ const requestSchema = new Schema({
     description:          { type: String },    
     
     nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
+    boleto_pagamento:     { type: String , default:'' },    // FOR exchange, provider
     comprobante_url:      { type: String , default:'' },    // FOR exchange, provider
     
     //deposit
@@ -166,6 +167,7 @@ exports.list = (perPage, page, query) => {
             .populate('created_by')
             .populate('requested_by')
             .populate('requested_to')
+            .populate('provider')
             .limit(perPage)
             .skip(perPage * page)
             .sort({requestCounterId: -1 })
