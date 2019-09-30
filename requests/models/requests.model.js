@@ -189,14 +189,23 @@ exports.list = (perPage, page, query) => {
 };
 
 getHeader = (request) => {
+    const req_types = {
+        [TYPE_DEPOSIT] : ' DEPOSIT',
+        [TYPE_EXCHANGE]: ' EXCHANGE',
+        [TYPE_PAYMENT]: ' PAYMENT',
+        [TYPE_PROVIDER]: ' PROVIDER PAYMENT',
+        [TYPE_SEND]: ' SEND',
+        [TYPE_WITHDRAW]: ' WITHDRAW',
+        [TYPE_SERVICE]: ' SERVICE AGREEMENT',
+    }
     if(request.state==STATE_REQUESTED)
         return {
-                sub_header:         'You have requested a '+request.requested_type
-            ,   sub_header_admin:   request.requested_by.account_name + ' has requested a ' + request.requested_type}
+                sub_header:         'You have requested a '+ req_types[request.requested_type]
+            ,   sub_header_admin:   request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]}
     if(request.state==STATE_CONCLUDED)
         return {
-                sub_header:         'You '+request.requested_type + ' request concluded succesfully!'
-            ,   sub_header_admin:   request.requested_type + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
+                sub_header:         'Your '+req_types[request.requested_type] + ' request concluded succesfully!'
+            ,   sub_header_admin:   req_types[request.requested_type] + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
     
     // if(request.state==STATE_PROCESSING)
     // if(request.state==STATE_REJECTED)
