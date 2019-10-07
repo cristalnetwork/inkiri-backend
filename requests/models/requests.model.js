@@ -17,6 +17,7 @@ const STATE_REJECTED   = 'state_rejected';
 const STATE_ACCEPTED   = 'state_accepted';
 const STATE_ERROR      = 'state_error';
 const STATE_CONCLUDED  = 'state_concluded';
+const STATE_CANCELED   = 'state_canceled';
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
@@ -46,7 +47,7 @@ const requestSchema = new Schema({
 
     state:                { 
                             type: String 
-                            , enum: [STATE_REQUESTED, STATE_PROCESSING, STATE_REJECTED, STATE_ACCEPTED, STATE_ERROR, STATE_CONCLUDED]
+                            , enum: [STATE_REQUESTED, STATE_PROCESSING, STATE_REJECTED, STATE_ACCEPTED, STATE_ERROR, STATE_CONCLUDED, STATE_CANCELED]
                           },
     
     tx_id:                { type: String },
@@ -138,6 +139,7 @@ exports.STATE_REJECTED   = 'state_rejected';
 exports.STATE_ACCEPTED   = 'state_accepted';
 exports.STATE_ERROR      = 'state_error';
 exports.STATE_CONCLUDED  = 'state_concluded';
+exports.STATE_CANCELED   = 'state_canceled';
 exports.findById = (id) => {
     return Request.findById(id)
         .then((result) => {
@@ -198,6 +200,7 @@ getHeader = (request) => {
         [TYPE_WITHDRAW]: ' WITHDRAW',
         [TYPE_SERVICE]: ' SERVICE AGREEMENT',
     }
+
     if(request.state==STATE_REQUESTED)
         return {
                 sub_header:         'You have requested a '+ req_types[request.requested_type]
