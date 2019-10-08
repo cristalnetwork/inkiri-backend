@@ -81,7 +81,6 @@ exports.patchById = (req, res) => {
 
     RequestModel.patchRequest(req.params.requestId, req.body)
         .then((result) => {
-            // res.status(204).send({});
             res.status(200).send({});
         });
 
