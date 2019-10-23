@@ -31,9 +31,9 @@ exports.validJWTNeeded = (req, res, next) => {
                 return res.status(401).send({error:'no bearer'});
             } else {
                 req.jwt = jwt.verify(authorization[1], config.jwt_secret);
-                
+
                 if (req.jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
-                    return res.status(401).send({error:'expired token'});                    
+                    return res.status(401).send({error:'expired token'});
                 }
                 // console.log('validJWTNeeded >> decoded >>', JSON.stringify(req.jwt));
                 return next();
@@ -45,6 +45,6 @@ exports.validJWTNeeded = (req, res, next) => {
         }
     } else {
         // console.log('validJWTNeeded?? >> 401' );
-        return res.status(401).send({error:'401'});
+        return res.status(401).send({error:'Unauthorized.'});
     }
 };

@@ -10,6 +10,7 @@ const EosRouter = require('./eos/routes.config');
 const RequestsRouter = require('./requests/routes.config');
 const ProvidersRouter = require('./providers/routes.config');
 const BankAccountsRouter = require('./bank_accounts/routes.config');
+const FilesRouter = require('./files/routes.config');
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -18,7 +19,7 @@ app.use(function (req, res, next) {
     res.header('Access-Control-Expose-Headers', 'Content-Length');
     res.header('Access-Control-Allow-Headers', 'Accept, Authorization, Content-Type, X-Requested-With, Range');
     if (req.method === 'OPTIONS') {
-        return res.send(200);
+        return res.sendStatus(200);
     } else {
         return next();
     }
@@ -31,6 +32,7 @@ EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
 ProvidersRouter.routesConfig(app);
 BankAccountsRouter.routesConfig(app);
+FilesRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
 
