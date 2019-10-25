@@ -1,93 +1,133 @@
 const config = require('../../common/config/env.config.js');
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify', false);    
+mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://localhost/inkiri');
 
-const TYPE_DEPOSIT     = 'type_deposit';
-const TYPE_EXCHANGE    = 'type_exchange';
-const TYPE_PAYMENT     = 'type_payment';
-const TYPE_PROVIDER    = 'type_provider'; 
-const TYPE_SEND        = 'type_send';
-const TYPE_WITHDRAW    = 'type_withdraw'; 
-const TYPE_SERVICE     = 'type_service';
-const STATE_REQUESTED  = 'state_requested';
-const STATE_PROCESSING = 'state_processing';
-const STATE_REJECTED   = 'state_rejected';
-const STATE_ACCEPTED   = 'state_accepted';
-const STATE_ERROR      = 'state_error';
-const STATE_CONCLUDED  = 'state_concluded';
-const STATE_CANCELED   = 'state_canceled';
+exports.TYPE_DEPOSIT                  = 'type_deposit';
+exports.TYPE_EXCHANGE                 = 'type_exchange';
+exports.TYPE_PAYMENT                  = 'type_payment';
+exports.TYPE_PROVIDER                 = 'type_provider';
+exports.TYPE_SEND                     = 'type_send';
+exports.TYPE_WITHDRAW                 = 'type_withdraw';
+exports.TYPE_SERVICE                  = 'type_service';
+
+exports.STATE_REQUESTED               = 'state_requested';
+exports.STATE_PROCESSING              = 'state_processing';
+exports.STATE_REJECTED                = 'state_rejected';
+exports.STATE_ACCEPTED                = 'state_accepted';
+exports.STATE_ERROR                   = 'state_error';
+exports.STATE_CONCLUDED               = 'state_concluded';
+exports.STATE_CANCELED                = 'state_canceled';
+
+exports.PAYMENT_VEHICLE               = 'payment_vehicle';
+exports.PAYMENT_VEHICLE_INKIRI        = 'payment_vehicle_inkiri';
+exports.PAYMENT_VEHICLE_INSTITUTO     = 'payment_vehicle_institute';
+
+exports.PAYMENT_CATEGORY              = 'payment_category';
+exports.PAYMENT_CATEGORY_ALUGEL       = 'payment_category_alugel';
+exports.PAYMENT_CATEGORY_INVESTIMENTO = 'payment_category_investimento';
+exports.PAYMENT_CATEGORY_INSUMOS      = 'payment_category_insumos';
+exports.PAYMENT_CATEGORY_ANOTHER      = 'payment_category_another';
+
+exports.PAYMENT_TYPE                  = 'payment_type';
+exports.PAYMENT_TYPE_DESPESA          = 'payment_type_despesa';
+exports.PAYMENT_TYPE_INVESTIMENTO     = 'payment_type_investimento';
+
+exports.PAYMENT_MODE                  = 'payment_mode';
+exports.PAYMENT_MODE_TRANSFER         = 'payment_mode_transfer';
+exports.PAYMENT_MODE_BOLETO           = 'payment_mode_boleto';
+
+exports.ATTACH_NOTA_FISCAL            = 'attach_nota_fiscal';
+exports.ATTACH_BOLETO_PAGAMENTO       = 'attach_boleto_pagamento';
+exports.ATTACH_COMPROBANTE            = 'attach_comprobante';
+
+exports.ATTACH_NOTA_FISCAL_ID         = 'attach_nota_fiscal_id';
+exports.ATTACH_BOLETO_PAGAMENTO_ID    = 'attach_boleto_pagamento_id';
+exports.ATTACH_COMPROBANTE_ID         = 'attach_comprobante_id';
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
- 
+
 const requestSchema = new Schema({
     created_by:           { type: Schema.Types.ObjectId, ref: 'Users', required : true},
-    
+
     requested_by:         { type: Schema.Types.ObjectId, ref: 'Users', required : true},
     from:                 { type: String, required : true},
-    
-    requested_type:       { 
-                            type: String 
-                            , enum: [TYPE_DEPOSIT, TYPE_EXCHANGE, TYPE_PAYMENT, TYPE_PROVIDER, TYPE_SEND, TYPE_WITHDRAW, TYPE_SERVICE]  
+
+    requested_type:       {
+                            type: String
+                            , enum: [exports.TYPE_DEPOSIT, exports.TYPE_EXCHANGE, exports.TYPE_PAYMENT, exports.TYPE_PROVIDER, exports.TYPE_SEND, exports.TYPE_WITHDRAW, exports.TYPE_SERVICE]
                           },
-                            
-    
+
+
     amount:               { type: String },
-    
-    requested_to:         { 
+
+    requested_to:         {
                             type: Schema.Types.ObjectId
                             , ref: 'Users'
                             , required: function() {
-                              return (this.requested_type == TYPE_SEND || this.requested_type == TYPE_PAYMENT || this.requested_type == TYPE_SERVICE);
+                              return (this.requested_type == exports.TYPE_SEND || this.requested_type == exports.TYPE_PAYMENT || this.requested_type == exports.TYPE_SERVICE);
                             }
                           },
     to:                   { type: String },
 
-    state:                { 
-                            type: String 
-                            , enum: [STATE_REQUESTED, STATE_PROCESSING, STATE_REJECTED, STATE_ACCEPTED, STATE_ERROR, STATE_CONCLUDED, STATE_CANCELED]
+    state:                {
+                            type: String
+                            , enum: [exports.STATE_REQUESTED, exports.STATE_PROCESSING, exports.STATE_REJECTED, exports.STATE_ACCEPTED, exports.STATE_ERROR, exports.STATE_CONCLUDED, exports.STATE_CANCELED]
                           },
-    
+
     tx_id:                { type: String },
-    
+
     requestCounterId:     { type: Number,  unique : true},
 
-    description:          { type: String },    
-    
-    nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
-    boleto_pagamento:     { type: String , default:'' },    // FOR exchange, provider
-    comprobante_url:      { type: String , default:'' },    // FOR exchange, provider
-    
+    description:          { type: String },
+
+    // nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
+    // boleto_pagamento:     { type: String , default:'' },    // FOR exchange, provider
+    // comprobante_url:      { type: String , default:'' },    // FOR exchange, provider
+
+    [exports.ATTACH_NOTA_FISCAL_ID]:       { type: String , default:'' },
+    [exports.ATTACH_BOLETO_PAGAMENTO_ID]:  { type: String , default:'' ,
+      required: function() {
+        return this.requested_type == exports.TYPE_PAYMENT && this.provider_extra.payment_mode==exports.PAYMENT_MODE_BOLETO;
+      }
+    },
+    [exports.ATTACH_COMPROBANTE_ID]:       { type: String , default:'' },
+
     //deposit
-    deposit_currency:     { 
+    deposit_currency:     {
                             type: String,
                             required: function() {
-                              return this.requested_type == TYPE_DEPOSIT;
+                              return this.requested_type == exports.TYPE_DEPOSIT;
                             }
-                          },
-    
+    },
     // User Exchange
-    bank_account:         { 
+    bank_account:         {
                             type: Schema.Types.ObjectId
                             , ref: 'BankAccounts'
                             , required: function() {
-                              return this.requested_type == TYPE_EXCHANGE;
+                              return this.requested_type == exports.TYPE_EXCHANGE;
                             }
-                          },
-    
+    },
     // Provider payment
-    provider:             { 
-                            type: Schema.Types.ObjectId, 
+    provider:             {
+                            type: Schema.Types.ObjectId,
                             ref: 'Providers',
                             required: function() {
-                              return this.requested_type == TYPE_PROVIDER;
+                              return this.requested_type == exports.TYPE_PROVIDER;
                             }
                           }, // FOR exchange
+    provider_extra:       {
+      payment_vehicle:      { type: String, enum: [exports.PAYMENT_VEHICLE_INKIRI, exports.PAYMENT_VEHICLE_INSTITUTO] }
+      , payment_category:   { type: String, enum: [exports.PAYMENT_CATEGORY_ALUGEL, exports.PAYMENT_CATEGORY_INVESTIMENTO, exports.PAYMENT_CATEGORY_INSUMOS, exports.PAYMENT_CATEGORY_ANOTHER]}
+      , payment_type:       { type: String, enum: [exports.PAYMENT_TYPE_DESPESA, exports.PAYMENT_TYPE_INVESTIMENTO] }
+      , payment_mode:       { type: String, enum: [exports.PAYMENT_MODE_TRANSFER, exports.PAYMENT_MODE_BOLETO]}
+
+    }
     // service:              { type: Schema.Types.ObjectId, ref: 'Services'}, // FOR service
 
-  }, 
+  },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
 
@@ -126,20 +166,20 @@ requestSchema.plugin(AutoIncrement, {inc_field: 'requestCounterId'});
 
 const Request = mongoose.model('Requests', requestSchema);
 
-exports.TYPE_DEPOSIT     = 'type_deposit';
-exports.TYPE_EXCHANGE    = 'type_exchange';
-exports.TYPE_PAYMENT     = 'type_payment';
-exports.TYPE_PROVIDER    = 'type_provider'; 
-exports.TYPE_SEND        = 'type_send';
-exports.TYPE_WITHDRAW    = 'type_withdraw'; 
-exports.TYPE_SERVICE     = 'type_service';
-exports.STATE_REQUESTED  = 'state_requested';
-exports.STATE_PROCESSING = 'state_processing';
-exports.STATE_REJECTED   = 'state_rejected';
-exports.STATE_ACCEPTED   = 'state_accepted';
-exports.STATE_ERROR      = 'state_error';
-exports.STATE_CONCLUDED  = 'state_concluded';
-exports.STATE_CANCELED   = 'state_canceled';
+// exports.TYPE_DEPOSIT     = 'type_deposit';
+// exports.TYPE_EXCHANGE    = 'type_exchange';
+// exports.TYPE_PAYMENT     = 'type_payment';
+// exports.TYPE_PROVIDER    = 'type_provider';
+// exports.TYPE_SEND        = 'type_send';
+// exports.TYPE_WITHDRAW    = 'type_withdraw';
+// exports.TYPE_SERVICE     = 'type_service';
+// exports.STATE_REQUESTED  = 'state_requested';
+// exports.STATE_PROCESSING = 'state_processing';
+// exports.STATE_REJECTED   = 'state_rejected';
+// exports.STATE_ACCEPTED   = 'state_accepted';
+// exports.STATE_ERROR      = 'state_error';
+// exports.STATE_CONCLUDED  = 'state_concluded';
+// exports.STATE_CANCELED   = 'state_canceled';
 exports.findById = (id) => {
     return Request.findById(id)
         .then((result) => {
@@ -177,7 +217,7 @@ exports.list = (perPage, page, query) => {
                 if (err) {
                     reject(err);
                 } else {
-                //   resolve(requests);  
+                //   resolve(requests);
                 //   const x = requests.map(req => toUIDict(req))
                     const x = requests.map((req) => {
                         const req_json  = req.toJSON();
@@ -192,24 +232,24 @@ exports.list = (perPage, page, query) => {
 
 getHeader = (request) => {
     const req_types = {
-        [TYPE_DEPOSIT] : ' DEPOSIT',
-        [TYPE_EXCHANGE]: ' EXCHANGE',
-        [TYPE_PAYMENT]: ' PAYMENT',
-        [TYPE_PROVIDER]: ' PROVIDER PAYMENT',
-        [TYPE_SEND]: ' SEND',
-        [TYPE_WITHDRAW]: ' WITHDRAW',
-        [TYPE_SERVICE]: ' SERVICE AGREEMENT',
+        [exports.TYPE_DEPOSIT] : ' DEPOSIT',
+        [exports.TYPE_EXCHANGE]: ' EXCHANGE',
+        [exports.TYPE_PAYMENT]: ' PAYMENT',
+        [exports.TYPE_PROVIDER]: ' PROVIDER PAYMENT',
+        [exports.TYPE_SEND]: ' SEND',
+        [exports.TYPE_WITHDRAW]: ' WITHDRAW',
+        [exports.TYPE_SERVICE]: ' SERVICE AGREEMENT',
     }
 
-    if(request.state==STATE_REQUESTED)
+    if(request.state==exports.STATE_REQUESTED)
         return {
                 sub_header:         'You have requested a '+ req_types[request.requested_type]
             ,   sub_header_admin:   request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]}
-    if(request.state==STATE_CONCLUDED)
+    if(request.state==exports.STATE_CONCLUDED)
         return {
                 sub_header:         'Your '+req_types[request.requested_type] + ' request concluded succesfully!'
             ,   sub_header_admin:   req_types[request.requested_type] + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
-    
+
     // if(request.state==STATE_PROCESSING)
     // if(request.state==STATE_REJECTED)
     // if(request.state==STATE_ACCEPTED)
@@ -228,7 +268,7 @@ requestToUIDict  = (request) => {
      , block_time        : request.created_at.toISOString().split('.')[0]
      , quantity          : request.amount
      , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
-     , tx_type           : request.requested_type  
+     , tx_type           : request.requested_type
      , i_sent            : true
     // , tx_name
     // , tx_code

@@ -4,7 +4,7 @@ module.exports = {
     "appEndpoint": "http://localhost:3600",
     "apiEndpoint": "http://localhost:3600",
     "jwt_secret": "myS33!!creeeT",
-    "jwt_expiration_in_seconds": 86400,
+    "jwt_expiration_in_seconds": 2592000,
     "environment": "dev",
     "mongodb_uri": "mongodb://localhost/inkiri",
     "eos" : {

@@ -3,7 +3,7 @@ const RequestModel = require('../models/requests.model');
 const crypto = require('crypto');
 
 exports.insert = (req, res) => {
-  
+
   req.body.state = RequestModel.STATE_REQUESTED;
   // res.status(201).send({'res':'exports.insert', received: req.body});
 //   console.log(' request.Controller::ABOUT TO SAVE')
@@ -12,8 +12,29 @@ exports.insert = (req, res) => {
       res.status(201).send({id: result._id});
   }, (err)=>{
       console.log(' request.Controller::ERROR', JSON.stringify(err));
-      res.status(400).send({error:err.errmsg});            
+      res.status(400).send({error:err.errmsg});
   });
+};
+
+exports.insert_files = (req, res) => {
+
+  req.body.state = RequestModel.STATE_REQUESTED;
+  const request = req.body.request;
+  delete req.body.request;
+  console.log(' ABOUT TO PARSE REQUEST:: ', request)
+  req.body = {
+              ...req.body
+              , ...JSON.parse(request)
+  };
+
+  RequestModel.createRequest(req.body)
+  .then((result) => {
+      res.status(201).send({id: result._id});
+  }, (err)=>{
+      console.log(' request.Controller::ERROR', JSON.stringify(err));
+      res.status(400).send({error:err.errmsg});
+  });
+
 };
 
 exports.list = (req, res) => {
@@ -25,7 +46,7 @@ exports.list = (req, res) => {
             req.query.page = parseInt(req.query.page);
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
-        
+
         // From & To, Provider and Excchanges
         if (req.query.from) {
             filter = {...filter, from: req.query.from};
@@ -54,7 +75,7 @@ exports.list = (req, res) => {
     // db.requests.find({requested_type:{$or:['type_deposit']}})
     // db.requests.find( { $or: [ { requested_type: "type_deposit" }, { requested_type: "type_withdraw" } ] } )
     // query.or([{ color: 'red' }, { status: 'emergency' }])
-            
+
     RequestModel
     .list(limit, page, filter)
     .then((result) => {

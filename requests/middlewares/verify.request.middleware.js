@@ -4,7 +4,7 @@ const crypto        = require('crypto');
 
 
 const getAccountId = (account_name) =>   new Promise((res,rej)=> {
-  
+
   if(!account_name || account_name.trim().length==0 )
   {
     res(undefined);
@@ -17,7 +17,7 @@ const getAccountId = (account_name) =>   new Promise((res,rej)=> {
     if(!user[0]){
         rej({error:account_name+' not found'});
     }else{
-      let resp = {}; 
+      let resp = {};
       resp[account_name] = user[0]._id;
       res(resp)
       return;
@@ -30,7 +30,7 @@ const getAccountId = (account_name) =>   new Promise((res,rej)=> {
 });
 
 exports.validRequiredFields = async(req, res, next) => {
-  
+
   // const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_SEND, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_SERVICE];
   const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER];
   const validStates   = [RequestModel.STATE_REQUESTED, RequestModel.STATE_PROCESSING, RequestModel.STATE_REJECTED, RequestModel.STATE_ACCEPTED, RequestModel.STATE_ERROR, RequestModel.STATE_CONCLUDED];
@@ -39,8 +39,8 @@ exports.validRequiredFields = async(req, res, next) => {
   {
     console.log( ' NOT A VALID TYPE')
     return res.status(404).send({error:'not a valid request type ', valid_types:validRequests});
-  }  
-  
+  }
+
   if(!req.body.state)
     req.body.state = RequestModel.STATE_REQUESTED;
 
@@ -89,28 +89,28 @@ exports.onlySameUserOrAdminCanDoThisAction = async (req, res, next) => {
  * @param  {req.body.to} string Originator of the request
  */
 exports.validAccountReferences = async(req, res, next) => {
-    
+
     let promises = [
       getAccountId(req.jwt.account_name) //created_by
       , getAccountId(req.body.from)      //requested_by
       , getAccountId(req.body.to)        //requested_to
     ];
-    
+
     let values;
     try{
       values = await Promise.all(promises);
       // console.log(JSON.stringify(values));
-      
+
       if(!values[0] || values[0]===undefined)
-      {  
+      {
         return res.status(404).send({error:'not a valid creator'});
       }
       else{
         req.body.created_by     = values[0][req.jwt.account_name]
       }
 
-      if(req.body.from && (!values[1] || values[1]===undefined)) 
-      {  
+      if(req.body.from && (!values[1] || values[1]===undefined))
+      {
         return res.status(404).send({error:'not a valid sender'});
       }
       else{
@@ -127,10 +127,10 @@ exports.validAccountReferences = async(req, res, next) => {
         req.body.from_id        = req.body.created_by
         req.body.requested_by   = req.body.created_by
       }
-      console.log(' >> body.to?');      
-      if(req.body.to && (!values[2] || values[2]===undefined)) 
-      {  
-        console.log(' >> body.to ERROR');      
+      console.log(' >> body.to?');
+      if(req.body.to && (!values[2] || values[2]===undefined))
+      {
+        console.log(' >> body.to ERROR');
         return res.status(404).send({error:'not a valid receiver'});
       }
       else{
@@ -140,15 +140,15 @@ exports.validAccountReferences = async(req, res, next) => {
           req.body.requested_to   = values[2][req.body.to]
         }
       }
-      
-      // console.log( ' validAccountReferences OK >>' , JSON.stringify(req.body));      
+
+      // console.log( ' validAccountReferences OK >>' , JSON.stringify(req.body));
       // return res.status(200).send({'resp': req.body});
       return next();
-      
+
     }
     catch(err){
       console.log(' -- ERROR #4')
       return res.status(200).send({error:err});
     }
-    
+
 };
