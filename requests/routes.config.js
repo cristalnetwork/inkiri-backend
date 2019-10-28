@@ -41,18 +41,6 @@ exports.routesConfig = function (app) {
         RequestsController.insert
     ]);
 
-    app.post(config.api_version+'/requests_files'
-        , multer_multi_file_conf
-        ,[
-          ValidationMiddleware.validJWTNeeded,
-          VerifyRequestMiddleware.validAccountReferences,
-          VerifyRequestMiddleware.validRequiredFields,
-          GoogleDriveMiddleware.validMimeTypes,
-          GoogleDriveMiddleware.uploadFiles,
-          RequestsController.insert_files
-        ]
-    );
-
     app.get(config.api_version+'/requests', [
         ValidationMiddleware.validJWTNeeded,
         // PermissionMiddleware.minimumPermissionLevelRequired(OPS),
@@ -60,8 +48,8 @@ exports.routesConfig = function (app) {
     ]);
     app.get(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-        PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
+        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.getById
     ]);
     app.patch(config.api_version+'/requests/:requestId', [
@@ -76,4 +64,32 @@ exports.routesConfig = function (app) {
         PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.removeById
     ]);
+
+
+    app.post(config.api_version+'/requests_files'
+        , multer_multi_file_conf
+        ,[
+          ValidationMiddleware.validJWTNeeded,
+          VerifyRequestMiddleware.validAccountReferences,
+          VerifyRequestMiddleware.validRequiredFields,
+          VerifyRequestMiddleware.explodeFormData,
+          GoogleDriveMiddleware.validMimeTypes,
+          GoogleDriveMiddleware.uploadFiles,
+          RequestsController.insert_files
+        ]
+    );
+
+    app.post(config.api_version+'/requests_files/:requestId'
+        , multer_multi_file_conf
+        ,[
+          ValidationMiddleware.validJWTNeeded,
+          // VerifyRequestMiddleware.validAccountReferences,
+          // VerifyRequestMiddleware.validRequiredFields,
+          VerifyRequestMiddleware.explodeFormData,
+          GoogleDriveMiddleware.validMimeTypes,
+          GoogleDriveMiddleware.uploadFiles,
+          RequestsController.update_files
+        ]
+    );
+
 };

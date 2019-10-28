@@ -14,6 +14,7 @@ exports.routesConfig = function (app) {
     app.get(config.api_version+'/ping', [
         UsersController.ping
     ]);
+    
     app.post(config.api_version+'/users', [
         UsersController.insert
     ]);

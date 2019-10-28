@@ -152,3 +152,18 @@ exports.validAccountReferences = async(req, res, next) => {
     }
 
 };
+
+/**
+ * Explodes request param form formData to req.body
+ * @param  {req.body.request} string Json request object
+ */
+exports.explodeFormData = async(req, res, next) => {
+  const request = req.body.request;
+  delete req.body.request;
+  console.log(' ABOUT TO PARSE REQUEST:: ', request)
+  req.body = {
+              ...req.body
+              , ...JSON.parse(request)
+  };
+  return next();
+}

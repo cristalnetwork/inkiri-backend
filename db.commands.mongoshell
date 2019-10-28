@@ -4,3 +4,23 @@ db.users.updateMany(
    {},
    { $set: { account_type: "personal" , business_name:""}}
 )
+
+
+db.requests.updateMany(
+   {},
+   { $unset: { nota_fiscal_url: "", boleto_pagamento: "", comprobante_url: ""}}
+)
+
+
+# db.requests.find({provider_extra: { $exists: true }})
+# db.requests.find({descrpition: { $exists: true }})
+
+db.requests.deleteMany(
+   {provider_extra: { $exists: false }}
+)
+
+
+db.requests.updateMany(
+   { requested_type: "type_provider"},
+   { $set: { description: "payment request reason or materials list!!"}}
+)

@@ -74,14 +74,20 @@ const requestSchema = new Schema({
 
     state:                {
                             type: String
-                            , enum: [exports.STATE_REQUESTED, exports.STATE_PROCESSING, exports.STATE_REJECTED, exports.STATE_ACCEPTED, exports.STATE_ERROR, exports.STATE_CONCLUDED, exports.STATE_CANCELED]
+                            , enum: [ exports.STATE_REQUESTED,
+                                      exports.STATE_PROCESSING,
+                                      exports.STATE_REJECTED,
+                                      exports.STATE_ACCEPTED,
+                                      exports.STATE_ERROR,
+                                      exports.STATE_CONCLUDED,
+                                      exports.STATE_CANCELED]
                           },
 
     tx_id:                { type: String },
 
     requestCounterId:     { type: Number,  unique : true},
 
-    description:          { type: String },
+    description:          { type: String }, // or MEMO
 
     // nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
     // boleto_pagamento:     { type: String , default:'' },    // FOR exchange, provider
@@ -93,7 +99,11 @@ const requestSchema = new Schema({
         return this.requested_type == exports.TYPE_PAYMENT && this.provider_extra.payment_mode==exports.PAYMENT_MODE_BOLETO;
       }
     },
-    [exports.ATTACH_COMPROBANTE_ID]:       { type: String , default:'' },
+    [exports.ATTACH_COMPROBANTE_ID]:       { type: String , default:'' ,
+      required: function() {
+        return (this.requested_type == exports.TYPE_PROVIDER || this.requested_type == exports.TYPE_EXCHANGE) && this.state==exports.STATE_ACCEPTED;
+      }
+    },
 
     //deposit
     deposit_currency:     {
@@ -158,9 +168,9 @@ requestSchema.set('toJSON', {
 //     }
 // };
 
-requestSchema.findById = function (cb) {
-    return this.model('Requests').find({id: this.id}, cb);
-};
+// requestSchema.findById = function (cb) {
+//     return this.model('Requests').find({id: this.id}, cb);
+// };
 
 requestSchema.plugin(AutoIncrement, {inc_field: 'requestCounterId'});
 
@@ -180,16 +190,53 @@ const Request = mongoose.model('Requests', requestSchema);
 // exports.STATE_ERROR      = 'state_error';
 // exports.STATE_CONCLUDED  = 'state_concluded';
 // exports.STATE_CANCELED   = 'state_canceled';
-exports.findById = (id) => {
-    return Request.findById(id)
-        .then((result) => {
-            result = result.toJSON();
-            // delete result._id;
-            // delete result.__v;
-            return result;
-        });
+exports.findByIdXX = (id) => {
+  return new Promise((resolve, reject) => {
+      Request.findById(id)
+          .populate('created_by')
+          .populate('requested_by')
+          .populate('requested_to')
+          .populate('provider')
+          .exec(function (err, result) {
+              if (err) {
+                  reject(err);
+              } else {
+                  if(!result)
+                  {
+                    reject('NOT FOUND!!!!!!!!!');
+                    return;
+                  }
+                  const req_json  = result.toJSON();
+                  let xxx         = requestToUIDict(result);
+                  resolve (Object.assign(req_json, xxx));
+
+              }
+          })
+  });
+
 };
 
+exports.findById = (id) => {
+    // return Request.findOne({
+    //     _id: id
+    //     });
+    return new Promise((resolve, reject) => {
+      Request.findById(id)    .exec(function (err, result) {
+              if (err) {
+                  reject(err);
+              } else {
+                  if(!result)
+                  {
+                    reject('NOT FOUND!!!!!!!!!');
+                    return;
+                  }
+                  const req_json  = result.toJSON();
+                  let xxx         = requestToUIDict(result);
+                  resolve (Object.assign(req_json, xxx));
+              }
+          })
+  });
+};
 
 exports.createRequest = (requestData) => {
     const _request = new Request(requestData);

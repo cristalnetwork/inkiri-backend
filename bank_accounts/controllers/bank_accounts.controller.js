@@ -2,17 +2,13 @@ const config = require('../../common/config/env.config.js');
 const BankAccountModel = require('../models/bank_accounts.model');
 const crypto = require('crypto');
 
-
-exports.ping = (req, res) => {
-    res.status(200).send({ping:'pong'});
-}
 exports.insert = (req, res) => {
     BankAccountModel.createBankAccount(req.body)
         .then((result) => {
             res.status(201).send({id: result._id});
         }, (err)=>{
             console.log(' ERROR# 1', JSON.stringify(err))
-            res.status(400).send({error:err.errmsg});            
+            res.status(400).send({error:err.errmsg});
         });
 };
 

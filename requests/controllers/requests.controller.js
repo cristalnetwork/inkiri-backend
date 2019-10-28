@@ -18,14 +18,14 @@ exports.insert = (req, res) => {
 
 exports.insert_files = (req, res) => {
 
-  req.body.state = RequestModel.STATE_REQUESTED;
-  const request = req.body.request;
-  delete req.body.request;
-  console.log(' ABOUT TO PARSE REQUEST:: ', request)
-  req.body = {
-              ...req.body
-              , ...JSON.parse(request)
-  };
+  // req.body.state = RequestModel.STATE_REQUESTED;
+  // const request = req.body.request;
+  // delete req.body.request;
+  // console.log(' ABOUT TO PARSE REQUEST:: ', request)
+  // req.body = {
+  //             ...req.body
+  //             , ...JSON.parse(request)
+  // };
 
   RequestModel.createRequest(req.body)
   .then((result) => {
@@ -36,6 +36,7 @@ exports.insert_files = (req, res) => {
   });
 
 };
+
 
 exports.list = (req, res) => {
     let limit = req.query.limit && req.query.limit <= 100 ? parseInt(req.query.limit) : 10;
@@ -87,9 +88,18 @@ exports.list = (req, res) => {
 };
 
 exports.getById = (req, res) => {
-    RequestModel.findById(req.params.userId)
+    console.log(' >> getById:', req.params.requestId);
+    RequestModel.findById(req.params.requestId)
         .then((result) => {
+            if(!result)
+            {
+              res.status(404).send({error:'NOT FOUND'});
+              return;
+            }
             res.status(200).send(result);
+        },
+        (err)=>{
+          res.status(404).send({error:JSON.stringify(err)});
         });
 };
 
@@ -99,12 +109,33 @@ exports.patchById = (req, res) => {
     //     let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
     //     req.body.password = salt + "$" + hash;
     // }
+    console.log(' ABOUT TO PATCH REQUEST ', req.params.requestId)
+    console.log(JSON.stringify(req.body));
 
     RequestModel.patchRequest(req.params.requestId, req.body)
         .then((result) => {
             res.status(200).send({});
         });
 
+};
+
+exports.update_files = (req, res) => {
+
+  // const request = req.body.request;
+  // delete req.body.request;
+  // console.log(' ABOUT TO PARSE REQUEST:: ', request)
+  // req.body = {
+  //             ...req.body
+  //             , ...JSON.parse(request)
+  // };
+  console.log(' ABOUT TO PATCH REQUEST WITH FILES ', req.params.requestId)
+  console.log(JSON.stringify(req.body));
+
+
+  RequestModel.patchRequest(req.params.requestId, req.body)
+      .then((result) => {
+          res.status(200).send({});
+      });
 };
 
 exports.removeById = (req, res) => {
