@@ -17,7 +17,7 @@ const userSchema = new Schema({
     legal_id:         { type:  String },
     birthday:         { type:  Date },
     phone:            { type:  String },
-    address:          { 
+    address:          {
                         street:   { type:String}, // Street and Number, Apt, Suite, Unit, Building
                         city:     { type:String}, //
                         state:    { type:String}, // State /Province
@@ -31,13 +31,13 @@ const userSchema = new Schema({
 
     account_type:     { type:  String ,
                         enum: ['none', 'personal', 'business', 'foundation', 'bankadmin']
-                      }, 
+                      },
     business_name:    { type:  String,
                         required: function() {
                             return this.account_type == 'business';
                         } },
     userCounterId:    { type: Number, unique : true},
-  }, 
+  },
   { timestamps: { createdAt: 'created_at' } });
 
 //const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
@@ -50,8 +50,6 @@ userSchema.virtual('id').get(function () {
 userSchema.set('toJSON', {
     virtuals: true,
     transform: function(doc, ret, options) {
-        // ret.id = ret._id;
-        // delete ret._id;
         delete ret.to_sign;
         delete ret.__v;
         return ret;
@@ -100,7 +98,7 @@ exports.createUser = (userData) => {
 //             }
 //             return User.create(userData);
 //         });
-    
+
 // }
 
 exports.list = (perPage, page, query) => {
@@ -154,18 +152,19 @@ exports.patchUser = (id, userData) => {
 
 exports.patchUserByAccountName = (account_name, userData) => {
 
+    console.log( ' >> users.model::patchUserByAccountName() params ' , account_name, JSON.stringify(userData))
     return new Promise((resolve, reject) => {
         const filter = { account_name: account_name };
         const update = userData;
         User.findOneAndUpdate(filter, update)
         .then((update_res)=>{
-            // console.log( 'users.model::patchUserByAccountName() OK ' , JSON.stringify(update_res))
+            console.log( ' >> users.model::patchUserByAccountName() OK ' , JSON.stringify(update_res))
             resolve({ok:'ok'})
         },(err)=>{
-            // console.log( 'users.model::patchUserByAccountName() ERROR#1 ' , JSON.stringify(err))
+            console.log( ' >> users.model::patchUserByAccountName() ERROR#1 ' , JSON.stringify(err))
             reject({error:err})
-        });       
-    }); 
+        });
+    });
     // return new Promise((resolve, reject) => {
     //     User.find({account_name: account_name})
     //     .then((users)=>{
@@ -179,15 +178,15 @@ exports.patchUserByAccountName = (account_name, userData) => {
     //         },(err)=>{
     //             console.log( 'users.model::patchUserByAccountName() ERROR#1 ' , JSON.stringify(err))
     //             reject({error:err})
-    //         });       
-            
+    //         });
+
     //     },(err)=>{
     //         console.log( 'users.model::patchUserByAccountName() ERROR#1 ' , JSON.stringify(err))
     //         reject({error:err})
     //     });
     // });
 
-    
+
 };
 
 exports.removeById = (userId) => {
@@ -201,4 +200,3 @@ exports.removeById = (userId) => {
         });
     });
 };
-

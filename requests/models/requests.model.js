@@ -17,8 +17,9 @@ exports.STATE_PROCESSING              = 'state_processing';
 exports.STATE_REJECTED                = 'state_rejected';
 exports.STATE_ACCEPTED                = 'state_accepted';
 exports.STATE_ERROR                   = 'state_error';
-exports.STATE_CONCLUDED               = 'state_concluded';
 exports.STATE_CANCELED                = 'state_canceled';
+exports.STATE_REFUNDED                = 'state_refunded';
+exports.STATE_REVERTED                = 'state_reverted';
 
 exports.PAYMENT_VEHICLE               = 'payment_vehicle';
 exports.PAYMENT_VEHICLE_INKIRI        = 'payment_vehicle_inkiri';
@@ -79,11 +80,17 @@ const requestSchema = new Schema({
                                       exports.STATE_REJECTED,
                                       exports.STATE_ACCEPTED,
                                       exports.STATE_ERROR,
-                                      exports.STATE_CONCLUDED,
-                                      exports.STATE_CANCELED]
-                          },
-
+                                      exports.STATE_CANCELED,
+                                      exports.STATE_REFUNDED,
+                                      exports.STATE_REVERTED
+                                    ]
+    },
     tx_id:                { type: String },
+    refund_tx_id:         { type: String ,
+      required: function() {
+        return ([exports.STATE_REJECTED, exports.STATE_REVERTED, exports.STATE_REFUNDED].includes(this.requested_type));
+      }
+    },
 
     requestCounterId:     { type: Number,  unique : true},
 
@@ -176,21 +183,7 @@ requestSchema.plugin(AutoIncrement, {inc_field: 'requestCounterId'});
 
 const Request = mongoose.model('Requests', requestSchema);
 
-// exports.TYPE_DEPOSIT     = 'type_deposit';
-// exports.TYPE_EXCHANGE    = 'type_exchange';
-// exports.TYPE_PAYMENT     = 'type_payment';
-// exports.TYPE_PROVIDER    = 'type_provider';
-// exports.TYPE_SEND        = 'type_send';
-// exports.TYPE_WITHDRAW    = 'type_withdraw';
-// exports.TYPE_SERVICE     = 'type_service';
-// exports.STATE_REQUESTED  = 'state_requested';
-// exports.STATE_PROCESSING = 'state_processing';
-// exports.STATE_REJECTED   = 'state_rejected';
-// exports.STATE_ACCEPTED   = 'state_accepted';
-// exports.STATE_ERROR      = 'state_error';
-// exports.STATE_CONCLUDED  = 'state_concluded';
-// exports.STATE_CANCELED   = 'state_canceled';
-exports.findByIdXX = (id) => {
+exports.findById = (id) => {
   return new Promise((resolve, reject) => {
       Request.findById(id)
           .populate('created_by')
@@ -216,12 +209,10 @@ exports.findByIdXX = (id) => {
 
 };
 
-exports.findById = (id) => {
-    // return Request.findOne({
-    //     _id: id
-    //     });
+exports.findByIdEx = (id) => {
     return new Promise((resolve, reject) => {
-      Request.findById(id)    .exec(function (err, result) {
+      Request.findById(id)
+      .exec(function (err, result) {
               if (err) {
                   reject(err);
               } else {
@@ -279,28 +270,24 @@ exports.list = (perPage, page, query) => {
 
 getHeader = (request) => {
     const req_types = {
-        [exports.TYPE_DEPOSIT] : ' DEPOSIT',
-        [exports.TYPE_EXCHANGE]: ' EXCHANGE',
-        [exports.TYPE_PAYMENT]: ' PAYMENT',
-        [exports.TYPE_PROVIDER]: ' PROVIDER PAYMENT',
-        [exports.TYPE_SEND]: ' SEND',
-        [exports.TYPE_WITHDRAW]: ' WITHDRAW',
-        [exports.TYPE_SERVICE]: ' SERVICE AGREEMENT',
+        [exports.TYPE_DEPOSIT] :  ' DEPOSIT',
+        [exports.TYPE_EXCHANGE]:  ' EXCHANGE',
+        [exports.TYPE_PAYMENT]:   ' PAYMENT',
+        [exports.TYPE_PROVIDER]:  ' PROVIDER PAYMENT',
+        [exports.TYPE_SEND]:      ' SEND',
+        [exports.TYPE_WITHDRAW]:  ' WITHDRAW',
+        [exports.TYPE_SERVICE]:   ' SERVICE AGREEMENT',
     }
 
     if(request.state==exports.STATE_REQUESTED)
         return {
                 sub_header:         'You have requested a '+ req_types[request.requested_type]
             ,   sub_header_admin:   request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]}
-    if(request.state==exports.STATE_CONCLUDED)
-        return {
-                sub_header:         'Your '+req_types[request.requested_type] + ' request concluded succesfully!'
-            ,   sub_header_admin:   req_types[request.requested_type] + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
+    // if(request.state==exports.STATE_CONCLUDED)
+    //     return {
+    //             sub_header:         'Your '+req_types[request.requested_type] + ' request concluded succesfully!'
+    //         ,   sub_header_admin:   req_types[request.requested_type] + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
 
-    // if(request.state==STATE_PROCESSING)
-    // if(request.state==STATE_REJECTED)
-    // if(request.state==STATE_ACCEPTED)
-    // if(request.state==STATE_ERROR)
     return {
         sub_header:          'You have requested a '+request.requested_type
         , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + request.requested_type

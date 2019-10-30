@@ -1,4 +1,5 @@
 const VerifyRequestMiddleware = require('./middlewares/verify.request.middleware');
+const RequestStateMachineMiddleware = require('./middlewares/state_machine.middleware');
 const RequestsController      = require('./controllers/requests.controller');
 const RequestsModel           = require('./models/requests.model');
 const PermissionMiddleware    = require('../common/middlewares/auth.permission.middleware');
@@ -54,6 +55,8 @@ exports.routesConfig = function (app) {
     ]);
     app.patch(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
+        VerifyRequestMiddleware.validRequestObject,
+        RequestStateMachineMiddleware.validateTransition,
         // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
         // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.patchById
@@ -87,6 +90,7 @@ exports.routesConfig = function (app) {
           // VerifyRequestMiddleware.validRequiredFields,
           VerifyRequestMiddleware.explodeFormData,
           GoogleDriveMiddleware.validMimeTypes,
+          RequestStateMachineMiddleware.validateTransition,
           GoogleDriveMiddleware.uploadFiles,
           RequestsController.update_files
         ]

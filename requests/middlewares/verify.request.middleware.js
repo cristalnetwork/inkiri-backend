@@ -10,8 +10,6 @@ const getAccountId = (account_name) =>   new Promise((res,rej)=> {
     res(undefined);
     return;
   }
-
-
   UserModel.findByAccountName(account_name)
   .then((user)=>{
     if(!user[0]){
@@ -49,22 +47,25 @@ exports.validRequiredFields = async(req, res, next) => {
     console.log( ' NOT A VALID STATE')
     return res.status(404).send({error:'not a valid state'});
   }
-
-  // let default_
-  // created_by
-  // requested_by
-  // from
-  // requested_type
-  // amount
-  // requested_to
-  // to
-  // state
-  // tx_id
-  // description
-  // nota_fiscal_url
-  // comprobante_url
-
   return next();
+}
+
+exports.validRequestObject  = async (req, res, next) => {
+  RequestModel.findById(req.params.requestId)
+    .then((result) => {
+        if(!result)
+        {
+          console.log(' ## REQUEST EXISTS VERIFICATION ERROR#1 -> ')
+          return res.status(404).send({error:'Request NOT FOUND'});
+        }
+        req.body.request_object = result;
+        return next();
+    },
+    (err)=>{
+      console.log(' ## REQUEST EXISTS VERIFICATION ERROR#2 -> ', JSON.stringify(err))
+      return res.status(404).send({error:JSON.stringify(err)});
+    });
+
 }
 
 exports.onlySameUserOrAdminCanDoThisAction = async (req, res, next) => {

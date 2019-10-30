@@ -1,6 +1,6 @@
-const config = require('../../common/config/env.config.js');
+const config       = require('../../common/config/env.config.js');
 const RequestModel = require('../models/requests.model');
-const crypto = require('crypto');
+const crypto       = require('crypto');
 
 exports.insert = (req, res) => {
 
@@ -87,7 +87,7 @@ exports.list = (req, res) => {
     });
 };
 
-exports.getById = (req, res) => {
+exports.getById = async (req, res) => {
     console.log(' >> getById:', req.params.requestId);
     RequestModel.findById(req.params.requestId)
         .then((result) => {
