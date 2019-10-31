@@ -289,8 +289,8 @@ getHeader = (request) => {
     //         ,   sub_header_admin:   req_types[request.requested_type] + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
 
     return {
-        sub_header:          'You have requested a '+request.requested_type
-        , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + request.requested_type
+        sub_header:          'You have requested a '+req_types[request.requested_type]
+        , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]
     }
 
 }

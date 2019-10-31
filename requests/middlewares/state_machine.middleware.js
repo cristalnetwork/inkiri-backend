@@ -7,18 +7,26 @@ const loadStatesForAdmin = (current_state) =>{
  return new StateMachine({
     init: current_state,
     transitions: [
-      // { name: 'process', from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_PROCESSING },
-      // { name: 'reject',  from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_REJECTED },
-      // { name: 'done',    from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_ACCEPTED },
-      // { name: 'accept',  from: RequestsModel.STATE_PROCESSING, to: RequestsModel.STATE_ACCEPTED },
-      // { name: 'revert',  from: RequestsModel.STATE_PROCESSING, to: RequestsModel.STATE_REVERTED },
-      // { name: 'refund',  from: RequestsModel.STATE_CANCELED,   to: RequestsModel.STATE_REFUNDED }
-      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_PROCESSING), from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_PROCESSING },
-      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECTED),   from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_REJECTED },
-      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_ACCEPTED),   from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_ACCEPTED },
-      { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_ACCEPTED),   from: RequestsModel.STATE_PROCESSING, to: RequestsModel.STATE_ACCEPTED },
-      { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_REVERTED),   from: RequestsModel.STATE_PROCESSING, to: RequestsModel.STATE_REVERTED },
-      { name: toTransition(RequestsModel.STATE_CANCELED,   RequestsModel.STATE_REFUNDED),   from: RequestsModel.STATE_CANCELED,   to: RequestsModel.STATE_REFUNDED }
+      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_PROCESSING),
+          from: RequestsModel.STATE_REQUESTED,
+          to: RequestsModel.STATE_PROCESSING },
+      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECTED),
+          from: RequestsModel.STATE_REQUESTED,
+          to: RequestsModel.STATE_REJECTED },
+      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_ACCEPTED),
+          from: RequestsModel.STATE_REQUESTED,
+          to: RequestsModel.STATE_ACCEPTED
+          // FOR DEPOSITS!
+      },
+      { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_ACCEPTED),
+          from: RequestsModel.STATE_PROCESSING,
+          to: RequestsModel.STATE_ACCEPTED },
+      { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_REVERTED),
+          from: RequestsModel.STATE_PROCESSING,
+          to: RequestsModel.STATE_REVERTED },
+      { name: toTransition(RequestsModel.STATE_CANCELED,   RequestsModel.STATE_REFUNDED),
+          from: RequestsModel.STATE_CANCELED,
+          to: RequestsModel.STATE_REFUNDED }
     ]
   });
 }

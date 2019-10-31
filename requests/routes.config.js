@@ -90,6 +90,7 @@ exports.routesConfig = function (app) {
           // VerifyRequestMiddleware.validRequiredFields,
           VerifyRequestMiddleware.explodeFormData,
           GoogleDriveMiddleware.validMimeTypes,
+          VerifyRequestMiddleware.validRequestObject,
           RequestStateMachineMiddleware.validateTransition,
           GoogleDriveMiddleware.uploadFiles,
           RequestsController.update_files
