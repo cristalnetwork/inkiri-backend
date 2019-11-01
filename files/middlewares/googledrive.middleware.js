@@ -73,9 +73,12 @@ exports.uploadFiles = async(req, res, next) => {
     //   , [RequestsModel.ATTACH_BOLETO_PAGAMENTO_ID]  : values[1]
     //   , [RequestsModel.ATTACH_COMPROBANTE_ID]       : values[2]
     // }
-    req.body[RequestsModel.ATTACH_NOTA_FISCAL_ID]       = values[0];
-    req.body[RequestsModel.ATTACH_BOLETO_PAGAMENTO_ID]  = values[1];
-    req.body[RequestsModel.ATTACH_COMPROBANTE_ID]       = values[2];
+    if(values[0])
+      req.body[RequestsModel.ATTACH_NOTA_FISCAL_ID]       = values[0];
+    if(values[1])
+      req.body[RequestsModel.ATTACH_BOLETO_PAGAMENTO_ID]  = values[1];
+    if(values[2])
+      req.body[RequestsModel.ATTACH_COMPROBANTE_ID]       = values[2];
   }
   catch(err){
     console.log(' -- ERROR #UPLOADING FILES', JSON.stringify(err))
