@@ -63,7 +63,7 @@ exports.validateTransition = async(req, res, next) => {
 
   if(!request)
   {
-    console.log(' ## STATE MACHINE ERROR#1 -> ')
+    console.log(' ## STATE MACHINE ERROR#1 -> Request NOT FOUND')
     return res.status(404).send({error:'Request NOT FOUND'});
   }
 
