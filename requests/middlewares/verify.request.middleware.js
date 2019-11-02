@@ -29,8 +29,8 @@ const getAccountId = (account_name) =>   new Promise((res,rej)=> {
 
 exports.validRequiredFields = async(req, res, next) => {
 
-  // const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_SEND, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_SERVICE];
-  const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER];
+  // const validRequests = [RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_SEND, RequestModel.TYPE_SERVICE];
+  const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW];
   const validStates   = [RequestModel.STATE_REQUESTED, RequestModel.STATE_PROCESSING, RequestModel.STATE_REJECTED, RequestModel.STATE_ACCEPTED, RequestModel.STATE_ERROR, RequestModel.STATE_CONCLUDED];
 
   if(validRequests.indexOf(req.body.requested_type)<0)

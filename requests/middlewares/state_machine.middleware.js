@@ -18,6 +18,11 @@ const loadStatesForAdmin = (current_state) =>{
           to: RequestsModel.STATE_ACCEPTED
           // FOR DEPOSITS!
       },
+      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECED),
+          from: RequestsModel.STATE_REQUESTED,
+          to: RequestsModel.STATE_REJECED
+          // FOR DEPOSITS!
+      },
       { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_PROCESSING,
           to: RequestsModel.STATE_ACCEPTED },
@@ -69,10 +74,11 @@ exports.validateTransition = async(req, res, next) => {
 
   const request_owner = request.from;
   const is_admin      = req.body.sender==config.eos.bank.account;
+  console.log(' >> is_admin? -> ', is_admin, ' = (',  req.body.sender, ' == ', config.eos.bank.account, ')');
   const permissioner  = is_admin?config.eos.bank.account:request_owner;
   try {
     let perm = await eos_helper.accountHasWritePermission(account_name, request_owner);
-    console.log(' >> '+request_owner+' PERMISSIONED: ', account_name, ' TO:', JSON.stringify(perm));
+    console.log(' >> request_owner: '+request_owner+'; PERMISSIONED: ', account_name, ' TO:', JSON.stringify(perm));
 
   } catch (e) {
     console.log(' ## STATE MACHINE ERROR#2 -> ', JSON.stringify(e))
