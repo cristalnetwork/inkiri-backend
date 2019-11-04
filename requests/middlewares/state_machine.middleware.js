@@ -72,18 +72,34 @@ exports.validateTransition = async(req, res, next) => {
     return res.status(404).send({error:'Request NOT FOUND'});
   }
 
-  const request_owner = request.from;
-  const is_admin      = req.body.sender==config.eos.bank.account;
-  console.log(' >> is_admin? -> ', is_admin, ' = (',  req.body.sender, ' == ', config.eos.bank.account, ')');
-  const permissioner  = is_admin?config.eos.bank.account:request_owner;
-  try {
-    let perm = await eos_helper.accountHasWritePermission(account_name, request_owner);
-    console.log(' >> request_owner: '+request_owner+'; PERMISSIONED: ', account_name, ' TO:', JSON.stringify(perm));
+  // const request_owner = request.from;
+  // const is_admin      = req.body.sender==config.eos.bank.account;
+  // const permissioner  = is_admin?config.eos.bank.account:request_owner;
+  // try {
+  //   let perm = await eos_helper.accountHasWritePermission(account_name, request_owner);
+  //   console.log(' >> request_owner: '+request_owner+'; PERMISSIONED: ', account_name, ' TO:', JSON.stringify(perm));
+  //
+  // } catch (e) {
+  //   console.log(' ## STATE MACHINE ERROR#2 -> ', JSON.stringify(e))
+  //   return res.status(404).send({error:'Account not permissioned for this operation', message:JSON.stringify(e)});
+  // }
 
-  } catch (e) {
-    console.log(' ## STATE MACHINE ERROR#2 -> ', JSON.stringify(e))
-    return res.status(404).send({error:'Account not permissioned for this operation', message:JSON.stringify(e)});
-  }
+  let is_authorized   = account_name==config.eos.bank.account;
+
+  if(!is_authorized)
+    try {
+      let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
+      if(perm) is_authorized = true;
+    } catch (e) { }
+
+  if(!is_authorized)
+    try {
+      let perm = await eos_helper.accountHasWritePermission(auth_user, request_owner);
+      if(perm) is_authorized = true;
+    } catch (e) {}
+
+  if(!is_authorized)
+    return res.status(404).send({error:'Account not authorized for this operation'});
 
   if(new_state==request.state)
   {

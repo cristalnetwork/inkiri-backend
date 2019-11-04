@@ -17,7 +17,7 @@ exports.insert = (req, res) => {
             res.status(201).send({id: result._id});
         }, (err)=>{
             console.log(' ERROR# 1', JSON.stringify(err))
-            res.status(400).send({error:err.errmsg});            
+            res.status(400).send({error:err.errmsg});
         });
 };
 
@@ -47,6 +47,21 @@ exports.getById = (req, res) => {
     UserModel.findById(req.params.userId)
         .then((result) => {
             res.status(200).send(result);
+        }, (err)=>{
+            console.log(' ERROR# 1', JSON.stringify(err))
+            res.status(404).send({error:JSON.stringify(err), message:err.errmsg});
+        });
+};
+
+exports.getByAccountName = (req, res) => {
+    UserModel.findByAccountName(req.params.accountName)
+        .then((result) => {
+            if(result && result.length>0)
+              return res.status(200).send(result[0]);
+            return res.status(404).send({error:'Not Found', message:'Not Found'});
+        }, (err)=>{
+            console.log(' ERROR# 1', JSON.stringify(err))
+            return res.status(404).send({error:JSON.stringify(err), message:err.errmsg});
         });
 };
 

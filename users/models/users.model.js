@@ -37,6 +37,13 @@ const userSchema = new Schema({
                             return this.account_type == 'business';
                         } },
     userCounterId:    { type: Number, unique : true},
+
+    bank_accounts:    [
+            {
+                bank_name:        { type:  String},
+                agency:           { type:  String },
+                cc:               { type:  String },
+            }],
   },
   { timestamps: { createdAt: 'created_at' } });
 

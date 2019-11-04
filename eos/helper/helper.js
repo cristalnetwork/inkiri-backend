@@ -34,21 +34,49 @@ exports.accountHasPermission = async (permissioned_account_name, permissioner_ac
 }
 
 exports.getPermissionsForAccount = async (account_name, permissioner_account, permissions) => {
-  const permissioner = await rpc.get_account(permissioner_account)
-  if(!permissioner || !permissioner || !permissioner.permissions)
-    return {error:'NO PERMISSIONS from account '+permissioner_account}
+  return new Promise( (resolve, reject) => {
 
-  const perms = permissioner.permissions.reduce((_arr, perm) =>  {
-    const perm_auths = perm.required_auth.accounts.filter(acc_perm => acc_perm.permission.actor == account_name) ;
-    if(perm_auths.length>0)
-    {
-      _arr.push({ permission: perm_auths[0].permission, perm_name:perm.perm_name, permissioner:permissioner_account});
-    };
-    return _arr;
-  } ,[] )
+    // const permissioner = await rpc.get_account(permissioner_account)
+    rpc.get_account(permissioner_account)
+    .then(
+      (permissioner) => {
+          if(!permissioner || !permissioner || !permissioner.permissions)
+          {
+            reject({error:'NO PERMISSIONS from account '+permissioner_account})
+            return;
+          }
 
-  if(!permissions)
-    return perms.length<1 ? undefined : perms.sort(function(a, b){return perms_hierarchy.indexOf(a.perm_name)<perms_hierarchy.indexOf(b.perm_name)});
-  return perms.length<1 ? undefined : perms.filter(perm => permissions.includes(perm.perm_name))[0];
+          const perms = permissioner.permissions.reduce((_arr, perm) =>  {
+            const perm_auths = perm.required_auth.accounts.filter(acc_perm => acc_perm.permission.actor == account_name) ;
+            if(perm_auths.length>0)
+            {
+              _arr.push({ permission: perm_auths[0].permission, perm_name:perm.perm_name, permissioner:permissioner_account});
+            };
+            return _arr;
+          } ,[] );
 
+          if(!permissions)
+          {
+            if(perms.length<1)
+            {
+              reject({error:'No permissions#1'})
+              return;
+            }
+            const result = perms.sort(function(a, b){return perms_hierarchy.indexOf(a.perm_name)<perms_hierarchy.indexOf(b.perm_name)});
+            resolve(result)  ;
+            return;
+          }
+          if(perms.length<1)
+          {
+            reject({error:'No permissions#1'})
+            return;
+          }
+          const result = perms.filter(perm => permissions.includes(perm.perm_name))[0];
+          resolve(result)
+      }, (err) => {
+        reject({error:'NO PERMISSIONS from account '+permissioner_account, message:JSON.stringify(err)})
+      }
+    )
+
+  });
 }
