@@ -1,7 +1,14 @@
-const credentials   = require('../../common/config/credentials.json');
+//const credentials   = require('../../common/config/credentials.json');
 const {google}      = require('googleapis');
 const config        = require('../../common/config/env.config.js');
 var moment = require('moment');
+var credentials = null;
+try {
+    credentials   = require('../../common/config/credentials.json');
+    // do stuff
+} catch (ex) {
+    
+}
 
 /*
 * +info at https://developers.google.com/identity/protocols/googlescopes
