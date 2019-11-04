@@ -96,10 +96,6 @@ const requestSchema = new Schema({
 
     description:          { type: String }, // or MEMO
 
-    // nota_fiscal_url:      { type: String , default:'' },    // FOR exchange, provider
-    // boleto_pagamento:     { type: String , default:'' },    // FOR exchange, provider
-    // comprobante_url:      { type: String , default:'' },    // FOR exchange, provider
-
     [exports.ATTACH_NOTA_FISCAL_ID]:       { type: String , default:'' },
     [exports.ATTACH_BOLETO_PAGAMENTO_ID]:  { type: String , default:'' ,
       required: function() {
@@ -121,11 +117,24 @@ const requestSchema = new Schema({
     },
     // User Exchange
     bank_account:         {
-                            type: Schema.Types.ObjectId
-                            , ref: 'BankAccounts'
-                            , required: function() {
-                              return this.requested_type == exports.TYPE_EXCHANGE;
+                            bank_name:        { type:  String
+                              , required: function() {
+                                return this.requested_type == exports.TYPE_EXCHANGE;
+                              }
                             }
+                            , agency:           { type:  String
+                              , required: function() {
+                                return this.requested_type == exports.TYPE_EXCHANGE;
+                              }
+                            }
+                            , cc:               { type:  String
+                              , required: function() {
+                                return this.requested_type == exports.TYPE_EXCHANGE;
+                              }
+                            }
+                            // type: Schema.Types.ObjectId
+                            // , ref: 'BankAccounts'
+
     },
     // Provider payment
     provider:             {

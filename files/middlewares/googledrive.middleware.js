@@ -33,7 +33,8 @@ exports.validMimeTypes = async(req, res, next) => {
  */
 exports.uploadFiles = async(req, res, next) => {
 
-  const account           = req.body.from;
+  // const account           = req.body.from;
+  const account           = req.body.request_object ? req.body.request_object.from : req.body.from;
   const fileNota          = req.files[RequestsModel.ATTACH_NOTA_FISCAL];
   const fileBoleto        = req.files[RequestsModel.ATTACH_BOLETO_PAGAMENTO];
   const fileComprobante   = req.files[RequestsModel.ATTACH_COMPROBANTE];

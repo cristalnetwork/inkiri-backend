@@ -13,16 +13,21 @@ const loadStatesForAdmin = (current_state) =>{
       { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECTED),
           from: RequestsModel.STATE_REQUESTED,
           to: RequestsModel.STATE_REJECTED },
+      { name: toTransition(RequestsModel.STATE_REQUESTED, RequestsModel.STATE_CANCELED),
+          from: RequestsModel.STATE_REQUESTED,
+          to: RequestsModel.STATE_CANCELED
+          // If I'm an admin and I'm a business GESTOR.
+      },
       { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_REQUESTED,
           to: RequestsModel.STATE_ACCEPTED
           // FOR DEPOSITS!
       },
-      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECED),
-          from: RequestsModel.STATE_REQUESTED,
-          to: RequestsModel.STATE_REJECED
-          // FOR DEPOSITS!
-      },
+      // { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECED),
+      //     from: RequestsModel.STATE_REQUESTED,
+      //     to: RequestsModel.STATE_REJECED
+      //     // FOR DEPOSITS!
+      // },
       { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_PROCESSING,
           to: RequestsModel.STATE_ACCEPTED },
@@ -62,7 +67,6 @@ exports.validateTransition = async(req, res, next) => {
     return next();
   }
 
-
   const account_name  = req.jwt.account_name;
   const request       = req.body.request_object;
 
@@ -72,7 +76,7 @@ exports.validateTransition = async(req, res, next) => {
     return res.status(404).send({error:'Request NOT FOUND'});
   }
 
-  // const request_owner = request.from;
+  const request_owner = request.from;
   // const is_admin      = req.body.sender==config.eos.bank.account;
   // const permissioner  = is_admin?config.eos.bank.account:request_owner;
   // try {
@@ -85,17 +89,25 @@ exports.validateTransition = async(req, res, next) => {
   // }
 
   let is_authorized   = account_name==config.eos.bank.account;
-
+  let is_admin        = is_authorized; //account_name==config.eos.bank.account;
   if(!is_authorized)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
-      if(perm) is_authorized = true;
+      if(perm)
+      {
+        is_authorized = true;
+        is_admin = true;
+      }
     } catch (e) { }
 
   if(!is_authorized)
     try {
-      let perm = await eos_helper.accountHasWritePermission(auth_user, request_owner);
-      if(perm) is_authorized = true;
+      let perm = await eos_helper.accountHasWritePermission(account_name, request_owner);
+      if(perm)
+      {
+        is_authorized = true;
+        is_admin = false;
+      }
     } catch (e) {}
 
   if(!is_authorized)
