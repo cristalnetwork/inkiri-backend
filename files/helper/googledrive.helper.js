@@ -11,9 +11,9 @@ var moment = require('moment');
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
 const auth = new google.auth.JWT(
-    credentials.client_email
+    process.env.GDRIVE_CLIENT_EMAIL || credentials.client_email
     , null
-    , credentials.private_key
+    , process.env.GDRIVE_PRIVATE_KEY || credentials.private_key
     , SCOPES
   );
 
