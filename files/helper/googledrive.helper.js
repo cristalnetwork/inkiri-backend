@@ -7,7 +7,7 @@ try {
     credentials   = require('../../common/config/credentials.json');
     // do stuff
 } catch (ex) {
-    
+
 }
 
 /*
@@ -17,12 +17,17 @@ try {
 // const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
+const GDRIVE_CLIENT_EMAIL = process.env.GDRIVE_CLIENT_EMAIL || credentials.client_email
+const GDRIVE_PRIVATE_KEY  = process.env.GDRIVE_PRIVATE_KEY || credentials.private_key
+
 const auth = new google.auth.JWT(
-    process.env.GDRIVE_CLIENT_EMAIL || credentials.client_email
+    GDRIVE_CLIENT_EMAIL
     , null
-    , process.env.GDRIVE_PRIVATE_KEY || credentials.private_key
+    , GDRIVE_PRIVATE_KEY
     , SCOPES
   );
+
+// console.log(' ** process.env.GDRIVE_CLIENT_EMAIL ** >> ', process.env.GDRIVE_CLIENT_EMAIL);
 
 const drive = google.drive({ version: 'v3', auth });
 exports.drive = drive;
