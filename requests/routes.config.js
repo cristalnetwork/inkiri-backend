@@ -47,12 +47,21 @@ exports.routesConfig = function (app) {
         // PermissionMiddleware.minimumPermissionLevelRequired(OPS),
         RequestsController.list
     ]);
+
     app.get(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
         // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
         // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.getById
     ]);
+
+    app.get(config.api_version+'/requests_by_counter/:counterId', [
+        ValidationMiddleware.validJWTNeeded,
+        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
+        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+        RequestsController.getByCounter
+    ]);
+
     app.patch(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
         VerifyRequestMiddleware.validRequestObject,
@@ -61,6 +70,7 @@ exports.routesConfig = function (app) {
         // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.patchById
     ]);
+
     app.delete(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.minimumPermissionLevelRequired(OPS),

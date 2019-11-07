@@ -78,30 +78,61 @@ exports.list = (req, res) => {
     // query.or([{ color: 'red' }, { status: 'emergency' }])
 
     RequestModel
-    .list(limit, page, filter)
-    .then((result) => {
+      .list(limit, page, filter)
+      .then((result) => {
         res.status(200).send(result);
-    },
-     (err)=> {
-
-    });
-};
+      },
+      (err)=> {
+        res.status(404).send({error:JSON.stringify(err)});
+      });
+    };
 
 exports.getById = async (req, res) => {
-    console.log(' >> getById:', req.params.requestId);
-    RequestModel.findById(req.params.requestId)
-        .then((result) => {
-            if(!result)
-            {
-              res.status(404).send({error:'NOT FOUND'});
-              return;
-            }
-            res.status(200).send(result);
-        },
-        (err)=>{
-          res.status(404).send({error:JSON.stringify(err)});
-        });
-};
+      console.log(' >> getById:', req.params.requestId);
+      RequestModel.findById(req.params.requestId)
+          .then((result) => {
+              if(!result)
+              {
+                res.status(404).send({error:'NOT FOUND'});
+                return;
+              }
+              res.status(200).send(result);
+          },
+          (err)=>{
+            res.status(404).send({error:JSON.stringify(err)});
+          });
+  };
+
+// exports.getById = async (req, res) => {
+//     console.log(' >> getById:', req.params.requestId);
+//     RequestModel.find(req.params.requestId)
+//         .then((result) => {
+//             if(!result)
+//             {
+//               res.status(404).send({error:'NOT FOUND'});
+//               return;
+//             }
+//             res.status(200).send(result);
+//         },
+//         (err)=>{
+//           res.status(404).send({error:JSON.stringify(err)});
+//         });
+//     };
+
+exports.getByCounter = async (req, res) => {
+    console.log(' >> getById:', req.params.counterId);
+    let filter = { requestCounterId : req.params.counterId};
+    RequestModel.list(1, 0, filter)
+      .then((result) => {
+        if(!result || !result[0])
+          return res.status(404).send({error:'NOT FOUND'});
+        return res.status(200).send(result[0]);
+      },
+       (err)=> {
+        return res.status(404).send({error:JSON.stringify(err)});
+      });
+
+    };
 
 exports.patchById = (req, res) => {
     // if (req.body.password) {
