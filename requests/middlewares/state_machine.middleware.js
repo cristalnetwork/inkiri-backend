@@ -88,8 +88,8 @@ exports.validateTransition = async(req, res, next) => {
   //   return res.status(404).send({error:'Account not permissioned for this operation', message:JSON.stringify(e)});
   // }
 
-  let is_authorized   = account_name==config.eos.bank.account;
-  let is_admin        = is_authorized; //account_name==config.eos.bank.account;
+  let is_authorized   = account_name==request_owner;
+  let is_admin        = account_name==config.eos.bank.account;
   if(!is_authorized)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
@@ -111,7 +111,7 @@ exports.validateTransition = async(req, res, next) => {
     } catch (e) {}
 
   if(!is_authorized)
-    return res.status(404).send({error:'Account not authorized for this operation'});
+    return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+account_name+', owner: '+request_owner});
 
   if(new_state==request.state)
   {
