@@ -5,7 +5,7 @@ const ValidationMiddleware      = require('../common/middlewares/auth.validation
 
 exports.routesConfig = function (app) {
 
-    app.get(config.api_version+'/iugu_import', [
+    app.get(config.api_version+'/iugu_importer/:task', [
         IuguController.import
     ]);
 

@@ -8,7 +8,8 @@ module.exports = {
     "environment": "dev",
     "mongodb_uri": "mongodb://localhost/inkiri",
     "eos" : {
-        "blockchain_endpoint": "https://jungle.eos.dfuse.io",
+        // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
+        "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
         "token": {
             "contract": "inkiritoken1",
             "account": "inkiritoken1",

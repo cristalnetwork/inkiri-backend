@@ -7,6 +7,7 @@ mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://loc
 exports.STATE_NOT_PROCESSED = 'state_not_processed';
 exports.STATE_ISSUED        = 'state_issued';
 exports.STATE_ERROR         = 'state_error';
+exports.STATE_ISSUE_ERROR   = 'state_issue_error';
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
@@ -37,7 +38,8 @@ const iuguSchema = new Schema({
                             type: String
                             , enum: [ exports.STATE_NOT_PROCESSED,
                                       exports.STATE_ISSUED,
-                                      exports.STATE_ERROR
+                                      exports.STATE_ERROR,
+                                      exports.STATE_ISSUE_ERROR
                                     ]
 
                            }
@@ -109,6 +111,36 @@ const lastImportedImpl = async () => {
                 if(!result)
                   return rej('Empty table/collection!');
                 return res(result.toJSON());
+              }
+          })
+  });
+}
+
+exports.listUnprocessed = async () => listUnprocessedImpl();
+
+const listUnprocessedImpl = async () => {
+  console.log(' >> llamarin a listUnprocessedImpl...');
+  return new Promise((res, rej) => {
+      Iugu.find({
+                  amount : { $ne: null , $gt : 0}
+                  , paid_at : { $ne: null }
+                  , receipt : { $ne: null }
+                  , receipt_alias : { $ne: null }
+                  , receipt_accountname : { $ne: null }
+                  , issued_at : null
+                  , issued_tx_id : null
+                  , state : exports.STATE_NOT_PROCESSED
+          })
+          .populate('receipt')
+          .limit(25)
+          .sort({paid_at : -1, iuguCounterId: -1 })
+          .exec(function (err, result) {
+              if (err) {
+                  return rej(err);
+              } else {
+                if(!result)
+                  return rej('Empty table/collection!');
+                return res(result.map( invoice => invoice.toJSON()));
               }
           })
   });

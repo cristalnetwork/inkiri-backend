@@ -155,9 +155,9 @@ const buildInvoice = async (invoice) => {
       , paid_at:              moment(invoice.paid_at)
       , receipt:              alias ? alias.user : null
       , receipt_alias:        alias ? alias.alias : alias_name
-      , receipt_accountname:  alias ? alias.user.account_name : ''
+      , receipt_accountname:  alias ? alias.user.account_name : null
       , original:             invoice
-      , error:                error ? JSON.stringify(error) : ''
+      , error:                error ? JSON.stringify(error) : null
       , state:                error ? IuguModel.STATE_ERROR : IuguModel.STATE_NOT_PROCESSED
     }
     return my_invoice;

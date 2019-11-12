@@ -1,58 +1,48 @@
 const config       = require('../../common/config/env.config.js');
 const IuguModel    = require('../models/iugu.model');
 const importer     = require('../services/importer');
-// const issuer       = require('../services/issuer');
+const issuer       = require('../services/issuer');
 
 const iugu_config = require('../../common/config/iugu.config.js');
 
+const TASK_IMPORT           = 'import';
+const TASK_ISSUE            = 'issue';
+const TASK_IMPORT_AND_ISSUE = 'import_and_issue';
+
 exports.import = (req, res) => {
 
-  // importer.import()
-  //   .then( (result) => {
-  //       res.status(200).send({message: 'OK', result: result});
-  //   }, (err)=>{
-  //     console.log('#import::ERROR1', JSON.stringify(err))
-  //     res.status(500).send({error:JSON.stringify(err)});
-  //     return;
-  //   });
+  if(req.params.task==TASK_IMPORT)
+  {
+    importer.importAndSave()
+      .then( (result) => {
+          res.status(200).send({message: 'OK', result: result});
+          return;
+      }, (err)=>{
+          console.log('#import::ERROR', JSON.stringify(err))
+          res.status(500).send({error:err});
+          return;
+      });
+    return;
+  }
 
-  // importer.save(invoices)
-  //   .then( (result2) => {
-  //       res.status(200).send({message: 'OK', result: result2});
-  //       return;
-  //   }, (err2)=>{
-  //       console.log('#import::ERROR2', JSON.stringify(err2))
-  //       res.status(500).send({error:err2});
-  //       return;
-  //   });
+  if(req.params.task==TASK_ISSUE)
+  {
+    issuer.issue()
+      .then( (result) => {
+          res.status(200).send({message: 'OK', result: result});
+          return;
+      }, (err)=>{
+          console.log('#issue::ERROR', JSON.stringify(err))
+          res.status(500).send({error:err});
+          return;
+      });
+    return;
+  }
 
-  // importer.import()
-  //   .then( (result) => {
-  //       importer.save(result)
-  //         .then( (result2) => {
-  //             res.status(200).send({message: 'OK', count: result2.length, result: result2});
-  //             return;
-  //         }, (err2)=>{
-  //             console.log('#import::ERROR2', JSON.stringify(err2))
-  //             res.status(500).send({error:err2});
-  //             return;
-  //         });
-  //
-  //   }, (err)=>{
-  //     console.log('#import::ERROR1', JSON.stringify(err))
-  //     res.status(500).send({error:err});
-  //     return;
-  //   });
-
-  importer.importAndSave()
-    .then( (result) => {
-        res.status(200).send({message: 'OK', result: result});
-        return;
-    }, (err)=>{
-        console.log('#import::ERROR2', JSON.stringify(err))
-        res.status(500).send({error:err});
-        return;
-    });
+  if(req.params.task==TASK_IMPORT_AND_ISSUE)
+  {
+    return;
+  }
 };
 
 exports.issue = (req, res) => {

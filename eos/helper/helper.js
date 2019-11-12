@@ -1,7 +1,20 @@
-const config = require('../../common/config/env.config.js');
-const { JsonRpc } = require('eosjs');
+const config                     = require('../../common/config/env.config.js');
+const { JsonRpc, RpcError, Api } = require('eosjs');
+const { JsSignatureProvider }    = require('eosjs/dist/eosjs-jssig');
 const fetch = require('node-fetch');
 const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+const { TextEncoder, TextDecoder } = require('util');
+
+var iugu_config         = null;
+try {
+    iugu_config         = require('../../common/config/iugu.config.js');
+} catch (ex) {}
+
+const iugu_private_key  = process.env.IUGU_ISSUER_PRIVATE_KEY || iugu_config.prod.private_key;
+
+const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+const signatureProvider = new JsSignatureProvider([iugu_private_key]);
+const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
 
 const PERMISSION_VIEWER = 'viewer';
 const PERMISSION_PDA    = 'pda';
@@ -79,4 +92,55 @@ exports.getPermissionsForAccount = async (account_name, permissioner_account, pe
     )
 
   });
+}
+
+
+exports.issueIugu = async (to, amount, memo) => {
+
+  const issueAction = {
+    account: config.eos.token.contract,
+    name: "issue",
+    authorization: [
+      {
+        actor: config.eos.token.account,
+        permission: "active"
+      }
+    ],
+    data: {
+      to: to,
+      quantity: formatAmount(amount),
+      memo: ('iug|'+memo)
+    }
+  }
+
+  return pushTX(issueAction);
+
+}
+
+// const pushTX = async (tx, privatekey) => {
+const pushTX = async (tx) => {
+  // const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+  // const signatureProvider = new JsSignatureProvider([iugu_private_key]);
+  // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
+
+  try {
+	  const result = await api.transact(
+	    { actions: Array.isArray(tx)?tx:[tx] },
+	    {
+	      blocksBehind: 3,
+	      expireSeconds: 30
+	    }
+	  );
+	  console.log(' InkiriApi::pushTX (then#1) >> ', JSON.stringify(result));
+    return {data:result};
+
+	} catch (e) {
+	  console.log(' InkiriApi::pushTX (error#1) >>  ', JSON.stringify(e));
+    // throw e.json.error.details[0].message;
+    throw e;
+	}
+}
+
+const formatAmount = (amount) => {
+  return Number(amount).toFixed(4) + ' ' + config.eos.token.code;
 }
