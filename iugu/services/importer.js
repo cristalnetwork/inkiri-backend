@@ -62,7 +62,6 @@ const importImpl = () => new Promise(async(res, rej) => {
                       , paid_at_to:    _now
                       , status_filter: 'paid'
                       , 'sortBy[paid_at]' : 'ASC'};
-
     //Um hash sendo a chave o nome do campo para ordenação e o valor sendo DESC ou ASC para descendente e ascendente, respectivamente. ex1: sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
     //  https://api.iugu.com/v1/invoices?limit=100&start=0&paid_at_from=2019-11-01T00:00:00-03:00&paid_at_to=2019-11-10T23:59:59-03:00&status_filter=paid
     fetch(url, {

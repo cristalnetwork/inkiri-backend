@@ -3,8 +3,6 @@ const IuguModel    = require('../models/iugu.model');
 const importer     = require('../services/importer');
 const issuer       = require('../services/issuer');
 
-const iugu_config = require('../../common/config/iugu.config.js');
-
 const TASK_IMPORT           = 'import';
 const TASK_ISSUE            = 'issue';
 const TASK_IMPORT_AND_ISSUE = 'import_and_issue';
