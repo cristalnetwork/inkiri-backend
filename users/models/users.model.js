@@ -11,6 +11,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     account_name:     { type:  String  , unique : true},
+    alias:            { type:  String   }, //, unique : true,
     first_name:       { type:  String },
     last_name:        { type:  String },
     email:            { type:  String  , unique : true},
@@ -78,6 +79,10 @@ exports.findByEmail = (email) => {
 
 exports.findByAccountName = (account_name) => {
     return User.find({account_name: account_name});
+};
+
+exports.findByAlias = (alias) => {
+    return User.find({alias: alias});
 };
 
 exports.findById = (id) => {

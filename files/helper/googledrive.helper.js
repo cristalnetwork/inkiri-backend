@@ -1,11 +1,10 @@
 //const credentials   = require('../../common/config/credentials.json');
 const {google}      = require('googleapis');
 const config        = require('../../common/config/env.config.js');
-var moment = require('moment');
-var credentials = null;
+var moment          = require('moment');
+var credentials     = null;
 try {
     credentials   = require('../../common/config/credentials.json');
-    // do stuff
 } catch (ex) {
 
 }
@@ -33,7 +32,7 @@ const drive = google.drive({ version: 'v3', auth });
 exports.drive = drive;
 
 const formatFileNameImpl = (original_filename) => {
-  return moment().format('YYYY-MM-DD.hh:mm:ss') + ' ' + original_filename;
+  return moment().format('YYYY-MM-DD.HH:mm:ss') + ' ' + original_filename;
 }
 exports.formatFileName = (original_filename) => formatFileNameImpl(original_filename);
 

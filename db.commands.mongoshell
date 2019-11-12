@@ -30,3 +30,9 @@ db.requests.updateMany(
    {state: 'state_concluded'},
    {state: 'state_accepted'}
 )
+
+
+db.users.updateMany(
+   {},
+   { $set: { alias: "" }}
+)
