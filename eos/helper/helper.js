@@ -2,7 +2,6 @@ const config                     = require('../../common/config/env.config.js');
 const { JsonRpc, RpcError, Api } = require('eosjs');
 const { JsSignatureProvider }    = require('eosjs/dist/eosjs-jssig');
 const fetch = require('node-fetch');
-const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
 const { TextEncoder, TextDecoder } = require('util');
 
 var iugu_config         = null;

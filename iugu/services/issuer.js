@@ -8,7 +8,7 @@ exports.issue = async () => new Promise(async(res, rej) => {
   IuguModel.listUnprocessed()
     .then( (invoices) => {
 
-      invoices.forEach(function(invoice){
+      invoices.forEach( async (invoice) => {
           let tx = null;
           try {
               tx = await eos_helper.issueIugu(invoice.receipt_accountname, invoice.amount, invoice.id)

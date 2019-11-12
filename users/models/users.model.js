@@ -10,11 +10,12 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    account_name:     { type:  String  , unique : true},
-    alias:            { type:  String   }, //, unique : true,
+    account_name:     { type:  String  , unique : true, index: true},
+    // alias:            { type:  String, trim: true, index: true, unique: true, sparse: true},
+    alias:            { type:  String , index: true},
     first_name:       { type:  String },
     last_name:        { type:  String },
-    email:            { type:  String  , unique : true},
+    email:            { type:  String  , unique : true, index: true},
     legal_id:         { type:  String },
     birthday:         { type:  Date },
     phone:            { type:  String },
@@ -33,7 +34,7 @@ const userSchema = new Schema({
     account_type:     { type:  String ,
                         enum: ['none', 'personal', 'business', 'foundation', 'bankadmin']
                       },
-    business_name:    { type:  String,
+    business_name:    { type:  String, index: true, 
                         required: function() {
                             return this.account_type == 'business';
                         } },
