@@ -71,7 +71,7 @@ exports.patchById = (req, res) => {
     //     let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
     //     req.body.password = salt + "$" + hash;
     // }
-
+    delete req.body.account_name;
     UserModel.patchUser(req.params.userId, req.body)
         .then((result) => {
             // res.status(204).send({});

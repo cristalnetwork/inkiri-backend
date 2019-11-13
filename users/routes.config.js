@@ -1,4 +1,5 @@
 const UsersController = require('./controllers/users.controller');
+const UsersMiddleware = require('./middlewares/users.middleware.js');
 const PermissionMiddleware = require('../common/middlewares/auth.permission.middleware');
 const ValidationMiddleware = require('../common/middlewares/auth.validation.middleware');
 const config = require('../common/config/env.config');
@@ -33,7 +34,8 @@ exports.routesConfig = function (app) {
     ]);
     app.patch(config.api_version+'/users/:userId', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.loggedUserHasWritePermissionOnUserObject,
+        UsersMiddleware.validateWriteAuth,
+        // PermissionMiddleware.loggedUserHasWritePermissionOnUserObject,
         // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
         // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         UsersController.patchById
