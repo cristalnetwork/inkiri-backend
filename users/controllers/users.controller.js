@@ -25,6 +25,7 @@ exports.list = (req, res) => {
     let limit = req.query.limit && req.query.limit <= 100 ? parseInt(req.query.limit) : 10;
     let page = 0;
     let filter = {};
+    console.log(' USER.list ...');
     if (req.query) {
         if (req.query.page) {
             req.query.page = parseInt(req.query.page);
@@ -32,6 +33,10 @@ exports.list = (req, res) => {
         }
         if (req.query.email) {
             filter = {...filter, email: req.query.email};
+        }
+        if (req.query.account_type) {
+          console.log(' USER.list :: filtered by req.query.account_type:', req.query.account_type)
+          filter = {...filter, account_type: req.query.account_type};
         }
         if (req.query.account_name) {
             filter = {...filter, account_name: req.query.account_name};
