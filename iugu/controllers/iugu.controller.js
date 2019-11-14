@@ -55,7 +55,7 @@ exports.insert = (req, res) => {
   .then((result) => {
       res.status(201).send({id: result._id});
   }, (err)=>{
-      console.log(' request.Controller::ERROR', JSON.stringify(err));
+      console.log(' iugu.Controller::ERROR', JSON.stringify(err));
       res.status(400).send({error:err.errmsg});
   });
 };
@@ -70,36 +70,23 @@ exports.list = (req, res) => {
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
 
-        // From & To, Provider and Excchanges
-        if (req.query.from) {
-            filter = {...filter, from: req.query.from};
+        // receipt_alias & receipt_accountname
+        if (req.query.alias) {
+            filter = {...filter, receipt_alias: req.query.alias};
         }
-        if (req.query.to) {
-            filter = {...filter, to: req.query.to};
+        if (req.query.account_name) {
+            filter = {...filter, receipt_accountname: req.query.account_name};
         }
-        if (req.query.provider_id) {
-            filter = {...filter, provider: req.query.provider_id};
+        if (req.query.iugu_id) {
+            filter = {...filter, iugu_id: req.query.iugu_id};
         }
 
         if (req.query.state) {
             filter = {...filter, state: req.query.state};
         }
-
-        if (req.query.requested_type && !req.query.requested_type.includes('|')) {
-            filter = {...filter, requested_type: req.query.requested_type};
-        }
-        else
-          if (req.query.requested_type && req.query.requested_type.includes('|')) {
-            filter = {...filter,  $or : req.query.requested_type.split('|').map(req_item=> {return { requested_type: req_item}}) };
-          }
     }
-    // console.log(req.query.requested_type.split('|').map(req_item=> {return { requested_type: req_item}}))
-    // console.log(filter)
-    // db.requests.find({requested_type:{$or:['type_deposit']}})
-    // db.requests.find( { $or: [ { requested_type: "type_deposit" }, { requested_type: "type_withdraw" } ] } )
-    // query.or([{ color: 'red' }, { status: 'emergency' }])
 
-    RequestModel
+    IuguModel
       .list(limit, page, filter)
       .then((result) => {
         res.status(200).send(result);
@@ -110,8 +97,8 @@ exports.list = (req, res) => {
     };
 
 exports.getById = async (req, res) => {
-      console.log(' >> getById:', req.params.requestId);
-      RequestModel.findById(req.params.requestId)
+      console.log(' >> getById:', req.params.invoiceId);
+      IuguModel.findById(req.params.invoiceId)
           .then((result) => {
               if(!result)
               {
@@ -128,7 +115,7 @@ exports.getById = async (req, res) => {
 exports.getByCounter = async (req, res) => {
     console.log(' >> getById:', req.params.counterId);
     let filter = { requestCounterId : req.params.counterId};
-    RequestModel.list(1, 0, filter)
+    IuguModel.list(1, 0, filter)
       .then((result) => {
         if(!result || !result[0])
           return res.status(404).send({error:'NOT FOUND'});
@@ -141,10 +128,10 @@ exports.getByCounter = async (req, res) => {
     };
 
 exports.patchById = (req, res) => {
-    console.log(' ABOUT TO PATCH REQUEST ', req.params.requestId)
+    console.log(' ABOUT TO PATCH REQUEST ', req.params.invoiceId)
     console.log(JSON.stringify(req.body));
 
-    RequestModel.patchRequest(req.params.requestId, req.body)
+    IuguModel.patchRequest(req.params.invoiceId, req.body)
         .then((result) => {
             res.status(200).send({});
         });
@@ -152,7 +139,7 @@ exports.patchById = (req, res) => {
 };
 
 exports.removeById = (req, res) => {
-    RequestModel.removeById(req.params.requestId)
+    IuguModel.removeById(req.params.invoiceId)
         .then((result)=>{
             // res.status(204).send({});
             res.status(200).send({});
