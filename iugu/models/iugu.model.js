@@ -5,6 +5,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://localhost/inkiri');
 
 exports.STATE_NOT_PROCESSED = 'state_not_processed';
+exports.STATE_PROCESSING    = 'state_processing';
 exports.STATE_ISSUED        = 'state_issued';
 exports.STATE_ERROR         = 'state_error';
 exports.STATE_ISSUE_ERROR   = 'state_issue_error';
@@ -37,6 +38,7 @@ const iuguSchema = new Schema({
     state:                {
                             type: String
                             , enum: [ exports.STATE_NOT_PROCESSED,
+                                      exports.STATE_PROCESSING,
                                       exports.STATE_ISSUED,
                                       exports.STATE_ERROR,
                                       exports.STATE_ISSUE_ERROR
@@ -116,6 +118,11 @@ const lastImportedImpl = async () => {
   });
 }
 
+exports.canReprocess = (invoice) => {
+  return (invoice)?
+    [exports.STATE_NOT_PROCESSED, exports.STATE_ERROR, exports.STATE_ISSUE_ERROR].includes(invoice.state)
+    :false;
+}
 exports.listUnprocessed = async () => listUnprocessedImpl();
 
 const listUnprocessedImpl = async () => {
@@ -164,11 +171,25 @@ exports.list = (perPage, page, query) => {
     });
 };
 
-exports.patchById = (id, iuguData) => {
-    return Iugu.findOneAndUpdate({
-        _id: id
-        }, iuguData);
+exports.patchById = async (id, iuguData) => {
+  return new Promise((resolve, reject) => {
+    Iugu.findOneAndUpdate(
+      {_id: id}
+      , iuguData
+      , function (err, result) {
+          if (err) {
+              reject(err);
+          } else {
+            resolve(result);
+          }
+        }
+    );
+  });
 };
+
+exports.updateMany = async(filter, update, options, callback) => {
+  return Iugu.updateMany(filter, update, options, callback);
+}
 
 exports.insertMany = (invoices) => {
   return new Promise((resolve, reject) => {
@@ -195,6 +216,26 @@ exports.removeById = (iuguId) => {
     });
 };
 
-exports.findByIuguId = (iugu_id) => {
-    return Iugu.find({iugu_id: iugu_id});
+// exports.findByIuguId = (iugu_id) => {
+//     return Iugu.find({iugu_id: iugu_id});
+// };
+
+exports.findByIuguId = (iugu_id, null_if_not_found) => {
+  return new Promise((resolve, reject) => {
+      Iugu.findOne({iugu_id: iugu_id})
+          .exec(function (err, result) {
+              if (err) {
+                reject(err);
+              } else {
+                  if(!result)
+                  {
+
+                    null_if_not_found?resolve(null):reject('NOT FOUND!!!!!!!!!');
+                    return;
+                  }
+                  resolve (result.toJSON());
+              }
+          })
+  });
+
 };

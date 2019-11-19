@@ -26,9 +26,13 @@ exports.routesConfig = function (app) {
         IuguController.getById
     ]);
 
-    app.patch(config.api_version+'/iugu/:invoiceId', [
-        ValidationMiddleware.validJWTNeeded,
-        IuguController.patchById
+    // app.patch(config.api_version+'/iugu/:invoiceId', [
+    //     ValidationMiddleware.validJWTNeeded,
+    //     IuguController.patchById
+    // ]);
+
+    app.get(config.api_version+'/iugu_process/:invoiceId', [
+        IuguController.reprocess
     ]);
 
     app.delete(config.api_version+'/iugu/:invoiceId', [

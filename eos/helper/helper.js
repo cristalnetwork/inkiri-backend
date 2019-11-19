@@ -131,7 +131,7 @@ const pushTX = async (tx) => {
 	    }
 	  );
 	  console.log(' InkiriApi::pushTX (then#1) >> ', JSON.stringify(result));
-    return {data:result};
+    return result;
 
 	} catch (e) {
 	  console.log(' InkiriApi::pushTX (error#1) >>  ', JSON.stringify(e));

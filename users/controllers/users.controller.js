@@ -39,8 +39,23 @@ exports.list = (req, res) => {
           filter = {...filter, account_type: req.query.account_type};
         }
         if (req.query.account_name) {
-            filter = {...filter, account_name: req.query.account_name};
+          filter = {...filter, account_name: req.query.account_name};
         }
+        if (req.query.account_names) {
+          filter = {...filter, account_name: {$in : req.query.account_names.split(',')}};
+          console.log(req.query.account_names)
+        }
+        if (req.query.ids) {
+          filter = {...filter, id: {$in : req.query.ids}};
+          console.log(req.query.ids)
+        }
+        if (req.query.alias) {
+          // filter = {...filter, alias: new RegExp('^'+req.query.alias+'$', "i")}
+          // filter = {...filter, alias: new RegExp('^'+req.query.alias+'$', "i")}
+          filter = {...filter, alias: {$regex: '.*' + req.query.alias + '.*'}}
+
+        }
+
     }
     UserModel.list(limit, page, filter)
         .then((result) => {

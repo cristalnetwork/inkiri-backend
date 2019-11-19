@@ -56,7 +56,7 @@ exports.patchById = (req, res) => {
     //     req.body.password = salt + "$" + hash;
     // }
 
-    BankAccountModel.patchProvider(req.params.bankAccountId, req.body)
+    BankAccountModel.patchBankAccount(req.params.bankAccountId, req.body)
         .then((result) => {
             // res.status(204).send({});
             res.status(200).send({});

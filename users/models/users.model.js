@@ -12,19 +12,19 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     account_name:     { type:  String  , unique : true, index: true},
     // alias:            { type:  String, trim: true, index: true, unique: true, sparse: true},
-    alias:            { type:  String , index: true},
-    first_name:       { type:  String },
-    last_name:        { type:  String },
-    email:            { type:  String  , unique : true, index: true},
-    legal_id:         { type:  String },
+    alias:            { type:  String , index: true, trim:true},
+    first_name:       { type:  String , trim:true},
+    last_name:        { type:  String , trim:true},
+    email:            { type:  String  , unique : true, index: true, trim:true},
+    legal_id:         { type:  String , trim:true},
     birthday:         { type:  Date },
-    phone:            { type:  String },
+    phone:            { type:  String , trim:true},
     address:          {
-                        street:   { type:String}, // Street and Number, Apt, Suite, Unit, Building
-                        city:     { type:String}, //
-                        state:    { type:String}, // State /Province
-                        zip:      { type:String}, // Postal Code
-                        country:  { type:String}
+                        street:   { type:String, trim:true}, // Street and Number, Apt, Suite, Unit, Building
+                        city:     { type:String, trim:true}, //
+                        state:    { type:String, trim:true}, // State /Province
+                        zip:      { type:String, trim:true}, // Postal Code
+                        country:  { type:String, trim:true}
                       },
     to_sign:          { type:  String },
     permission_level: { type:  Number },
@@ -34,7 +34,7 @@ const userSchema = new Schema({
     account_type:     { type:  String ,
                         enum: ['none', 'personal', 'business', 'foundation', 'bankadmin']
                       },
-    business_name:    { type:  String, index: true, 
+    business_name:    { type:  String, index: true, trim:true,
                         required: function() {
                             return this.account_type == 'business';
                         } },
@@ -42,9 +42,9 @@ const userSchema = new Schema({
 
     bank_accounts:    [
             {
-                bank_name:        { type:  String},
-                agency:           { type:  String },
-                cc:               { type:  String },
+                bank_name:        { type:  String, trim:true},
+                agency:           { type:  String, trim:true},
+                cc:               { type:  String, trim:true},
             }],
   },
   { timestamps: { createdAt: 'created_at' } });

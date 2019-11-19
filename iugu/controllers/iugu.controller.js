@@ -1,23 +1,41 @@
 const config       = require('../../common/config/env.config.js');
 const IuguModel    = require('../models/iugu.model');
+const IuguLogModel = require('../../iugu_log/models/iugu_log.model');
 const importer     = require('../services/importer');
 const issuer       = require('../services/issuer');
 
-const TASK_IMPORT           = 'import';
-const TASK_ISSUE            = 'issue';
-const TASK_IMPORT_AND_ISSUE = 'import_and_issue';
+const TASK_IMPORT            = 'import';
+const TASK_ISSUE             = 'issue';
+const TASK_IMPORT_AND_ISSUE  = 'import_and_issue';
+const TASK_GET_LAST_IMPORTED = 'get_last_imported';
 
-exports.import = (req, res) => {
+exports.import = async(req, res) => {
+
+  if(req.params.task==TASK_GET_LAST_IMPORTED)
+  {
+    const lastImported = await IuguModel.lastImported();
+    // from = lastImported.paid_at;
+    res.status(200).send({paid_at: lastImported.paid_at, result: lastImported});
+    return;
+  }
 
   if(req.params.task==TASK_IMPORT)
   {
     importer.importAndSave()
       .then( (result) => {
           res.status(200).send({message: 'OK', result: result});
+
+          if(!result.error)
+            IuguLogModel.logImport('', result.items.length, result.items.map(obj => obj.id), null, 0, null, null, result.qs)
+          else
+            IuguLogModel.logImport(result.error, 0, null, null, 0, null, null, result.qs)
+
+          console.log('importController::importAndSave()::result-> ', JSON.stringify(result))
           return;
       }, (err)=>{
-          console.log('#import::ERROR', JSON.stringify(err))
+          console.log('importController::importAndSave()::ERROR-> ', JSON.stringify(err))
           res.status(500).send({error:err});
+          IuguLogModel.logImport(err.error, 0, null, null, 0, null, null, err.qs )
           return;
       });
     return;
@@ -25,13 +43,15 @@ exports.import = (req, res) => {
 
   if(req.params.task==TASK_ISSUE)
   {
-    issuer.issue()
+    issuer.issuePending()
       .then( (result) => {
+          console.log('importController::issue()::result-> ', JSON.stringify(result))
           res.status(200).send({message: 'OK', result: result});
           return;
       }, (err)=>{
-          console.log('#issue::ERROR', JSON.stringify(err))
+          console.log('importController::issue()::ERROR-> ', JSON.stringify(err))
           res.status(500).send({error:err});
+          IuguLogModel.logImport(err.error, 0, null, null, 0, null, null, err.qs )
           return;
       });
     return;
@@ -39,12 +59,37 @@ exports.import = (req, res) => {
 
   if(req.params.task==TASK_IMPORT_AND_ISSUE)
   {
+    console.log('#issue::ERROR -> TASK_IMPORT_AND_ISSUE NOT ALLOWED')
+    res.status(405).send({error:'TASK_IMPORT_AND_ISSUE NOT ALLOWED!'});
     return;
   }
 };
 
-exports.issue = (req, res) => {
+exports.reprocess = (req, res) => {
+  importer.reProcessInvoice(req.params.invoiceId)
+    .then( (result) => {
+        console.log('importController::repsocess()::result-> ', JSON.stringify(result));
+        res.status(200).send({message: 'OK', result: result});
 
+        const issued_ok    = [result];
+        const issued_error = [];
+        IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice.id), null,
+                                   issued_error.length,    issued_error.map(obj => obj.invoice.id),    issued_error.map(obj => obj.error)
+                                   , false)
+        return;
+    }, (err)=>{
+        console.log('importController::repsocess()::ERROR', req.params.invoiceId, JSON.stringify(err))
+        res.status(500).send({error:err});
+
+        const issued_ok    = [err];
+        const issued_error = [];
+        IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice.id), null,
+                                   issued_error.length,    issued_error.map(obj => obj.invoice.id),    issued_error.map(obj => obj.error)
+                                   , false)
+
+        return;
+    });
+  return;
 }
 
 exports.insert = (req, res) => {
@@ -69,7 +114,6 @@ exports.list = (req, res) => {
             req.query.page = parseInt(req.query.page);
             page = Number.isInteger(req.query.page) ? req.query.page : 0;
         }
-
         // receipt_alias & receipt_accountname
         if (req.query.alias) {
             filter = {...filter, receipt_alias: req.query.alias};

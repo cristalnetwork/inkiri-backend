@@ -14,7 +14,7 @@ const providerSchema = new Schema({
     cnpj:             { type:  String, required: true},
     email:            { type:  String  , unique : true},
     phone:            { type:  String },
-    address:          { 
+    address:          {
                         street:   { type:String}, // Street and Number, Apt, Suite, Unit, Building
                         city:     { type:String}, //
                         state:    { type:String}, // State /Province
@@ -24,23 +24,23 @@ const providerSchema = new Schema({
 
     category:           { type:  String },
     products_services:  { type:  String },
-    
+
     created_by:       { type: Schema.Types.ObjectId, ref: 'Users', required : true},
     updated_by:       { type: Schema.Types.ObjectId, ref: 'Users'},
     state:            { type:  String ,
                         enum: ['ok', 'disabled', 'deleted']
-                      }, 
+                      },
 
     // bank_accounts:    [{ type: Schema.Types.ObjectId, ref: 'BankAccounts' }],
     bank_accounts:    [
-            { 
+            {
                 bank_name:        { type:  String},
                 agency:           { type:  String },
-                cc:               { type:  String }, 
+                cc:               { type:  String },
             }],
 
     providerCounterId:    { type: Number, unique : true},
-  }, 
+  },
   { timestamps:       { createdAt: 'created_at' } });
 
 //const thingSchema = new Schema({..}, { timestamps: { createdAt: 'created_at' } });
@@ -74,7 +74,8 @@ exports.findByEmail = (email) => {
 };
 
 exports.searchByName = (name) => {
-    return Provider.find({name: new RegExp('^'+name+'$', "i")});
+    // return Provider.find({name: new RegExp('^'+name+'$', "i")});
+    return Provider.find({name: {$regex: '.*' + name + '.*'}});
 };
 
 exports.findById = (id) => {
@@ -100,7 +101,7 @@ exports.createProvider = (providerData) => {
 //             }
 //             return User.create(userData);
 //         });
-    
+
 // }
 
 exports.list = (perPage, page, query) => {
@@ -149,9 +150,9 @@ exports.patchProviderByEmail = (email, providerData) => {
         },(err)=>{
             // console.log( 'users.model::patchUserByAccountName() ERROR#1 ' , JSON.stringify(err))
             reject({error:err})
-        });       
-    }); 
-    
+        });
+    });
+
 };
 
 exports.removeById = (providerId) => {
@@ -165,4 +166,3 @@ exports.removeById = (providerId) => {
         });
     });
 };
-
