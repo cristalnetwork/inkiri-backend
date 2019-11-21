@@ -1,4 +1,5 @@
-const IuguLogModel = require('../../iugu_log/models/iugu_log.model');
+const IuguLogModel      = require('../../iugu_log/models/iugu_log.model');
+const UserModel         = require('../../users/models/users.model');
 const IuguModel         = require('../models/iugu.model');
 const eos_helper        = require('../../eos/helper/helper');
 var  moment             = require('moment');
@@ -9,6 +10,7 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
   IuguModel.listUnprocessed()
     .then( async (invoices) => {
 
+      console.log(' >> issuer::issuePending #1');
       const invoices_ids = invoices.map( invoice => invoice.id );
       IuguModel.updateMany(
                             {
@@ -20,6 +22,7 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
                             , (err, writeResult) => {
 
                             });
+
       let _issue_p = invoices.map(async (invoice) => { return issueOneImpl(invoice).catch(e => e); } )
 
       let _issue         = null;

@@ -1,18 +1,16 @@
-const config = require('./common/config/env.config.js');
-
-const express = require('express');
-const app = express();
+const config     = require('./common/config/env.config.js');
+const express    = require('express');
+const app        = express();
 const bodyParser = require('body-parser');
 
 const AuthorizationRouter = require('./authorization/routes.config');
-const UsersRouter = require('./users/routes.config');
-const EosRouter = require('./eos/routes.config');
-const RequestsRouter = require('./requests/routes.config');
-const ProvidersRouter = require('./providers/routes.config');
-const BankAccountsRouter = require('./bank_accounts/routes.config');
-// const FilesRouter = require('./files/routes.config');
-const CommonRouter = require('./common/routes.config');
-const IuguRouter = require('./iugu/routes.config');
+const UsersRouter         = require('./users/routes.config');
+const EosRouter           = require('./eos/routes.config');
+const RequestsRouter      = require('./requests/routes.config');
+const ProvidersRouter     = require('./providers/routes.config');
+const BankAccountsRouter  = require('./bank_accounts/routes.config');
+const CommonRouter        = require('./common/routes.config');
+const IuguRouter          = require('./iugu/routes.config');
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
