@@ -1,6 +1,7 @@
 const fetch             = require('node-fetch');
 const IuguModel         = require('../models/iugu.model');
 const UserModel         = require('../../users/models/users.model');
+const config            = require('../../common/config/env.config.js');
 var iugu_config         = null;
 try {
     iugu_config         = require('../../common/config/iugu.config.js');
@@ -65,7 +66,7 @@ const importImpl = () => new Promise(async(res, rej) => {
     const _from   = moment(from).format(iugu_date_format);
     console.log(' ## since-03 : _from: ', _from);
     const _now    = moment().format(iugu_date_format)
-    const url     = iugu_config.api.endpoint + '/invoices';
+    const url     = config.iugu.api.endpoint + '/invoices';
     const method  = 'GET';
     const qs      = { limit :          100
                       , start :        0
