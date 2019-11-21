@@ -4,6 +4,8 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://localhost/inkiri');
 
+exports.ACCOUNT_TYPE_BUSINESS = 'business';
+
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 // const AutoIncrementFactory = require('mongoose-sequence');
 
@@ -32,7 +34,7 @@ const userSchema = new Schema({
     self_created:     { type:  Boolean, default: true },
 
     account_type:     { type:  String ,
-                        enum: ['none', 'personal', 'business', 'foundation', 'bankadmin']
+                        enum: ['none', 'personal', exports.ACCOUNT_TYPE_BUSINESS, 'foundation', 'bankadmin']
                       },
     business_name:    { type:  String, index: true, trim:true,
                         required: function() {

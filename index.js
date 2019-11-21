@@ -11,6 +11,7 @@ const ProvidersRouter     = require('./providers/routes.config');
 const BankAccountsRouter  = require('./bank_accounts/routes.config');
 const CommonRouter        = require('./common/routes.config');
 const IuguRouter          = require('./iugu/routes.config');
+const TeamsRouter         = require('./teams/routes.config');
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -32,9 +33,9 @@ EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
 ProvidersRouter.routesConfig(app);
 BankAccountsRouter.routesConfig(app);
-// FilesRouter.routesConfig(app);
 CommonRouter.routesConfig(app);
 IuguRouter.routesConfig(app);
+TeamsRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
 

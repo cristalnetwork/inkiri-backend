@@ -43,7 +43,7 @@ exports.validateWriteAuth = async(req, res, next) => {
 
   if(!is_authorized)
     try {
-      let perm = await eos_helper.accountHasWritePermission(account_name, request_owner);
+      let perm = await eos_helper.accountHasWritePermission(account_name, user_owner);
       if(perm)
       {
         is_authorized = true;
