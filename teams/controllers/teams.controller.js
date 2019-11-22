@@ -33,8 +33,8 @@ exports.getById = (req, res) => {
 exports.getByAccountName = (req, res) => {
     TeamModel.findByAccountName(req.params.accountName)
         .then((result) => {
-            if(result && result.length>0)
-              return res.status(200).send(result[0]);
+            if(result)
+              return res.status(200).send(result);
             return res.status(404).send({error:'Not Found', message:'Not Found'});
         }, (err)=>{
             console.log(' ERROR# 1', JSON.stringify(err))
@@ -43,7 +43,7 @@ exports.getByAccountName = (req, res) => {
 };
 
 exports.patchById = (req, res) => {
-    TeamModel.patchUser(req.params.teamId, req.body)
+    TeamModel.patchTeam(req.params.teamId, req.body)
         .then((result) => {
             // res.status(204).send({});
             res.status(200).send({});

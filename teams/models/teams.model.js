@@ -82,14 +82,26 @@ const Team = mongoose.model('Teams', teamSchema);
 
 
 exports.findByAccountName = (account_name) => {
-    return Team.find({account_name: account_name});
+    // return Team.find({account_name: account_name})
+    return new Promise((resolve, reject) => {
+        Team.find({account_name: account_name})
+            .populate('created_by')
+            .populate('members.member')
+            .exec(function (err, teams) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(teams[0].toJSON());
+                }
+            })
+    });
 };
 
 exports.getById = (id) => {
   return new Promise((resolve, reject) => {
       Team.findById(id)
           .populate('created_by')
-          .populate('members')
+          .populate('members.member')
           .exec(function (err, result) {
               if (err) {
                   reject(err);
@@ -115,7 +127,7 @@ exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
         Team.find(query)
             .populate('created_by')
-            .populate('members')
+            .populate('members.member')
             .limit(perPage)
             .skip(perPage * page)
             .exec(function (err, members) {

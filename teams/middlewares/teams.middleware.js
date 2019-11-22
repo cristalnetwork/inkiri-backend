@@ -40,38 +40,41 @@ exports.validateWriteAuth = async(req, res, next) => {
   {
     const team_id = req.params.teamId;
     if(!team_id)
-      return res.status(404).send({error:'Team/Business NOT SET'});
+      return res.status(404).send({error:'Team/Business NOT SET #1'});
 
     let team = null;
 
     try {
         team = await TeamModel.findById(team_id);
     } catch (e) {
-        return res.status(404).send({error:'Team/Business NOT SET'});
+        return res.status(404).send({error:'Team/Business NOT SET #2'});
     }
     ref_account = team.account_name;
     biz         = team.created_by;
   }
   if(!ref_account)
-    return res.status(404).send({error:'Team/Business NOT SET'});
+    return res.status(404).send({error:'Team/Business NOT SET #3'});
 
   if(!biz)
     try {
         biz = await UserModel.findByAccountName(ref_account);
     } catch (e) {
-      return res.status(404).send({error:'Team/Business NOT FOUND'});
+      return res.status(404).send({error:'Team/Business NOT FOUND #4'});
     }
 
   if(!biz)
   {
-    return res.status(404).send({error:'Team/Business NOT FOUND'});
+    return res.status(404).send({error:'Team/Business NOT FOUND #5'});
   }
+
+  if(Array.isArray(biz))
+    biz=biz[0];
 
   const account_name  = req.jwt.account_name;
   const biz_account   = biz.account_name;
-
-  if(biz.account_type!=UserModel.ACCOUNT_TYPE_BUSINESS)
-    return res.status(500).send({error:'Ref account type is not a Business'});
+  // console.log(' teams mw -> ', biz)
+  if(biz.account_type!=UserModel.ACCOUNT_TYPE_BUSINESS && biz.account_name!=config.eos.bank.account)
+    return res.status(500).send({error:'Ref account['+biz.account_name+'] type is not a Business neither the bank #6'});
 
   let is_authorized   = account_name==biz_account;
   let is_admin        = account_name==config.eos.bank.account;
