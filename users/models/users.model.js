@@ -63,6 +63,8 @@ userSchema.set('toJSON', {
     transform: function(doc, ret, options) {
         delete ret.to_sign;
         delete ret.__v;
+        if(!ret.id)
+          ret.id = ret._id;
         return ret;
     }
 });
@@ -92,7 +94,7 @@ exports.findById = (id) => {
     return User.findById(id)
         .then((result) => {
             result = result.toJSON();
-            delete result._id;
+            // delete result._id;
             delete result.__v;
             return result;
         });

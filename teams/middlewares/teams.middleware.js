@@ -72,7 +72,7 @@ exports.validateWriteAuth = async(req, res, next) => {
 
   const account_name  = req.jwt.account_name;
   const biz_account   = biz.account_name;
-  // console.log(' teams mw -> ', biz)
+
   if(biz.account_type!=UserModel.ACCOUNT_TYPE_BUSINESS && biz.account_name!=config.eos.bank.account)
     return res.status(500).send({error:'Ref account['+biz.account_name+'] type is not a Business neither the bank #6'});
 
