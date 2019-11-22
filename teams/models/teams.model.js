@@ -91,7 +91,9 @@ exports.findByAccountName = (account_name) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(teams[0].toJSON());
+                  if(!teams || teams.length==0)
+                    return reject('Team not found!');
+                  resolve(teams[0].toJSON());
                 }
             })
     });
