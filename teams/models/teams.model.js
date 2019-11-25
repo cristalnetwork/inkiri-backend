@@ -66,7 +66,6 @@ teamSchema.virtual('id').get(function () {
 teamSchema.set('toJSON', {
     virtuals: true,
     transform: function(doc, ret, options) {
-        delete ret.to_sign;
         delete ret.__v;
         return ret;
     }
