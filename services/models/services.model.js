@@ -9,9 +9,29 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const Schema = mongoose.Schema;
 
-exports.ENUM_STATE_INIT      = 'enum_state_init';
+exports.ENUM_STATE_INITIATED = 'enum_state_initiated';
 exports.ENUM_STATE_PUBLISHED = 'enum_state_published';
+exports.ENUM_STATE_INACTIVE  = 'enum_state_inactive';
 exports.ENUM_STATE_ERROR     = 'enum_state_error';
+
+exports.services_states = [
+  {
+    key   : exports.ENUM_STATE_INITIATED,
+    title : 'Initialized',
+  },
+  {
+    key   : exports.ENUM_STATE_PUBLISHED,
+    title : 'Published',
+  },
+  {
+    key   : exports.ENUM_STATE_INACTIVE,
+    title : 'Inactive'
+  },
+  {
+    key   : exports.ENUM_STATE_ERROR,
+    title : 'Error'
+  }
+];
 
 const serviceSchema = new Schema({
     created_by:       { type: Schema.Types.ObjectId, ref: 'Users', required : true },
@@ -21,8 +41,7 @@ const serviceSchema = new Schema({
     title:            { type: String  , unique : true, index: true },
     description:      { type: String  , unique : true, index: true },
     amount:           { type: Number , required: true },
-
-    state:            { type: String, enum:[exports.ENUM_STATE_INIT, exports.ENUM_STATE_PUBLISHED, exports.ENUM_STATE_ERROR] },
+    state:            { type: String, enum:[exports.ENUM_STATE_INITIATED, exports.ENUM_STATE_PUBLISHED, exports.ENUM_STATE_ERROR, exports.ENUM_STATE_INACTIVE] },
 
     contracts: [
       {

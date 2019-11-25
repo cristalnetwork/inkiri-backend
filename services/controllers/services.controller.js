@@ -12,14 +12,6 @@ exports.insert = (req, res) => {
         });
 };
 
-// exports.getPositions = (req, res) => {
-//   res.status(200).send({job_positions:ServiceModel.job_positions});
-// };
-
-exports.list = (req, res) => {
-
-};
-
 exports.getById = (req, res) => {
     ServiceModel.getById(req.params.serviceId)
         .then((result) => {
@@ -30,16 +22,41 @@ exports.getById = (req, res) => {
         });
 };
 
-exports.getByAccountName = (req, res) => {
-    ServiceModel.findByAccountName(req.params.accountName)
-        .then((result) => {
-            if(result)
-              return res.status(200).send(result);
-            return res.status(404).send({error:'Not Found', message:'Not Found'});
-        }, (err)=>{
-            console.log(' ERROR# 1', JSON.stringify(err))
-            return res.status(404).send({error:JSON.stringify(err), message:err.errmsg});
-        });
+exports.getStates = (req, res) => {
+  res.status(200).send({services_states:ServiceModel.services_states});
+};
+
+exports.list = (req, res) => {
+    let limit = req.query.limit && req.query.limit <= 100 ? parseInt(req.query.limit) : 10;
+    let page = 0;
+    let filter = {};
+    if (req.query) {
+        if (req.query.page) {
+            req.query.page = parseInt(req.query.page);
+            page = Number.isInteger(req.query.page) ? req.query.page : 0;
+        }
+
+        if (req.query.state) {
+            filter = {...filter, state: req.query.state};
+        }
+
+        if (req.query.account_name) {
+            filter = {...filter, account_name: req.query.account_name};
+        }
+
+        if (req.query.id || req.query._id) {
+            filter = {...filter, _id: (req.query.id || req.query._id)};
+        }
+    }
+
+    ServiceModel
+      .list(limit, page, filter)
+      .then((result) => {
+        res.status(200).send(result);
+      },
+      (err)=> {
+        res.status(404).send({error:JSON.stringify(err)});
+      });
 };
 
 exports.patchById = (req, res) => {

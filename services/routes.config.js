@@ -14,7 +14,7 @@ exports.routesConfig = function (app) {
 
     app.get(config.api_version+'/services', [
         ValidationMiddleware.validJWTNeeded,
-        ServicesMiddleware.validateWriteAuth,
+        // ServicesMiddleware.validateWriteAuth,
         ServicesController.list
     ]);
 
@@ -42,4 +42,8 @@ exports.routesConfig = function (app) {
     //     ServicesController.listByAccountName
     // ]);
 
+    app.get(config.api_version+'/services_states', [
+        ValidationMiddleware.validJWTNeeded,
+        ServicesController.getStates
+    ]);
 };
