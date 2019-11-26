@@ -1,6 +1,7 @@
-const ProvidersController = require('./controllers/providers.controller');
-const PermissionMiddleware = require('../common/middlewares/auth.permission.middleware');
-const ValidationMiddleware = require('../common/middlewares/auth.validation.middleware');
+const ProvidersController      = require('./controllers/providers.controller');
+//const PermissionMiddleware = require('../common/middlewares/auth.permission.middleware');
+const ProvidersMiddleware      = require('./middlewares/providers.middleware.js');
+const ValidationMiddleware     = require('../common/middlewares/auth.validation.middleware');
 const VerifyProviderMiddleware = require('./middlewares/verify.provider.middleware');
 
 const config = require('../common/config/env.config');
@@ -10,9 +11,10 @@ const OPS = config.permission_levels.OPS_USER;
 const FREE = config.permission_levels.NORMAL_USER;
 
 exports.routesConfig = function (app) {
-    
+
     app.post(config.api_version+'/providers', [
         ValidationMiddleware.validJWTNeeded,
+        ProvidersMiddleware.validateWriteAuth,
         VerifyProviderMiddleware.validAccountReferences,
         ProvidersController.insert
     ]);
@@ -29,14 +31,13 @@ exports.routesConfig = function (app) {
     ]);
     app.patch(config.api_version+'/providers/:providerId', [
         ValidationMiddleware.validJWTNeeded,
-        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+        ProvidersMiddleware.validateWriteAuth,
         VerifyProviderMiddleware.validAccountReferences,
         ProvidersController.patchById
     ]);
     app.delete(config.api_version+'/providers/:providerId', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.minimumPermissionLevelRequired(ADMIN),
+        ProvidersMiddleware.validateWriteAuth,
         ProvidersController.removeById
     ]);
 };
