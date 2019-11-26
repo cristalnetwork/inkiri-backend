@@ -7,16 +7,16 @@ const config        = require('../../common/config/env.config.js');
 */
 exports.validateWriteAuth = async(req, res, next) => {
 
-  const new_state = req.body.state;
-  if(!new_state)
-  {
-    console.log(' ## STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
-    return next();
-  }
+  // const new_state = req.body.state;
+  // if(!new_state)
+  // {
+  //   console.log(' ## STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
+  //   return next();
+  // }
 
   let user = null;
   try {
-      user = await UserModel.findById(req.params.userId)
+    user = await UserModel.findById(req.params.userId)
   } catch (e) {
     return res.status(404).send({error:'Profile/User NOT FOUND'});
   }
@@ -31,7 +31,8 @@ exports.validateWriteAuth = async(req, res, next) => {
 
   let is_authorized   = account_name==user_owner;
   let is_admin        = account_name==config.eos.bank.account;
-  if(!is_authorized)
+
+  if(!is_authorized && !is_admin)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
       if(perm)
@@ -41,7 +42,7 @@ exports.validateWriteAuth = async(req, res, next) => {
       }
     } catch (e) { }
 
-  if(!is_authorized)
+  if(!is_authorized && !is_admin && user.account_type==UserModel.ACCOUNT_TYPE_BUSINESS)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, user_owner);
       if(perm)
@@ -51,7 +52,7 @@ exports.validateWriteAuth = async(req, res, next) => {
       }
     } catch (e) {}
 
-  if(!is_authorized)
+  if(!is_authorized && !is_admin)
     return res.status(404).send({error:'Account not authorized for this operation. Op requested by:'+account_name+', owner: '+user_owner});
 
   return next();
