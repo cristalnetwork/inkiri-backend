@@ -36,12 +36,6 @@ exports.routesConfig = function (app) {
         ServicesController.removeById
     ]);
 
-    // app.get(config.api_version+'/services_by_account/:accountName', [
-    //     ValidationMiddleware.validJWTNeeded,
-    //     ServicesMiddleware.validateWriteAuth,
-    //     ServicesController.listByAccountName
-    // ]);
-
     app.get(config.api_version+'/services_states', [
         ValidationMiddleware.validJWTNeeded,
         ServicesController.getStates

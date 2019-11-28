@@ -31,11 +31,6 @@ module.exports = {
           "tx_url"                    : 'https://jungle.bloks.io/transaction/'
         }
     },
-    "permission_levels": {
-        "NORMAL_USER": 1,
-        "OPS_USER": 4,
-        "ADMIN": 2048
-    },
     "google":{
         "root_folder_id":"1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7"
     },

@@ -30,7 +30,7 @@ exports.validateWriteAuth = async(req, res, next) => {
   const user_owner    = user.account_name;
 
   let is_admin        = account_name==config.eos.bank.account;
-  let is_authorized   = account_name==user_owner || is_admin;
+  let is_authorized   = (account_name==user_owner) || is_admin;
 
   if(!is_authorized)
     try {

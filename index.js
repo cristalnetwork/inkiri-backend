@@ -3,12 +3,11 @@ const express    = require('express');
 const app        = express();
 const bodyParser = require('body-parser');
 
-const AuthorizationRouter = require('./authorization/routes.config');
 const UsersRouter         = require('./users/routes.config');
 const EosRouter           = require('./eos/routes.config');
 const RequestsRouter      = require('./requests/routes.config');
 const ProvidersRouter     = require('./providers/routes.config');
-const BankAccountsRouter  = require('./bank_accounts/routes.config');
+// const BankAccountsRouter  = require('./bank_accounts/routes.config');
 const CommonRouter        = require('./common/routes.config');
 const IuguRouter          = require('./iugu/routes.config');
 const TeamsRouter         = require('./teams/routes.config');
@@ -28,12 +27,11 @@ app.use(function (req, res, next) {
 });
 
 app.use(bodyParser.json());
-// AuthorizationRouter.routesConfig(app);
 UsersRouter.routesConfig(app);
 EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
 ProvidersRouter.routesConfig(app);
-BankAccountsRouter.routesConfig(app);
+// BankAccountsRouter.routesConfig(app);
 CommonRouter.routesConfig(app);
 IuguRouter.routesConfig(app);
 TeamsRouter.routesConfig(app);

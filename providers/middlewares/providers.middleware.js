@@ -29,8 +29,9 @@ exports.validateWriteAuth = async(req, res, next) => {
   if(biz.account_type!=UserModel.ACCOUNT_TYPE_BUSINESS && biz.account_name!=config.eos.bank.account)
     return res.status(500).send({error:'Ref account['+biz.account_name+'] type is not a Business neither the bank #6'});
 
-  let is_authorized   = account_name==biz_account;
   let is_admin        = account_name==config.eos.bank.account;
+  let is_authorized   = (account_name==biz_account) || is_admin;
+
   if(!is_authorized)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);

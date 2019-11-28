@@ -9,7 +9,11 @@ exports.ACCOUNT_TYPE_PERSONAL   = 'personal';
 exports.ACCOUNT_TYPE_BUSINESS   = 'business';
 exports.ACCOUNT_TYPE_FOUNDATION = 'foundation';
 exports.ACCOUNT_TYPE_BANKADMIN  = 'bankadmin';
-exports.ACCOUNT_TYPES_ENUM      = [exports.ACCOUNT_TYPE_NONE, exports.ACCOUNT_TYPE_PERSONAL, exports.ACCOUNT_TYPE_BUSINESS, exports.ACCOUNT_TYPE_FOUNDATION, exports.ACCOUNT_TYPE_BANKADMIN];
+exports.ACCOUNT_TYPES_ENUM      = [exports.ACCOUNT_TYPE_NONE
+                                    , exports.ACCOUNT_TYPE_PERSONAL
+                                    , exports.ACCOUNT_TYPE_BUSINESS
+                                    , exports.ACCOUNT_TYPE_FOUNDATION
+                                    , exports.ACCOUNT_TYPE_BANKADMIN];
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 // const AutoIncrementFactory = require('mongoose-sequence');
@@ -34,7 +38,6 @@ const userSchema = new Schema({
                         country:  { type:String, trim:true}
                       },
     to_sign:          { type:  String },
-    permission_level: { type:  Number },
 
     self_created:     { type:  Boolean, default: false },
 

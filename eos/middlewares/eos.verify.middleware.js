@@ -1,22 +1,12 @@
-const UserModel = require('../../users/models/users.model');
-const crypto = require('crypto');
+const UserModel     = require('../../users/models/users.model');
+const crypto        = require('crypto');
+const helper        = require('../helper/helper')
 
-
-/*
-let customerInfo = null;
-try {
-    customerInfo = await helper.getCustomerInfo(req.body.account_name);
-} catch (e) {
-  res.status(400).send({error: 'Account is not a customer!'});
-  return;
-}
-
-*/
-
-exports.createIfNotExists  = (req, res, next) => {
+exports.createIfNotExists  = async (req, res, next) => {
 
   const account_name = req.params.account_name.trim();
   let user           = null;
+
   try {
     user = await UserModel.findByAccountName(account_name);
   } catch (e) {
@@ -32,6 +22,7 @@ exports.createIfNotExists  = (req, res, next) => {
   try {
     customerInfo = await helper.getCustomerInfo(account_name);
   } catch (e) {
+    console.log(' ERROR createIfNotExists#1' , e)
     res.status(404).send({error: 'Account is not a customer!'});
     return;
   }
@@ -44,10 +35,11 @@ exports.createIfNotExists  = (req, res, next) => {
   const email         = `${account_name}@cristalnetwork.org`;
   if(account_type==null)
   {
-    res.status(404).send({error: 'Account has invalid ACCOunT TYPE!'});
+    console.log(' ERROR createIfNotExists#2' )
+    res.status(404).send({error: 'Account has invalid ACCOUNT TYPE!'});
     return;
   }
-  const user = {
+  const new_user = {
     account_name:     account_name,
     alias:            alias,
     first_name:       first_name,
@@ -58,7 +50,14 @@ exports.createIfNotExists  = (req, res, next) => {
     business_name:    business_name};
 
   let created = null;
-  UserModel.createUser(user);
+  try {
+    created = UserModel.createUser(new_user);
+  } catch (e) {
+    console.log(' ERROR createIfNotExists#4' )
+    res.status(404).send({error: 'Something went wrong self creating account/user/profile.' + JSON.stringify(e)});
+    return;
+  }
+  return next();
 }
 
 exports.hasChallengeValidFields = (req, res, next) => {
@@ -75,13 +74,14 @@ exports.hasChallengeValidFields = (req, res, next) => {
       UserModel.findByAccountName(req.params.account_name)
         .then((user)=>{
             if(!user[0]){
+              console.log(' ERROR hasChallengeValidFields#1' )
               return res.status(404).send({error:'Account not found man!'});
             }else{
               return next();
             }
         },
         (error) => {
-          // console.log(' **************** ERROR #2', error)
+          console.log(' ERROR hasChallengeValidFields#2' )
           return res.status(400).send({errors: ['Something went wrong my dear friend!']});
         });
     }
@@ -124,7 +124,6 @@ exports.isChallengeAndUserMatch = (req, res, next) => {
             }
             else{
               req.body.userId           = user[0]._id;
-              req.body.permission_level = user[0].permission_level;
               return next();
             }
           }

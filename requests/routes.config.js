@@ -30,10 +30,6 @@ var multer_multi_file_conf = multer.fields([
   { name: RequestsModel.ATTACH_COMPROBANTE, maxCount: 1 }
 ]);
 
-const ADMIN = config.permission_levels.ADMIN;
-const OPS = config.permission_levels.OPS_USER;
-const FREE = config.permission_levels.NORMAL_USER;
-
 exports.routesConfig = function (app) {
     app.post(config.api_version+'/requests', [
         ValidationMiddleware.validJWTNeeded,
@@ -44,21 +40,16 @@ exports.routesConfig = function (app) {
 
     app.get(config.api_version+'/requests', [
         ValidationMiddleware.validJWTNeeded,
-        // PermissionMiddleware.minimumPermissionLevelRequired(OPS),
         RequestsController.list
     ]);
 
     app.get(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
-        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.getById
     ]);
 
     app.get(config.api_version+'/requests_by_counter/:counterId', [
         ValidationMiddleware.validJWTNeeded,
-        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.getByCounter
     ]);
 
@@ -66,15 +57,12 @@ exports.routesConfig = function (app) {
         ValidationMiddleware.validJWTNeeded,
         VerifyRequestMiddleware.validRequestObject,
         RequestStateMachineMiddleware.validateTransition,
-        // PermissionMiddleware.minimumPermissionLevelRequired(FREE),
-        // PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
         RequestsController.patchById
     ]);
 
     app.delete(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.minimumPermissionLevelRequired(OPS),
-        PermissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+        PermissionMiddleware.loggedHasAdminWritePermission,
         RequestsController.removeById
     ]);
 
@@ -96,8 +84,6 @@ exports.routesConfig = function (app) {
         , multer_multi_file_conf
         ,[
           ValidationMiddleware.validJWTNeeded,
-          // VerifyRequestMiddleware.validAccountReferences,
-          // VerifyRequestMiddleware.validRequiredFields,
           VerifyRequestMiddleware.explodeFormData,
           GoogleDriveMiddleware.validMimeTypes,
           VerifyRequestMiddleware.validRequestObject,
