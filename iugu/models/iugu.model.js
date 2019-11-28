@@ -2,7 +2,7 @@ const config = require('../../common/config/env.config.js');
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri || 'mongodb://localhost/inkiri');
+mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri );
 
 exports.STATE_NOT_PROCESSED = 'state_not_processed';
 exports.STATE_PROCESSING    = 'state_processing';

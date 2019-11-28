@@ -8,7 +8,7 @@ exports.ping = (req, res) => {
 }
 exports.insert = (req, res) => {
     // ToDo: validate is a valid EOS account and a Valid Customer.
-    if(req.body.account_name=='inkiritoken1' || req.body.account_name=='inkirimaster')
+    if(req.body.account_name=='inkiritoken1' || req.body.account_name==config.eos.bank.account)
         req.body.permission_level = config.ADMIN;
     else
         req.body.permission_level = config.NORMAL_USER;

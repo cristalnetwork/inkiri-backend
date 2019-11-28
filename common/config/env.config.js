@@ -11,14 +11,14 @@ module.exports = {
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
         "token": {
-            "contract": "inkiritoken1",
-            "account": "inkiritoken1",
+            "contract": "cristaltoken",
+            "account": "cristaltoken",
             "code": "INK"
         },
         "bank": {
-            "contract":        "inkirimaster",
-            "account":         "inkirimaster",
-            "table_accounts":  "ikaccounts"
+            "contract":        "cristaltoken",
+            "account":         "cristaltoken",
+            "table_accounts":  "customer"
         },
         "dfuse" : {
           "api_key"                   : 'web_8a50f2bc42c1df1a41830c359ba74240',

@@ -40,6 +40,6 @@ db.users.updateMany(
 # db.users.find({first_name : { $ne: null } })
 db.users.find({first_name : null }).forEach( function (doc) {
   doc.first_name = doc.email;
-  doc.email      = doc.account_name + '@' + 'inkiri.com';
+  doc.email      = doc.account_name + '@' + 'cristalnetwork.org';
   db.users.save(doc);
 });
