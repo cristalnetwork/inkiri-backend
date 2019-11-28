@@ -4,7 +4,12 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri);
 
-exports.ACCOUNT_TYPE_BUSINESS = 'business';
+exports.ACCOUNT_TYPE_NONE       = 'none';
+exports.ACCOUNT_TYPE_PERSONAL   = 'personal';
+exports.ACCOUNT_TYPE_BUSINESS   = 'business';
+exports.ACCOUNT_TYPE_FOUNDATION = 'foundation';
+exports.ACCOUNT_TYPE_BANKADMIN  = 'bankadmin';
+exports.ACCOUNT_TYPES_ENUM      = [exports.ACCOUNT_TYPE_NONE, exports.ACCOUNT_TYPE_PERSONAL, exports.ACCOUNT_TYPE_BUSINESS, exports.ACCOUNT_TYPE_FOUNDATION, exports.ACCOUNT_TYPE_BANKADMIN];
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 // const AutoIncrementFactory = require('mongoose-sequence');
@@ -31,10 +36,10 @@ const userSchema = new Schema({
     to_sign:          { type:  String },
     permission_level: { type:  Number },
 
-    self_created:     { type:  Boolean, default: true },
+    self_created:     { type:  Boolean, default: false },
 
     account_type:     { type:  String ,
-                        enum: ['none', 'personal', exports.ACCOUNT_TYPE_BUSINESS, 'foundation', 'bankadmin']
+                        enum: exports.ACCOUNT_TYPES_ENUM
                       },
     business_name:    { type:  String, index: true, trim:true,
                         required: function() {
@@ -77,6 +82,19 @@ userSchema.plugin(AutoIncrement, {inc_field: 'userCounterId'});
 
 const User = mongoose.model('Users', userSchema);
 
+exports.getTypeFromInt = (int_type) => {
+    if(isNaN(int_type))
+    {
+      console.log(`-- users.model::getTypeFromInt int_type (${int_type}) is not a NUMBER!`)
+      return null;
+    }
+    if(exports.ACCOUNT_TYPES_ENUM.includes(int_type))
+    {
+      console.log(`-- users.model::getTypeFromInt int_type (${int_type}) is not included in ACCOUNT_TYPES_ENUM!`)
+      return null;
+    }
+    return exports.ACCOUNT_TYPES_ENUM[int_type];
+};
 
 exports.findByEmail = (email) => {
     return User.find({email: email});
@@ -102,8 +120,6 @@ exports.findById = (id) => {
 
 exports.createUser = (userData) => {
     let user = new User(userData);
-    if(!user.email)
-        user.email = `${user.account_name}@inkiri.com`;
     return user.save();
 };
 

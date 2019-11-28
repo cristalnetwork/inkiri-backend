@@ -28,7 +28,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(bodyParser.json());
-AuthorizationRouter.routesConfig(app);
+// AuthorizationRouter.routesConfig(app);
 UsersRouter.routesConfig(app);
 EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);

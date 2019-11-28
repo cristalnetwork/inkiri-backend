@@ -3,7 +3,7 @@ const jwt              = require('jsonwebtoken'),
 const ADMIN_PERMISSION = 4096;
 
 const UserModel        = require('../../users/models/users.model');
-const eos_helper    = require('../../eos/helper/helper');
+const eos_helper       = require('../../eos/helper/helper');
 
 exports.minimumPermissionLevelRequired = (required_permission_level) => {
     return (req, res, next) => {
@@ -48,51 +48,41 @@ exports.sameUserCantDoThisAction = (req, res, next) => {
 
 };
 
-exports.loggedUserHasWritePermissionOnUserObject = async (req, res, next) => {
+exports.loggedHasWritePermissionOnUser = async (req, res, next) => {
 
   UserModel.findById(req.params.userId)
     .then((result) => {
       const auth_user    = req.jwt.account_name;
       const editing_user = result.account_name;
-      // logged user is updating his profile info
-      if (auth_user==editing_user)
-        return next();
-      // admin user is updating another user profile info
-      if(auth_user==config.eos.bank.account)
-        return next();
 
-      // admin permissioned user is updating another user profile info
-      eos_helper.accountHasWritePermission(auth_user, config.eos.bank.account)
-        .then(
-          (result)=>{
-            return next();
+      let is_admin        = auth_user==config.eos.bank.account;
+      let is_authorized   = (auth_user==editing_user) || is_authorized;
+
+      if(!is_authorized)
+        try {
+          let perm = await eos_helper.accountHasWritePermission(auth_user, config.eos.bank.account);
+          if(perm)
+          {
+            is_authorized = true;
+            is_admin = true;
           }
-          , (error)=>{
-              // user permissioned user is updating another user profile info
-              eos_helper.accountHasWritePermission(auth_user, editing_user)
-              .then(
-                (result)=>{
-                  return next();
-                }
-                , (error)=>{
-                  return res.status(404).send({error:'Unauthorized action', message:'You are not allowed to update user profile.'});
-                }
-              );
-          }
-      );
-      // try {
-      //   let perm = await eos_helper.accountHasWritePermission(auth_user, config.eos.bank.account);
-      //   if(perm)
-      //     return next();
-      // } catch (e) { }
-      // user permissioned user is updating another user profile info
-      // try {
-      //   let perm = await eos_helper.accountHasWritePermission(auth_user, editing_user);
-      //   if(perm)
-      //     return next();
-      // } catch (e) {}
-      //
-      // return res.status(404).send({error:'Unauthorized action', message:'You are not allowed to update user profile.'});
+        } catch (e) { }
+
+      // if(!is_authorized)
+      //   try {
+      //     let perm = await eos_helper.accountHasWritePermission(auth_user, editing_user);
+      //     if(perm)
+      //     {
+      //       is_authorized = true;
+      //       is_admin = false;
+      //     }
+      //   } catch (e) {}
+
+      if(!is_authorized)
+        return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+auth_user+', owner: '+editing_user});
+
+      return next();
+
     }, (err)=>{
         console.log(' ERROR# 1', JSON.stringify(err))
         return res.status(404).send({error:JSON.stringify(err), message:err.errmsg});

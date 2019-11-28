@@ -1,6 +1,66 @@
 const UserModel = require('../../users/models/users.model');
 const crypto = require('crypto');
 
+
+/*
+let customerInfo = null;
+try {
+    customerInfo = await helper.getCustomerInfo(req.body.account_name);
+} catch (e) {
+  res.status(400).send({error: 'Account is not a customer!'});
+  return;
+}
+
+*/
+
+exports.createIfNotExists  = (req, res, next) => {
+
+  const account_name = req.params.account_name.trim();
+  let user           = null;
+  try {
+    user = await UserModel.findByAccountName(account_name);
+  } catch (e) {
+    user = null;
+  }
+
+  if(user!=null && (Array.isArray(user)?user:[user])[0]!=null)
+  {
+    return next();
+  }
+
+  let customerInfo = null;
+  try {
+    customerInfo = await helper.getCustomerInfo(account_name);
+  } catch (e) {
+    res.status(404).send({error: 'Account is not a customer!'});
+    return;
+  }
+
+  const account_type  = UserModel.getTypeFromInt(customerInfo.account_type);
+  const alias         = (account_type==UserModel.ACCOUNT_TYPE_BUSINESS)?account_name:'';
+  const business_name = (account_type==UserModel.ACCOUNT_TYPE_BUSINESS)?account_name:'';
+  const first_name    = (account_type==UserModel.ACCOUNT_TYPE_PERSONAL)?account_name:'';
+  const last_name     = (account_type==UserModel.ACCOUNT_TYPE_PERSONAL)?account_name:'';
+  const email         = `${account_name}@cristalnetwork.org`;
+  if(account_type==null)
+  {
+    res.status(404).send({error: 'Account has invalid ACCOunT TYPE!'});
+    return;
+  }
+  const user = {
+    account_name:     account_name,
+    alias:            alias,
+    first_name:       first_name,
+    last_name:        last_name,
+    email:            email,
+    self_created:     true,
+    account_type:     account_type ,
+    business_name:    business_name};
+
+  let created = null;
+  UserModel.createUser(user);
+}
+
 exports.hasChallengeValidFields = (req, res, next) => {
     let errors = [];
 
@@ -22,10 +82,10 @@ exports.hasChallengeValidFields = (req, res, next) => {
         },
         (error) => {
           // console.log(' **************** ERROR #2', error)
-          return res.status(400).send({errors: ['Something went wrong my dear friend!']});        
+          return res.status(400).send({errors: ['Something went wrong my dear friend!']});
         });
     }
-    
+
 };
 
 exports.hasAuthValidFields = (req, res, next) => {
@@ -62,7 +122,7 @@ exports.isChallengeAndUserMatch = (req, res, next) => {
             if (challenge != req.body.challenge) {
               return res.status(400).send({errors: ['Invalid something']});
             }
-            else{    
+            else{
               req.body.userId           = user[0]._id;
               req.body.permission_level = user[0].permission_level;
               return next();
@@ -70,6 +130,6 @@ exports.isChallengeAndUserMatch = (req, res, next) => {
           }
       },
       (error) => {
-        return res.status(400).send({errors: ['Something went wrong my dear friend!']});        
+        return res.status(400).send({errors: ['Something went wrong my dear friend!']});
       });
 };

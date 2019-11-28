@@ -29,6 +29,26 @@ exports.getAccountInfo = async (account_name) => {
   return resp;
 }
 
+exports.getCustomerInfo = async (account_name) => {
+  const response = await rpc.get_table_rows({
+    json:           true
+    , code:         config.eos.bank.account
+    , scope:        config.eos.bank.account
+    , table:        config.eos.bank.table_accounts
+    , lower_bound:  account_name
+    , upper_bound:  account_name
+    , limit:        1
+    , reverse:      false
+    , show_payer :  false
+  });
+  const _found = (response.rows&&response.rows.length>0);
+  if(_found)
+    console.log(' EOSHelper::getCustomerInfo >> ', JSON.stringify(response.rows[0]));
+  else
+    console.log(' EOSHelper::getCustomerInfo >> ', 'NOT FOUND');
+  return _found?{...response.rows[0]}:undefined;
+}
+
 exports.accountHasWritePermission = async (permissioned_account_name, permissioner_account_name) => {
   return exports.getPermissionsForAccount(permissioned_account_name, permissioner_account_name, [PERMISSION_ACTIVE, PERMISSION_OWNER]);
 }

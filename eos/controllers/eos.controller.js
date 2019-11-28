@@ -15,8 +15,7 @@ exports.challenge = async(req, res) => {
 
   ecc.unsafeRandomKey().then((privateKey) => {
     const _privateKey = privateKey.toString();
-    // console.log('Private Key:\t', _privateKey) // wif
-    // console.log('Public Key:\t', ecc.privateToPublic(privateKey)).toString();
+
     UserModel.patchUserByAccountName(req.params.account_name, {to_sign: _privateKey})
     .then((update_res)=>{
       // console.log(' == update_res :\t', JSON.stringify(update_res))
@@ -32,7 +31,14 @@ exports.auth = async(req, res) => {
   // 1.- Lets validate the challenge token.
   // DONE @ middleware
   // 2.- Lets get account's public active keys and find a matching one validating signature and challenge.
-  const accountInfo = await helper.getAccountInfo(req.body.account_name);
+  let accountInfo = null;
+  try {
+      accountInfo = await helper.getAccountInfo(req.body.account_name);
+  } catch (e) {
+    res.status(400).send({error: 'Account not found on blockchain!'});
+    return;
+  }
+
   const active_perm = accountInfo.permissions.filter( perm => perm.perm_name == 'active' )[0];
   const valid_perm =active_perm.required_auth.keys.filter(
     (key) => ecc.verify(req.body.signature, req.body.challenge, key.key))
@@ -41,6 +47,7 @@ exports.auth = async(req, res) => {
   if(!valid_perm || valid_perm.length==0)
   {
     res.status(400).send({errors: ['Something went wrong my dear friend!']});
+    return;
   }
   else{
      // Si, se ll
