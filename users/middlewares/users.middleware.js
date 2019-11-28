@@ -29,10 +29,10 @@ exports.validateWriteAuth = async(req, res, next) => {
   const account_name  = req.jwt.account_name;
   const user_owner    = user.account_name;
 
-  let is_authorized   = account_name==user_owner;
   let is_admin        = account_name==config.eos.bank.account;
+  let is_authorized   = account_name==user_owner || is_admin;
 
-  if(!is_authorized && !is_admin)
+  if(!is_authorized)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
       if(perm)

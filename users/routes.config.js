@@ -18,7 +18,7 @@ exports.routesConfig = function (app) {
 
     app.post(config.api_version+'/users', [
         ValidationMiddleware.validJWTNeeded,
-
+        PermissionMiddleware.loggedHasAdminWritePermission,
         UsersController.insert
     ]);
 
@@ -42,7 +42,7 @@ exports.routesConfig = function (app) {
     ]);
     app.delete(config.api_version+'/users/:userId', [
         ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.minimumPermissionLevelRequired(ADMIN),
+        PermissionMiddleware.loggedHasAdminWritePermission,
         UsersController.removeById
     ]);
 

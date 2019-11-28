@@ -48,6 +48,30 @@ exports.sameUserCantDoThisAction = (req, res, next) => {
 
 };
 
+exports.loggedHasAdminWritePermission = async (req, res, next) => {
+
+    const auth_user    = req.jwt.account_name;
+
+    let is_admin        = auth_user==config.eos.bank.account;
+
+    if(!is_admin)
+      try {
+        let perm = await eos_helper.accountHasWritePermission(auth_user, config.eos.bank.account);
+        if(perm)
+        {
+          is_admin = true;
+        }
+      } catch (e) { }
+
+    if(!is_admin)
+      return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+auth_user});
+
+    return next();
+};
+
+/*
+* Required -> req.params.userId
+*/
 exports.loggedHasWritePermissionOnUser = async (req, res, next) => {
 
   UserModel.findById(req.params.userId)
@@ -56,7 +80,7 @@ exports.loggedHasWritePermissionOnUser = async (req, res, next) => {
       const editing_user = result.account_name;
 
       let is_admin        = auth_user==config.eos.bank.account;
-      let is_authorized   = (auth_user==editing_user) || is_authorized;
+      let is_authorized   = (auth_user==editing_user) || is_admin;
 
       if(!is_authorized)
         try {
