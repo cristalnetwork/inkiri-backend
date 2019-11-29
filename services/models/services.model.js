@@ -48,8 +48,8 @@ const serviceSchema = new Schema({
         customer:                { type: Schema.Types.ObjectId, ref: 'Users', required: true },
         customer_account_name:   { type: String, required: true },
         amount:                  { type: Number , required: true },
-        from:                    { type: Date , required: true },
-        to:                      { type: Date , required: true }
+        begins_at:               { type: Date , required: true },
+        expires_at:              { type: Date , required: true }
       }],
   },
   { timestamps: { createdAt: 'created_at' } });
