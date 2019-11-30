@@ -28,6 +28,8 @@ exports.setAccounts = async(req, res, next) => {
   return next();
 
 }
+
+
 exports.validateWriteAuth = async(req, res, next) => {
 
   let biz = null;

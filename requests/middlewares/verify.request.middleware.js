@@ -1,7 +1,9 @@
 const RequestModel  = require('../models/requests.model');
 const UserModel     = require('../../users/models/users.model');
-const crypto        = require('crypto');
-
+const ServiceModel  = require('../../services/models/services.model');
+const eos_helper    = require('../../eos/helper/helper');
+const config        = require('../../common/config/env.config.js');
+var moment          = require('moment');
 
 const getAccountId = (account_name) =>   new Promise((res,rej)=> {
 
@@ -27,10 +29,141 @@ const getAccountId = (account_name) =>   new Promise((res,rej)=> {
   });
 });
 
+exports.loggedHasAdminWritePermission = async (req, res, next) => {
+
+  let logged_account = req.jwt.account_name;
+  const is_new       = !req.body._id && !req.params.requestId;
+  let validate_with  = null;
+  if(is_new)
+  {
+    validate_with = req.body.from;
+  }
+  else{
+    if(!req.params.requestId)
+      return res.status(500).send({error:'Can not validate account permissions'});
+    let biz = null;
+    try {
+      biz = await RequestModel.findById(req.params.requestId)
+    } catch (e) {
+      return res.status(500).send({error:'Business not found. Can not validate account permissions'});
+    }
+    if(Array.isArray(biz)) biz=biz[0];
+    validate_with = biz.account_name;
+  }
+  if(!validate_with)
+    return res.status(500).send({error:'Can not validate account permissions. Something went wrong!'});
+
+  let is_authorized   = logged_account==validate_with;
+  let is_admin        = logged_account==config.eos.bank.account;
+  if(!is_authorized)
+    try {
+      let perm = await eos_helper.accountHasWritePermission(logged_account, config.eos.bank.account);
+      if(perm)
+      {
+        is_authorized = true;
+        is_admin = true;
+      }
+    } catch (e) { }
+
+  if(!is_authorized)
+    try {
+      let perm = await eos_helper.accountHasWritePermission(logged_account, validate_with);
+      if(perm)
+      {
+        is_authorized = true;
+        is_admin = false;
+      }
+    } catch (e) {}
+
+  if(!is_authorized)
+    return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+logged_account+', owner: '+validate_with});
+  return next();
+
+};
+
+
+exports.validateIfServiceRequestFields = async(req, res, next) => {
+  if(req.body.requested_type!=RequestModel.TYPE_SERVICE)
+  {
+    return next();
+  }
+  const is_new      = !req.body._id && !req.params.requestId;
+  if(is_new)
+  {
+    try {
+
+      // console.log('--validateIfServiceRequestFields#1', req.body)
+      if(!req.body.from)
+        return res.status(500).send({error:'not a valid request sender '});
+      if(!req.body.requested_by)
+        return res.status(500).send({error:'not a valid request sender '});
+      let _requested_by = await UserModel.findByAccountName(req.body.from);
+      if(Array.isArray(_requested_by)) _requested_by=_requested_by[0];
+      if(!_requested_by
+          || _requested_by.account_name!=req.body.from
+          || (![UserModel.ACCOUNT_TYPE_BUSINESS, UserModel.ACCOUNT_TYPE_BANKADMIN].includes(_requested_by.account_type))
+        )
+        return res.status(500).send({error:'Requestor not match or is not valid '});
+      req.body.requested_by = _requested_by;
+
+
+      // console.log('--validateIfServiceRequestFields#2')
+      if(!req.body.to)
+        return res.status(500).send({error:'not a valid request receiver '});
+      let _requested_to = await UserModel.findByAccountName(req.body.to);
+      if(Array.isArray(_requested_to)) _requested_to=_requested_to[0];
+      // console.log(_requested_to)
+      if(!_requested_to
+          || _requested_to.account_name!=req.body.to)
+        return res.status(500).send({error:'Requested not match or is not valid '});
+      req.body.requested_to = _requested_to;
+
+
+      // console.log('--validateIfServiceRequestFields#3')
+      if(!req.body.service_id)
+        return res.status(500).send({error:'not a valid service '});
+      let _service = await ServiceModel.getById(req.body.service_id);
+      if(!_service
+          || _service.account_name!=req.body.from)
+        return res.status(500).send({error:'Service does not belongs to requestor '});
+      req.body.service = _service;
+      req.body.amount  = _service.amount;
+
+
+      // console.log('--validateIfServiceRequestFields#4')
+      if(!req.body.service_extra.begins_at && !req.body.service_extra.expires_at || moment(req.body.service_extra.begins_at)>=moment(req.body.service_extra.expires_at))
+        return res.status(500).send({error:'Invalid dates: begins and/or expires.'});
+
+      const invalid_states =  [RequestModel.STATE_REQUESTED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED];
+
+      const filter = {from      : req.body.from
+                      , to      : req.body.to
+                      , service : req.body.service._id
+                      , $or     : invalid_states.map(item=> {return { state: item}}) }
+      const exists = await RequestModel.list(1, 0, filter);
+      if(exists && exists.length>0)
+        return res.status(500).send({error:'Service provising contract already exists or is processing for Provider:Service:Customer. '});
+      // console.log(' > exists:');
+      // console.log(exists);
+
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send({error:'Validation error occurs. ' + JSON.stringify(e)});
+    }
+
+    delete req.body.service_id
+
+    return next()
+  }
+
+  return next();
+
+}
+
 exports.validRequiredFields = async(req, res, next) => {
 
   // const validRequests = [RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_SEND, RequestModel.TYPE_SERVICE];
-  const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_EXCHANGE];
+  const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_SERVICE];
   const validStates   = [RequestModel.STATE_REQUESTED, RequestModel.STATE_PROCESSING, RequestModel.STATE_REJECTED, RequestModel.STATE_ACCEPTED, RequestModel.STATE_ERROR, RequestModel.STATE_CONCLUDED];
 
   if(validRequests.indexOf(req.body.requested_type)<0)
@@ -67,21 +200,6 @@ exports.validRequestObject  = async (req, res, next) => {
     });
 
 }
-
-exports.onlySameUserOrAdminCanDoThisAction = async (req, res, next) => {
-
-  // let user_permission_level = parseInt(req.jwt.permission_level);
-  // let userId = req.jwt.userId;
-  // if (req.params && req.params.userId && userId === req.params.userId) {
-  //   return next();
-  // } else {
-  //   if (user_permission_level == config.permission_levels.ADMIN) {
-  //     return next();
-  //   } else {
-  //     return res.status(403).send();
-  //   }
-  // }
-};
 
 /**
  * Validate account names and insert private account ids.

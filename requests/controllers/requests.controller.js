@@ -49,11 +49,17 @@ exports.list = (req, res) => {
         }
 
         // From & To, Provider and Excchanges
-        if (req.query.from) {
-            filter = {...filter, from: req.query.from};
+        if (req.query.from&&req.query.to) {
+            filter = { $or : [{from: req.query.from}, {to: req.query.to}] };
         }
-        if (req.query.to) {
-            filter = {...filter, to: req.query.to};
+        else
+        {
+          if (req.query.from) {
+              filter = {...filter, from: req.query.from};
+          }
+          if (req.query.to) {
+              filter = {...filter, to: req.query.to};
+          }
         }
         if (req.query.provider_id) {
             filter = {...filter, provider: req.query.provider_id};

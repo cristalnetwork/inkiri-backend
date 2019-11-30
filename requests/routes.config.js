@@ -35,6 +35,8 @@ exports.routesConfig = function (app) {
         ValidationMiddleware.validJWTNeeded,
         VerifyRequestMiddleware.validAccountReferences,
         VerifyRequestMiddleware.validRequiredFields,
+        VerifyRequestMiddleware.validateIfServiceRequestFields,
+        VerifyRequestMiddleware.loggedHasAdminWritePermission,
         RequestsController.insert
     ]);
 

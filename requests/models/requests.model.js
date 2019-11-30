@@ -150,8 +150,18 @@ const requestSchema = new Schema({
       , payment_type:       { type: String, enum: [exports.PAYMENT_TYPE_DESPESA, exports.PAYMENT_TYPE_INVESTIMENTO] }
       , payment_mode:       { type: String, enum: [exports.PAYMENT_MODE_TRANSFER, exports.PAYMENT_MODE_BOLETO]}
 
+    },
+
+    service:              { type: Schema.Types.ObjectId,
+                            ref: 'Services',
+                            required: function() {
+                              return this.requested_type == exports.TYPE_SERVICE;
+                            }
+                          },
+    service_extra:        {
+      begins_at:               { type: Date , required: true },
+      expires_at:              { type: Date , required: true }
     }
-    // service:              { type: Schema.Types.ObjectId, ref: 'Services'}, // FOR service
 
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });

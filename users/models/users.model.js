@@ -104,7 +104,8 @@ exports.findByEmail = (email) => {
 };
 
 exports.findByAccountName = (account_name) => {
-    return User.find({account_name: account_name});
+    const _account_name = account_name?account_name.trim():'';
+    return User.find({account_name: _account_name});
 };
 
 exports.findByAlias = (alias) => {
