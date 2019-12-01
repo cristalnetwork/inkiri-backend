@@ -62,6 +62,13 @@ exports.routesConfig = function (app) {
         RequestsController.patchById
     ]);
 
+    app.patch(config.api_version+'/requests_c2c/:requestId', [
+        ValidationMiddleware.validJWTNeeded,
+        VerifyRequestMiddleware.validRequestObject,
+        RequestStateMachineMiddleware.validateTransitionC2C,
+        RequestsController.patchById
+    ]);
+
     app.delete(config.api_version+'/requests/:requestId', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.loggedHasAdminWritePermission,

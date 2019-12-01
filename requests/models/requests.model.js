@@ -209,6 +209,7 @@ exports.findById = (id) => {
           .populate('requested_by')
           .populate('requested_to')
           .populate('provider')
+          .populate('service')
           .exec(function (err, result) {
               if (err) {
                   reject(err);
@@ -267,6 +268,7 @@ exports.list = (perPage, page, query) => {
             .populate('requested_by')
             .populate('requested_to')
             .populate('provider')
+            .populate('service')
             .limit(perPage)
             .skip(perPage * page)
             .sort({requestCounterId: -1 })
@@ -298,19 +300,16 @@ getHeader = (request) => {
         [exports.TYPE_SERVICE]:   ' SERVICE AGREEMENT',
     }
 
-    if(request.state==exports.STATE_REQUESTED)
-        return {
-                sub_header:         'You have requested a '+ req_types[request.requested_type]
-            ,   sub_header_admin:   request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]}
-    // if(request.state==exports.STATE_CONCLUDED)
-    //     return {
-    //             sub_header:         'Your '+req_types[request.requested_type] + ' request concluded succesfully!'
-    //         ,   sub_header_admin:   req_types[request.requested_type] + ' requested by ' + request.requested_by.account_name + ' concluded succesfully!'}
-
+    // if(request.state==exports.STATE_REQUESTED)
     return {
-        sub_header:          'You have requested a '+req_types[request.requested_type]
-        , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]
+            sub_header:           `You have requested a ${req_types[request.requested_type]}`
+            , sub_header_ex:      `${req_types[request.requested_type]} request`
+            , sub_header_admin:   `${request.requested_by.account_name} has requested a ${req_types[request.requested_type]} ${ request.to?(' to '+request.to):''}`
     }
+    // return {
+    //     sub_header:          'You have requested a '+req_types[request.requested_type]
+    //     , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]
+    // }
 
 }
 requestToUIDict  = (request) => {

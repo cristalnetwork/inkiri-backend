@@ -166,7 +166,7 @@ exports.update_files = (req, res) => {
   //             , ...JSON.parse(request)
   // };
   console.log(' ABOUT TO PATCH REQUEST WITH FILES ', req.params.requestId)
-  console.log(JSON.stringify(req.body));
+  console.log(' request body data:', JSON.stringify(req.body));
 
 
   RequestModel.patchRequest(req.params.requestId, req.body)
