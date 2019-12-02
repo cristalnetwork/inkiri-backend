@@ -9,8 +9,8 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const Schema = mongoose.Schema;
 
-exports.ENUM_STATE_PENDING   = 'enum_state_initiated';
-exports.ENUM_STATE_PUBLISHED = 'enum_state_published';
+exports.ENUM_STATE_PENDING   = 'enum_state_pending';
+exports.ENUM_STATE_ACTIVE    = 'enum_state_active';
 exports.ENUM_STATE_INACTIVE  = 'enum_state_inactive';
 exports.ENUM_STATE_ERROR     = 'enum_state_error';
 
@@ -20,8 +20,8 @@ exports.services_states = [
     title : 'Pending',
   },
   {
-    key   : exports.ENUM_STATE_PUBLISHED,
-    title : 'Published',
+    key   : exports.ENUM_STATE_ACTIVE,
+    title : 'Active',
   },
   {
     key   : exports.ENUM_STATE_INACTIVE,
@@ -41,7 +41,7 @@ const serviceSchema = new Schema({
     title:            { type: String  , unique : true, index: true },
     description:      { type: String  , unique : true, index: true },
     amount:           { type: Number , required: true },
-    state:            { type: String, enum:[exports.ENUM_STATE_PENDING, exports.ENUM_STATE_PUBLISHED, exports.ENUM_STATE_ERROR, exports.ENUM_STATE_INACTIVE] },
+    state:            { type: String, enum:[exports.ENUM_STATE_PENDING, exports.ENUM_STATE_ACTIVE, exports.ENUM_STATE_ERROR, exports.ENUM_STATE_INACTIVE] },
 
     contracts: [
       {
@@ -75,24 +75,6 @@ serviceSchema.plugin(AutoIncrement, {inc_field: 'serviceCounterId'});
 
 const Service = mongoose.model('Services', serviceSchema);
 
-// exports.findByAccountName = (account_name) => {
-//     return new Promise((resolve, reject) => {
-//         Service.find({account_name: account_name})
-//             .populate('created_by')
-//             // .populate('contracts.customer')
-//             .exec(function (err, services) {
-//                 if (err) {
-//                     reject(err);
-//                 } else {
-//                   if(!services || services.length==0)
-//                     return reject('Service not found!');
-//                   const x = services.map(service => service.toJSON() )
-//                   resolve(x);
-//                 }
-//             })
-//     });
-// };
-
 exports.getById = (id) => {
   return new Promise((resolve, reject) => {
       Service.findById(id)
@@ -104,7 +86,7 @@ exports.getById = (id) => {
               } else {
                   if(!result)
                   {
-                    reject('NOT FOUND!!!!!!!!!');
+                    reject('Service NOT FOUND #1');
                     return;
                   }
                   resolve (result.toJSON());
@@ -116,7 +98,7 @@ exports.getById = (id) => {
 
 exports.createService = (serviceData) => {
     let service = new Service(serviceData);
-    service.state = exports.ENUM_STATE_PENDING;
+    service.state = exports.ENUM_STATE_ACTIVE;
     return service.save();
 };
 

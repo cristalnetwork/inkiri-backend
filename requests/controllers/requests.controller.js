@@ -99,7 +99,7 @@ exports.getById = async (req, res) => {
           .then((result) => {
               if(!result)
               {
-                res.status(404).send({error:'NOT FOUND'});
+                res.status(404).send({error:'Request NOT FOUND #1'});
                 return;
               }
               res.status(200).send(result);
@@ -109,21 +109,6 @@ exports.getById = async (req, res) => {
           });
   };
 
-// exports.getById = async (req, res) => {
-//     console.log(' >> getById:', req.params.requestId);
-//     RequestModel.find(req.params.requestId)
-//         .then((result) => {
-//             if(!result)
-//             {
-//               res.status(404).send({error:'NOT FOUND'});
-//               return;
-//             }
-//             res.status(200).send(result);
-//         },
-//         (err)=>{
-//           res.status(404).send({error:JSON.stringify(err)});
-//         });
-//     };
 
 exports.getByCounter = async (req, res) => {
     console.log(' >> getById:', req.params.counterId);
@@ -131,7 +116,7 @@ exports.getByCounter = async (req, res) => {
     RequestModel.list(1, 0, filter)
       .then((result) => {
         if(!result || !result[0])
-          return res.status(404).send({error:'NOT FOUND'});
+          return res.status(404).send({error:'Request NOT FOUND #2'});
         return res.status(200).send(result[0]);
       },
        (err)=> {
