@@ -176,7 +176,7 @@ requestSchema.set('toJSON', {
     virtuals: true,
     transform: function(doc, ret, options) {
         ret.id = ret._id;
-        delete ret._id;
+        // delete ret._id;
         delete ret.__v;
         return ret;
     }
@@ -238,7 +238,7 @@ exports.findByIdEx = (id) => {
               } else {
                   if(!result)
                   {
-                    reject('NOT FOUND!!!!!!!!!');
+                    reject('request NOT FOUND!!!!!!!!!');
                     return;
                   }
                   const req_json  = result.toJSON();
