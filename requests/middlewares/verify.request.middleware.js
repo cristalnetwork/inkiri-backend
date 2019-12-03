@@ -131,7 +131,7 @@ exports.validateIfServiceRequestFields = async(req, res, next) => {
 
 
       // console.log('--validateIfServiceRequestFields#4')
-      if(!req.body.service_extra.begins_at && !req.body.service_extra.expires_at || moment(req.body.service_extra.begins_at)>=moment(req.body.service_extra.expires_at))
+      if(!req.body.service_extra.begins_at && !req.body.service_extra.expires_at || moment(req.body.service_extra.begins_at)>moment(req.body.service_extra.expires_at))
         return res.status(500).send({error:'Invalid dates: begins and/or expires.'});
 
       const invalid_states =  [RequestModel.STATE_REQUESTED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED];
