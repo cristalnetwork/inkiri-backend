@@ -47,8 +47,13 @@ exports.list = (req, res) => {
         if (req.query.id || req.query._id) {
             filter = {...filter, _id: (req.query.id || req.query._id)};
         }
-    }
 
+        if (req.query.counter_ids) {
+          filter = {...filter, serviceCounterId: {$in : req.query.counter_ids.split(',').map(idx=>parseInt(idx))}};
+          // console.log(req.query.account_names)
+        }
+    }
+    console.log(limit, page, filter)
     ServiceModel
       .list(limit, page, filter)
       .then((result) => {
