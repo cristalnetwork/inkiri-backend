@@ -159,8 +159,16 @@ const requestSchema = new Schema({
                             }
                           },
     service_extra:        {
-      begins_at:               { type: Date , required: true },
-      expires_at:              { type: Date , required: true }
+      begins_at:               {  type: Date ,
+                                  required: function() {
+                                    return this.requested_type == exports.TYPE_SERVICE;
+                                  }
+                               },
+      expires_at:              {  type: Date ,
+                                  required: function() {
+                                    return this.requested_type == exports.TYPE_SERVICE;
+                                  }
+                               }
     }
 
   },
