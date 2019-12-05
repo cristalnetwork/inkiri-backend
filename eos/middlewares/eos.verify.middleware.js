@@ -1,6 +1,9 @@
 const UserModel     = require('../../users/models/users.model');
 const crypto        = require('crypto');
 const helper        = require('../helper/helper')
+const config        = require('../../common/config/env.config.js');
+
+const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN || config.email_domain || 'inkiri.com';
 
 exports.createIfNotExists  = async (req, res, next) => {
 
@@ -32,7 +35,7 @@ exports.createIfNotExists  = async (req, res, next) => {
   const business_name = (account_type==UserModel.ACCOUNT_TYPE_BUSINESS)?account_name:'';
   const first_name    = (account_type==UserModel.ACCOUNT_TYPE_PERSONAL)?account_name:'';
   const last_name     = (account_type==UserModel.ACCOUNT_TYPE_PERSONAL)?account_name:'';
-  const email         = `${account_name}@cristalnetwork.org`;
+  const email         = `${account_name}@${EMAIL_DOMAIN}`; //`${account_name}@cristalnetwork.org`;
   if(account_type==null)
   {
     console.log(' ERROR createIfNotExists#2' )

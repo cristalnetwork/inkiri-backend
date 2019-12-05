@@ -2,16 +2,15 @@ const config = require('../../common/config/env.config.js');
 const UserModel = require('../models/users.model');
 const crypto = require('crypto');
 
+const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN || config.email_domain || 'inkiri.com';
 
 exports.ping = (req, res) => {
     res.status(200).send({ping:'pong'});
 }
 exports.insert = (req, res) => {
     // ToDo: validate is a valid EOS account and a Valid Customer.
-    if(req.body.account_name=='inkiritoken1' || req.body.account_name==config.eos.bank.account)
-        req.body.permission_level = config.ADMIN;
-    else
-        req.body.permission_level = config.NORMAL_USER;
+    if(!req.body.email)
+      req.body.email = `${req.body.account_name}@${EMAIL_DOMAIN}`;
     UserModel.createUser(req.body)
         .then((result) => {
             res.status(201).send({id: result._id});

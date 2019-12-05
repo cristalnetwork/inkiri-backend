@@ -6,6 +6,7 @@ module.exports = {
     "jwt_secret": "myS33!!creeeT",
     "jwt_expiration_in_seconds": 2592000,
     "environment": "dev",
+    "email_domain": "inkiri.com",
     "mongodb_uri": "mongodb://localhost/cristal",
     "eos" : {
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
