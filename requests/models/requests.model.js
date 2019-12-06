@@ -159,8 +159,16 @@ const requestSchema = new Schema({
                             }
                           },
     service_extra:        {
-      begins_at:               { type: Date , required: true },
-      expires_at:              { type: Date , required: true }
+      begins_at:          { type: Date ,
+                            required: function() {
+                              return this.requested_type == exports.TYPE_SERVICE;
+                            }
+                          },
+      expires_at:         { type: Date ,
+                            required: function() {
+                              return this.requested_type == exports.TYPE_SERVICE;
+                            }
+                          }
     }
 
   },
@@ -289,20 +297,20 @@ exports.list = (perPage, page, query) => {
     });
 };
 
-getHeader = (request) => {
-    const req_types = {
-        [exports.TYPE_DEPOSIT] :  ' DEPOSIT',
-        [exports.TYPE_EXCHANGE]:  ' EXCHANGE',
-        [exports.TYPE_PAYMENT]:   ' PAYMENT',
-        [exports.TYPE_PROVIDER]:  ' PROVIDER PAYMENT',
-        [exports.TYPE_SEND]:      ' SEND',
-        [exports.TYPE_WITHDRAW]:  ' WITHDRAW',
-        [exports.TYPE_SERVICE]:   ' SERVICE AGREEMENT',
-    }
+const req_types = {
+    [exports.TYPE_DEPOSIT] :  'DEPOSIT',
+    [exports.TYPE_EXCHANGE]:  'EXCHANGE',
+    [exports.TYPE_PAYMENT]:   'PAYMENT',
+    [exports.TYPE_PROVIDER]:  'PROVIDER PAYMENT',
+    [exports.TYPE_SEND]:      'SEND',
+    [exports.TYPE_WITHDRAW]:  'WITHDRAW',
+    [exports.TYPE_SERVICE]:   'SERVICE AGREEMENT',
+}
 
-    // if(request.state==exports.STATE_REQUESTED)
+getHeader = (request) => {
     return {
-            sub_header:           `You have requested a ${req_types[request.requested_type]}`
+            header:               `${req_types[request.requested_type]}`
+            , sub_header:         `You have requested a ${req_types[request.requested_type]}`
             , sub_header_ex:      `${req_types[request.requested_type]} request`
             , sub_header_admin:   `${request.requested_by.account_name} has requested a ${req_types[request.requested_type]} ${ request.to?(' to '+request.to):''}`
     }
