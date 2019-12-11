@@ -307,9 +307,25 @@ getHeader = (request) => {
 }
 requestToUIDict  = (request) => {
   const headers = getHeader(request)
-  const flag    = [exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE].includes(request.requested_type)
-                    ?(request[exports.ATTACH_NOTA_FISCAL_ID]&&request[exports.ATTACH_NOTA_FISCAL_ID].length>0)
-                    :true;
+  let flag = { ok:true, message:'', tag:''};
+
+  if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE].includes(request.requested_type)
+    && (!request[exports.ATTACH_NOTA_FISCAL_ID] || request[exports.ATTACH_NOTA_FISCAL_ID].length<=0) )
+  {
+    flag = {
+             ok:        false
+             , tag:     'PENDING'
+             , message: 'NOTA FISCAL PENDING!'
+            }
+  }
+  if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE, exports.TYPE_WITHDRAW].includes(request.requested_type) && !request.tx_id)
+  {
+    flag = {
+             ok:        false
+             , tag:     'INVALID'
+             , message: 'NO MONEY RECEIVED FOR THIS OPERATION!'
+            }
+  }
   return {
      ...headers
     , key               : request.id
@@ -318,10 +334,7 @@ requestToUIDict  = (request) => {
      , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
      , tx_type           : request.requested_type
      , i_sent            : true
-     , flag              : {
-                            ok:        flag
-                            , message: 'NOT FISCAL PENDING'
-                           }
+     , flag              : flag
   }
 }
 // [{"nota_fiscal_url":"","comprobante_url":"","deposit_currency":"IK$","_id":"5d5c152c8c3a466b65e3c2f3","requested_type":"type_deposit","amount":"44.00","created_by":{"_id":"5d5bf05ffe092b38101f018f","account_name":"inkpersonal1","first_name":"fn","last_name":"ln","email":"inkpersonal1@gmail.com","created_at":"2019-08-20T13:06:39.506Z","updatedAt":"2019-08-20T14:08:04.153Z","userCounterId":6,"__v":0,"to_sign":"5KHxDfqZBrHgR5i1Nw82LB8J2TcyveRh9ZndzaMhzUvyQEwiaW7","id":"5d5bf05ffe092b38101f018f"},"from":"inkpersonal1","requested_by":{"_id":"5d5bf05ffe092b38101f018f","account_name":"inkpersonal1","first_name":"fn","last_name":"ln","email":"inkpersonal1@gmail.com","created_at":"2019-08-20T13:06:39.506Z","updatedAt":"2019-08-20T14:08:04.153Z","userCounterId":6,"__v":0,"to_sign":"5KHxDfqZBrHgR5i1Nw82LB8J2TcyveRh9ZndzaMhzUvyQEwiaW7","id":"5d5bf05ffe092b38101f018f"},"state":"state_requested","created_at":"2019-08-20T15:43:40.266Z","updatedAt":"2019-08-20T15:43:40.266Z","requestCounterId":1,"__v":0,"id":"5d5c152c8c3a466b65e3c2f3"}]
