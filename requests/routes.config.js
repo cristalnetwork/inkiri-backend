@@ -62,6 +62,13 @@ exports.routesConfig = function (app) {
         RequestsController.patchById
     ]);
 
+    app.patch(config.api_version+'/requests_admin/:requestId', [
+        ValidationMiddleware.validJWTNeeded,
+        VerifyRequestMiddleware.validRequestObject,
+        RequestStateMachineMiddleware.validateTransitionForAdmin,
+        RequestsController.patchById
+    ]);
+
     // app.patch(config.api_version+'/requests_c2c/:requestId', [
     //     ValidationMiddleware.validJWTNeeded,
     //     VerifyRequestMiddleware.validRequestObject,
@@ -118,6 +125,19 @@ exports.routesConfig = function (app) {
           GoogleDriveMiddleware.validMimeTypes,
           VerifyRequestMiddleware.validRequestObject,
           RequestStateMachineMiddleware.validateTransition,
+          GoogleDriveMiddleware.uploadFiles,
+          RequestsController.update_files
+        ]
+    );
+
+    app.post(config.api_version+'/requests_files_admin/:requestId'
+        , multer_multi_file_conf
+        ,[
+          ValidationMiddleware.validJWTNeeded,
+          VerifyRequestMiddleware.explodeFormData,
+          GoogleDriveMiddleware.validMimeTypes,
+          VerifyRequestMiddleware.validRequestObject,
+          RequestStateMachineMiddleware.validateTransitionForAdmin,
           GoogleDriveMiddleware.uploadFiles,
           RequestsController.update_files
         ]
