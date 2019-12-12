@@ -62,10 +62,31 @@ exports.routesConfig = function (app) {
         RequestsController.patchById
     ]);
 
-    app.patch(config.api_version+'/requests_c2c/:requestId', [
+    // app.patch(config.api_version+'/requests_c2c/:requestId', [
+    //     ValidationMiddleware.validJWTNeeded,
+    //     VerifyRequestMiddleware.validRequestObject,
+    //     RequestStateMachineMiddleware.validateTransitionC2C,
+    //     RequestsController.patchById
+    // ]);
+
+    app.patch(config.api_version+'/requests_c2c_by_sender/:requestId', [
         ValidationMiddleware.validJWTNeeded,
         VerifyRequestMiddleware.validRequestObject,
-        RequestStateMachineMiddleware.validateTransitionC2C,
+        RequestStateMachineMiddleware.validateC2CTransitionFor(RequestStateMachineMiddleware.REQUEST_USER_SENDER),
+        RequestsController.patchById
+    ]);
+
+    app.patch(config.api_version+'/requests_c2c_by_receiver/:requestId', [
+        ValidationMiddleware.validJWTNeeded,
+        VerifyRequestMiddleware.validRequestObject,
+        RequestStateMachineMiddleware.validateC2CTransitionFor(RequestStateMachineMiddleware.REQUEST_USER_RECEIVER),
+        RequestsController.patchById
+    ]);
+
+    app.patch(config.api_version+'/requests_c2c_by_admin/:requestId', [
+        ValidationMiddleware.validJWTNeeded,
+        VerifyRequestMiddleware.validRequestObject,
+        RequestStateMachineMiddleware.validateC2CTransitionFor(RequestStateMachineMiddleware.REQUEST_USER_ADMIN),
         RequestsController.patchById
     ]);
 

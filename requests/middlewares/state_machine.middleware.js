@@ -18,6 +18,8 @@ const loadStatesForAdmin = (current_state) =>{
           to: RequestsModel.STATE_CANCELED
           // If I'm an admin and I'm a business GESTOR.
       },
+
+      // HACK FOR DEPOSITS!!!
       { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_REQUESTED,
           to: RequestsModel.STATE_ACCEPTED
@@ -117,15 +119,6 @@ exports.validateTransition = async(req, res, next) => {
 
   let is_authorized   = account_name==request_owner;
   let is_admin        = account_name==config.eos.bank.account;
-  if(!is_admin)
-    try {
-      let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
-      if(perm)
-      {
-        is_authorized = true;
-        is_admin = true;
-      }
-    } catch (e) { }
 
   if(!is_authorized)
     try {
@@ -136,6 +129,16 @@ exports.validateTransition = async(req, res, next) => {
         is_admin = false;
       }
     } catch (e) {}
+
+  if(!is_authorized)
+    try {
+      let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
+      if(perm)
+      {
+        is_authorized = true;
+        is_admin = true;
+      }
+    } catch (e) { }
 
   if(!is_authorized)
     return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+account_name+', owner: '+request_owner});
@@ -228,11 +231,8 @@ exports.validateTransitionC2C = async(req, res, next) => {
     return next();
   }
 
-  loadStatesForRequestedC2CSender
-  loadStatesForRequestedC2CReceiver
-
   const fsm = (is_admin)
-    ?loadStatesForRequestedC2CAdmin
+    ?loadStatesForRequestedC2CAdmin(request.state)
     : (is_sender)
         ?loadStatesForRequestedC2CSender(request.state)
         :loadStatesForRequestedC2CReceiver(request.state);
@@ -246,3 +246,100 @@ exports.validateTransitionC2C = async(req, res, next) => {
   }
   return next();
 }
+
+
+exports.REQUEST_USER_SENDER   = 'REQUEST_USER_SENDER';
+exports.REQUEST_USER_RECEIVER = 'REQUEST_USER_RECEIVER';
+exports.REQUEST_USER_ADMIN    = 'REQUEST_USER_ADMIN';
+exports.validateC2CTransitionFor = (_type_) => {
+    return async (req, res, next) => {
+          const new_state = req.body.state;
+          if(!new_state)
+          {
+            console.log(' ## STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
+            return next();
+          }
+
+          const account_name  = req.jwt.account_name;
+          const request       = req.body.request_object;
+
+          if(!request)
+          {
+            console.log(' ## STATE MACHINE ERROR#1 -> Request NOT FOUND')
+            return res.status(404).send({error:'Request NOT FOUND'});
+          }
+
+          let is_authorized = false;
+          let is_admin      = false;
+
+          switch(_type_){
+            case exports.REQUEST_USER_SENDER:
+
+              is_authorized   = account_name==request.from;
+              if(!is_authorized)
+                try {
+                  let perm = await eos_helper.accountHasWritePermission(account_name, request.from);
+                  if(perm)
+                  {
+                    is_authorized = true;
+                    is_admin = false;
+                  }
+                } catch (e) {}
+
+
+            break;
+            case exports.REQUEST_USER_RECEIVER:
+              is_authorized   = account_name==request.to;
+              if(!is_authorized)
+                try {
+                  let perm = await eos_helper.accountHasWritePermission(account_name, request.to);
+                  if(perm)
+                  {
+                    is_authorized = true;
+                    is_admin = false;
+                  }
+                } catch (e) {}
+
+            break;
+            case exports.REQUEST_USER_ADMIN:
+              is_admin        = account_name==config.eos.bank.account;
+              if(!is_admin)
+                try {
+                  let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
+                  if(perm)
+                  {
+                    is_authorized = true;
+                    is_admin = true;
+                  }
+                } catch (e) { }
+
+            break;
+          }
+
+          if(!is_authorized)
+            return res.status(404).send({error:`Account not authorized for this operation. Operation by: +${account_name}, request sender: ${request_sender}, request receiver: ${request_receiver}` });
+
+          if(new_state==request.state)
+          {
+            console.log(' ## STATE MACHINE ISSUE#3 -> NO TRANSITION REQUIRED')
+            return next();
+          }
+
+          let fsm = null;
+          if(_type_ == exports.REQUEST_USER_SENDER)
+            fsm = loadStatesForRequestedC2CAdmin(request.state)
+          if(_type_ == exports.REQUEST_USER_RECEIVER)
+            fsm = loadStatesForRequestedC2CReceiver(request.state);
+          if(_type_ == exports.REQUEST_USER_ADMIN)
+            fsm = loadStatesForRequestedC2CSender(request.state)
+
+          const transition = toTransition(request.state, new_state)
+          console.log(' ## STATE MACHINE info : Using admin?->', is_admin, ' for transition:', transition)
+          if (!fsm.can(transition))
+          {
+            console.log(' ## STATE MACHINE ISSUE#4 -> New Request STATE NOT ALLOWED', 'Current state:'+request.state+' - New state: '+new_state );
+            return res.status(404).send({error:'New Request STATE NOT ALLOWED', message: 'Current state:'+request.state+' - New state: '+new_state });
+          }
+          return next();
+    };
+};
