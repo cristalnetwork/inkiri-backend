@@ -55,7 +55,7 @@ exports.loggedHasAdminWritePermission = async (req, res, next) => {
 
   let is_authorized   = logged_account==validate_with;
   let is_admin        = logged_account==config.eos.bank.account;
-  if(!is_authorized)
+  if(!is_admin)
     try {
       let perm = await eos_helper.accountHasWritePermission(logged_account, config.eos.bank.account);
       if(perm)

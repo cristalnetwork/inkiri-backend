@@ -117,7 +117,7 @@ exports.validateTransition = async(req, res, next) => {
 
   let is_authorized   = account_name==request_owner;
   let is_admin        = account_name==config.eos.bank.account;
-  if(!is_authorized)
+  if(!is_admin)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
       if(perm)
@@ -189,7 +189,7 @@ exports.validateTransitionC2C = async(req, res, next) => {
   let is_admin        = account_name==config.eos.bank.account;
   let is_authorized   = is_admin || is_sender || is_receiver;
 
-  if(!is_authorized)
+  if(!is_admin)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
       if(perm)
@@ -236,7 +236,7 @@ exports.validateTransitionC2C = async(req, res, next) => {
     : (is_sender)
         ?loadStatesForRequestedC2CSender(request.state)
         :loadStatesForRequestedC2CReceiver(request.state);
-  
+
   const transition = toTransition(request.state, new_state)
   console.log(' ## STATE MACHINE info : Using admin?->', is_admin, ' for transition:', transition)
   if (!fsm.can(transition))

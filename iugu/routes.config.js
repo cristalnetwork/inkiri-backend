@@ -2,7 +2,7 @@ const IuguController            = require('./controllers/iugu.controller');
 const IuguModel                 = require('./models/iugu.model');
 const config                    = require('../common/config/env.config');
 const ValidationMiddleware      = require('../common/middlewares/auth.validation.middleware');
-const PermissionMiddleware  = require('../common/middlewares/auth.permission.middleware');
+const PermissionMiddleware      = require('../common/middlewares/auth.permission.middleware');
 
 exports.routesConfig = function (app) {
 
