@@ -99,7 +99,7 @@ exports.validateTransitionForAdmin = async(req, res, next) => {
   const new_state = req.body.state;
   if(!new_state)
   {
-    console.log(' ## STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
+    console.log(' ## ADMIN STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
     return next();
   }
 
@@ -108,7 +108,7 @@ exports.validateTransitionForAdmin = async(req, res, next) => {
 
   if(!request)
   {
-    console.log(' ## STATE MACHINE ERROR#1 -> Request NOT FOUND')
+    console.log(' ## ADMIN STATE MACHINE ERROR#1 -> Request NOT FOUND')
     return res.status(404).send({error:'Request NOT FOUND'});
   }
 
@@ -130,17 +130,17 @@ exports.validateTransitionForAdmin = async(req, res, next) => {
 
   if(new_state==request.state)
   {
-    console.log(' ## STATE MACHINE ISSUE#3 -> NO TRANSITION REQUIRED')
+    console.log(' ## ADMIN STATE MACHINE ISSUE#3 -> NO TRANSITION REQUIRED')
     return next();
   }
 
   const fsm = loadStatesForAdmin(request.state);
   // fsm.is(s)
   const transition = toTransition(request.state, new_state)
-  console.log(' ## STATE MACHINE info : Using admin?->', is_admin, ' for transition:', transition)
+  console.log(' ## ADMIN STATE MACHINE info : Using admin?->', is_admin, ' for transition:', transition)
   if (!fsm.can(transition))
   {
-    console.log(' ## STATE MACHINE ISSUE#4 -> New Request STATE NOT ALLOWED', 'Current state:'+request.state+' - New state: '+new_state );
+    console.log(' ## ADMIN STATE MACHINE ISSUE#4 -> New Request STATE NOT ALLOWED', 'Current state:'+request.state+' - New state: '+new_state );
     return res.status(404).send({error:'New Request STATE NOT ALLOWED', message: 'Current state:'+request.state+' - New state: '+new_state });
   }
   return next();
@@ -170,7 +170,7 @@ exports.validateTransition = async(req, res, next) => {
 
   let is_authorized   = account_name==request_owner;
 
-  if(!authorized)
+  if(!is_authorized)
     try {
       let perm = await eos_helper.accountHasWritePermission(account_name, request_owner);
       if(perm)
@@ -192,7 +192,7 @@ exports.validateTransition = async(req, res, next) => {
   const fsm = loadStatesForUser(request.state);
   // fsm.is(s)
   const transition = toTransition(request.state, new_state)
-  console.log(' ## STATE MACHINE info : Using admin?->', is_admin, ' for transition:', transition)
+
   if (!fsm.can(transition))
   {
     console.log(' ## STATE MACHINE ISSUE#4 -> New Request STATE NOT ALLOWED', 'Current state:'+request.state+' - New state: '+new_state );
