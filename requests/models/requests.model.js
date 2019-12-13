@@ -310,6 +310,7 @@ requestToUIDict  = (request) => {
   let flag = { ok:true, message:'', tag:''};
 
   if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE].includes(request.requested_type)
+    && ![exports.STATE_REJECTED, exports.STATE_ACCEPTED, exports.STATE_ERROR, exports.STATE_CANCELED, exports.STATE_REFUNDED, exports.STATE_REVERTED].includes(request.state)
     && (!request[exports.ATTACH_NOTA_FISCAL_ID] || request[exports.ATTACH_NOTA_FISCAL_ID].length<=0) )
   {
     flag = {
