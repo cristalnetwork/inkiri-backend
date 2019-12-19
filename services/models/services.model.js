@@ -38,8 +38,8 @@ const serviceSchema = new Schema({
     account_name:     { type: String, index: true, required : true },
     serviceCounterId: { type: Number, unique : true },
 
-    title:            { type: String  , unique : true, index: true },
-    description:      { type: String  , unique : true, index: true },
+    title:            { type: String  , unique : true, index: true, required : true },
+    description:      { type: String  },
     amount:           { type: Number , required: true },
     state:            { type: String, enum:[exports.ENUM_STATE_PENDING, exports.ENUM_STATE_ACTIVE, exports.ENUM_STATE_ERROR, exports.ENUM_STATE_INACTIVE] },
 

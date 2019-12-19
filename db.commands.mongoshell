@@ -43,3 +43,12 @@ db.users.find({first_name : null }).forEach( function (doc) {
   doc.email      = doc.account_name + '@' + 'cristalnetwork.org';
   db.users.save(doc);
 });
+
+
+
+// db.services.updateMany(
+//   {},
+//   { $unset: { description:""}}
+// )
+
+db.runCommand( { dropIndexes: "services", index: "description_1" })

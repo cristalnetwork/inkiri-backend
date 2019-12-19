@@ -162,13 +162,12 @@ exports.validateIfServiceRequestFields = async(req, res, next) => {
 
 exports.validRequiredFields = async(req, res, next) => {
 
-  // const validRequests = [RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_SEND, RequestModel.TYPE_SERVICE];
-  const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_SERVICE];
+  const validRequests = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_SERVICE, RequestModel.TYPE_SEND, RequestModel.TYPE_PAYMENT];
   const validStates   = [RequestModel.STATE_REQUESTED, RequestModel.STATE_PROCESSING, RequestModel.STATE_REJECTED, RequestModel.STATE_ACCEPTED, RequestModel.STATE_ERROR, RequestModel.STATE_CONCLUDED];
 
   if(validRequests.indexOf(req.body.requested_type)<0)
   {
-    console.log( ' NOT A VALID TYPE')
+    console.log( ' NOT A VALID TYPE', req.body.requested_type)
     return res.status(404).send({error:'not a valid request type ', valid_types:validRequests});
   }
 
