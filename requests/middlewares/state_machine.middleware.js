@@ -119,13 +119,13 @@ exports.validateTransitionForAdmin = async(req, res, next) => {
       let perm = await eos_helper.accountHasWritePermission(account_name, config.eos.bank.account);
       if(perm)
       {
-        is_authorized = true;
+        // is_authorized = true;
         is_admin = true;
       }
     } catch (e) { }
 
 
-  if(!is_authorized)
+  if(!is_admin)
     return res.status(404).send({error:'Account not authorized for this operation. Only admins!'});
 
   if(new_state==request.state)
