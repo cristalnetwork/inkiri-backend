@@ -13,6 +13,10 @@ const IuguRouter          = require('./iugu/routes.config');
 const TeamsRouter         = require('./teams/routes.config');
 const ServicesRouter      = require('./services/routes.config');
 
+const ExpressGraphQL      = require("express-graphql");
+const {schema, root}      = require('./graphql/index');
+
+
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -27,6 +31,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(bodyParser.json());
+
 UsersRouter.routesConfig(app);
 EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
@@ -38,6 +43,14 @@ TeamsRouter.routesConfig(app);
 ServicesRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
+
+// app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+// app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+
+app.use("/graphql", ExpressGraphQL({
+    schema:     schema,
+    graphiql:   true
+}));
 
 app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);

@@ -124,11 +124,11 @@ exports.createTeam = (teamData) => {
     return team.save();
 };
 
-exports.list = (perPage, page, query) => {
+exports.list = (perPage, page, query, populate) => {
     return new Promise((resolve, reject) => {
         Team.find(query)
             .populate('created_by')
-            .populate('members.member')
+            .populate(populate||'members.member')
             .limit(perPage)
             .skip(perPage * page)
             .exec(function (err, members) {

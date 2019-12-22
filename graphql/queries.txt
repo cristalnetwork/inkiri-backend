@@ -1,0 +1,124 @@
+query getTodo($email : String, $account_name: String) {
+  user(email:$email) {
+    _id 
+    email
+    account_name
+    alias
+    address{
+      _id
+      street
+    }
+    bank_accounts{
+      _id
+      bank_name
+    }
+  
+  }
+  
+  maxRequestId
+  jobPositions{
+    key
+    title 
+    wage
+  } 
+  serviceStates{
+    key
+    title
+  }
+  
+  services(account_name:$account_name, page:"0", limit:"100"){
+    title
+    description
+    amount
+    state
+    account_name
+  }
+  
+  team(account_name:"organicvegan"){
+    _id
+    created_by{
+      _id
+      account_name
+      business_name
+    }
+    account_name
+    teamCounterId
+    members{
+      _id
+      member{
+        _id
+        account_name
+        first_name
+        last_name
+        legal_id
+        email
+      }
+      position
+      wage
+    }
+  }
+  
+}
+
+----
+-- VALUES: 
+----
+{"email":"ptutino",
+"account_name":"organicvegan"}
+
+------------------------------------------
+{
+  userById(id:"5de02d0400115e187dbd043d") {
+    _id 
+    account_name
+    alias
+    address{
+      _id
+      street
+    }
+    bank_accounts{
+      _id
+      bank_name
+    }
+  
+  }
+}
+
+// users(email, account_type, account_name, id, alias, last_name, business_name, bank_name, bank_agency, bank_cc) {
+
+{
+  users(email:"@inkiri") {
+    _id 
+    account_name
+    alias
+    address{
+      _id
+      street
+    }
+    bank_accounts{
+      _id
+      bank_name
+    }
+  
+  }
+}
+
+
+{
+  requests(page:"0", limit:"100", requested_type:"type_provider,type_exchange") {
+    _id 
+    created_at
+    updated_at
+    from
+    to
+    requested_type
+    state
+    provider{
+      _id
+    }
+    service{
+      _id
+    }
+  
+  }
+}

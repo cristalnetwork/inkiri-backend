@@ -22,7 +22,6 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     account_name:     { type:  String  , unique : true, index: true},
-    // alias:            { type:  String, trim: true, index: true, unique: true, sparse: true},
     alias:            { type:  String , index: true, trim:true},
     first_name:       { type:  String , trim:true},
     last_name:        { type:  String , trim:true},

@@ -222,6 +222,34 @@ exports.findById = (id) => {
 
 };
 
+exports.findByCounterId = (counterId) => {
+  return new Promise((resolve, reject) => {
+      Request.find({ requestCounterId : counterId})
+          .populate('created_by')
+          .populate('requested_by')
+          .populate('requested_to')
+          .populate('provider')
+          .populate('service')
+          .exec(function (err, result) {
+              if (err) {
+                  reject(err);
+              } else {
+                  if(!result)
+                  {
+                    reject('NOT FOUND!!!!!!!!!');
+                    return;
+                  }
+                  const req_json  = result.toJSON();
+                  let xxx         = requestToUIDict(result);
+                  resolve (Object.assign(req_json, xxx));
+
+              }
+          })
+  });
+
+};
+
+
 exports.findByIdEx = (id) => {
     return new Promise((resolve, reject) => {
       Request.findById(id)
