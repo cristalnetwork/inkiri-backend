@@ -192,7 +192,7 @@ const typeDefs = `
   
     maxRequestId:                                   Int
     request(id:String, requestCounterId:String):    Request
-    requests(page:String!, limit:String!, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:String) : [Request]
+    requests(page:String!, limit:String!, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:String, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String) : [Request]
     
     service(account_name:String, id:String, serviceCounterId:String):                                    Service
     services(page:String!, limit:String!, account_name:String, id:String, serviceCounterId:String):      [Service]
@@ -206,6 +206,10 @@ const typeDefs = `
 
     providers(page:String!, limit:String!, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): [Provider]
     provider(id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ):                Provider
+
+    iugu(id:String, iugu_id:String):   Iugu
+    iugus(page:String!, limit:String!, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String):  [Iugu]
+    
   }
 
 
@@ -296,6 +300,19 @@ const resolvers = {
       return (Array.isArray(res))?res[0]:res;
     },
 
+    /* 
+    *  IUGU 
+    */
+    iugu: async (_, args) => {
+      const query = queryHelper.iuguQuery(args)
+      const res = await IuguModel.list(1, 0, query.filter);
+      return (Array.isArray(res))?res[0]:res;
+    },
+    iugus: async (_, args) => {
+      const query = queryHelper.iuguQuery(args)
+      const res = await IuguModel.list(query.limit, query.page, query.filter);
+      return res;
+    },
   },
 };
 

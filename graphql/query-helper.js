@@ -34,6 +34,18 @@ const makeLikeFilter = (name, value, filter) => {
   return {...filter, ...getLikeFilter(name, value)}
 }
 
+const getBetweenFilter = (name, from, to) => {
+  return {[name]: { $gte: from, $lte: to }}
+}
+
+const makeBetweenFilter = (name, from, to, filter) => {
+  
+  if(!name || !from || !to)
+    return filter;
+  
+  return {...filter, ...getBetweenFilter(name, from, to)}
+}
+
 const makeCollectionFilter = (col, name, value, filter, isLike) => {
   
   if(!value || !name || !col)
@@ -79,7 +91,7 @@ exports.usersQuery  = (args) => {
 exports.requestQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {requested_type, from, to, provider_id, state, id, requestCounterId} = args;
+  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency} = args;
 
   let filter = {};
 
@@ -97,6 +109,15 @@ exports.requestQuery = (args) => {
   filter = makeFilter('provider', provider_id, filter)
   filter = makeFilter('state', state, filter)
   filter = makeFilter('requested_type', requested_type, filter)
+  
+  filter = makeFilter('tx_id', tx_id, filter)
+  filter = makeFilter('refund_tx_id', refund_tx_id, filter)
+  filter = makeFilter('attach_nota_fiscal_id', attach_nota_fiscal_id, filter)
+  filter = makeFilter('attach_boleto_pagamento_id', attach_boleto_pagamento_id, filter)
+  filter = makeFilter('attach_comprobante_id', attach_comprobante_id, filter)
+  filter = makeFilter('deposit_currency', deposit_currency, filter)
+  
+
   return {
     limit:   limit,
     page:    page,
@@ -185,6 +206,33 @@ exports.providerQuery  = (args) => {
   filter = makeLikeFilter('bank_accounts.bank_agency', bank_agency, filter)
   filter = makeLikeFilter('bank_accounts.bank_cc', bank_cc, filter)
   
+  return {
+    limit:   limit,
+    page:    page,
+    filter:  filter
+  };    
+}
+
+exports.iuguQuery = (args) => {
+  const page  = args.page ? parseInt(args.page) : 0;
+  const limit = args.limit ? parseInt(args.limit) : 100;
+  const { iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state} = args;
+
+  let filter = {};
+
+  filter = makeFilter('_id', id, filter)
+  filter = makeFilter('iugu_id', iugu_id, filter)
+  filter = makeFilter('receipt.business_name', business_name, filter)
+  filter = makeFilter('receipt_accountname', account_name, filter)
+  filter = makeFilter('receipt_alias', alias, filter)
+  filter = makeFilter('iuguCounterId', iuguCounterId, filter)
+  filter = makeFilter('state', state, filter)
+
+  filter = makeBetweenFilter('paid_at', paid_at_from, paid_at_to, filter)
+  filter = makeBetweenFilter('issued_at', issued_at_from, issued_at_to, filter)
+
+  filter = makeFilter('issued_tx_id', issued_tx_id, filter)
+
   return {
     limit:   limit,
     page:    page,

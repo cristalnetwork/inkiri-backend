@@ -1,3 +1,6 @@
+---------------------------------------------------------
+EJEMPLO#1
+
 query getTodo($email : String, $account_name: String) {
   user(email:$email) {
     _id 
@@ -58,6 +61,7 @@ query getTodo($email : String, $account_name: String) {
     }
   }
   
+  
 }
 
 ----
@@ -66,7 +70,9 @@ query getTodo($email : String, $account_name: String) {
 {"email":"ptutino",
 "account_name":"organicvegan"}
 
-------------------------------------------
+---------------------------------------------------------
+EJEMPLO#2
+
 {
   userById(id:"5de02d0400115e187dbd043d") {
     _id 
@@ -121,4 +127,53 @@ query getTodo($email : String, $account_name: String) {
     }
   
   }
+}
+
+---------------------------------------------------------
+EJEMPLO#3
+
+
+  
+{
+  requests(page:"0", limit:"25", provider_id:"5de02e4500115e187dbd043f,5de02e4500115e187dbd043f"){
+    provider{
+      name
+      cnpj
+    }
+    requested_type
+  }
+  providers(page:"0", limit:"25", bank_name:"bras"){
+    _id
+    name
+    cnpj
+    bank_accounts{
+      bank_name
+      agency
+      cc
+    }
+  }
+  teams(page:"0", limit:"25", member_name:"tutino"){
+    _id
+    created_by{
+      _id
+      account_name
+      business_name
+    }
+    account_name
+    teamCounterId
+    members{
+      _id
+      member{
+        _id
+        account_name
+        first_name
+        last_name
+        legal_id
+        email
+      }
+      position
+      wage
+    }
+  }
+  
 }
