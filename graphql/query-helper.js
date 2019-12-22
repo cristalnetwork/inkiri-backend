@@ -239,3 +239,19 @@ exports.iuguQuery = (args) => {
     filter:  filter
   };    
 }
+
+exports.iuguLogQuery = (args) => {
+  const page  = args.page ? parseInt(args.page) : 0;
+  const limit = args.limit ? parseInt(args.limit) : 100;
+  const { id } = args;
+
+  let filter = {};
+
+  filter = makeFilter('_id', id, filter)
+  
+  return {
+    limit:   limit,
+    page:    page,
+    filter:  filter
+  };    
+}

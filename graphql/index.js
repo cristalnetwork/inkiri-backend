@@ -210,6 +210,8 @@ const typeDefs = `
     iugu(id:String, iugu_id:String):   Iugu
     iugus(page:String!, limit:String!, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String):  [Iugu]
     
+    iuguLog(id:String):   IuguLog
+    iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
   }
 
 
@@ -312,6 +314,16 @@ const resolvers = {
       const query = queryHelper.iuguQuery(args)
       const res = await IuguModel.list(query.limit, query.page, query.filter);
       return res;
+    },
+    iuguLog: async (_, args) => {
+      const query = queryHelper.iuguLogQuery(args)
+      const res = await IuguLogModel.list(1, 0, query.filter);
+      return (Array.isArray(res))?res[0]:res;
+    },
+    iuguLogs: async (_, args) => {
+      const query = queryHelper.iuguLogQuery(args)
+      const res = await IuguLogModel.list(1, 0, query.filter);
+      return (Array.isArray(res))?res[0]:res;
     },
   },
 };

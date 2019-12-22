@@ -47,7 +47,7 @@ const PORT = process.env.PORT || config.port || 5000
 // app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 // app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
-app.use("/graphql", ExpressGraphQL({
+app.use(`${config.api_version}/graphql`, ExpressGraphQL({
     schema:     schema,
     graphiql:   true
 }));
