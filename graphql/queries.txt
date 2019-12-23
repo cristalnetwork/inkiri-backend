@@ -177,3 +177,175 @@ EJEMPLO#3
   }
   
 }
+
+---------------------------------------------------------
+EJEMPLO#4
+
+{
+  requests(page:"0", limit:"2", deposit_currency:"IK$"){
+    _id
+    requested_type
+    from
+    to
+    amount
+    deposit_currency
+  }
+  
+  iugus(page:"0", limit:"5"){
+    _id
+    amount
+    iugu_id
+    paid_at
+    receipt{
+      account_name
+      business_name
+      account_type
+    }
+    receipt_alias
+    receipt_accountname
+    original
+  }
+}
+
+---------------------------------------------------------
+EJEMPLO#5
+{
+  
+  configurationsJobPositions{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    amount
+    created_at
+    updated_at
+  }
+  configurationsPayVehicles{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    bank_account{
+      bank_name
+      agency
+      cc
+    }
+    created_at
+    updated_at
+  }
+  configurationsPayCategory{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    created_at
+    updated_at
+  }
+  configurationsPayType{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    created_at
+    updated_at
+  }
+  configurationsPayMode{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    created_at
+    updated_at
+  }
+  configurationsExternalTxFee{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    amount
+    created_at
+    updated_at
+  }
+  configurationsAccountConfig{
+    _id
+    created_by{
+      _id
+      account_name
+    }
+    updated_by{
+      _id
+      account_name
+    }
+    configurationCounterId
+    father
+    key
+    value
+    amount
+    bank_account{
+      bank_name
+      agency
+      cc
+    }
+    account{
+      account_type
+      fee
+      overdraft
+    }
+    created_at
+    updated_at
+  }
+}

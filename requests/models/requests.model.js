@@ -21,23 +21,23 @@ exports.STATE_CANCELED                = 'state_canceled';
 exports.STATE_REFUNDED                = 'state_refunded';
 exports.STATE_REVERTED                = 'state_reverted';
 
-exports.PAYMENT_VEHICLE               = 'payment_vehicle';
-exports.PAYMENT_VEHICLE_INKIRI        = 'payment_vehicle_inkiri';
-exports.PAYMENT_VEHICLE_INSTITUTO     = 'payment_vehicle_institute';
+// exports.PAYMENT_VEHICLE               = 'payment_vehicle';
+// exports.PAYMENT_VEHICLE_INKIRI        = 'payment_vehicle_inkiri';
+// exports.PAYMENT_VEHICLE_INSTITUTO     = 'payment_vehicle_institute';
 
-exports.PAYMENT_CATEGORY              = 'payment_category';
-exports.PAYMENT_CATEGORY_ALUGEL       = 'payment_category_alugel';
-exports.PAYMENT_CATEGORY_INVESTIMENTO = 'payment_category_investimento';
-exports.PAYMENT_CATEGORY_INSUMOS      = 'payment_category_insumos';
-exports.PAYMENT_CATEGORY_ANOTHER      = 'payment_category_another';
+// exports.PAYMENT_CATEGORY              = 'payment_category';
+// exports.PAYMENT_CATEGORY_ALUGEL       = 'payment_category_alugel';
+// exports.PAYMENT_CATEGORY_INVESTIMENTO = 'payment_category_investimento';
+// exports.PAYMENT_CATEGORY_INSUMOS      = 'payment_category_insumos';
+// exports.PAYMENT_CATEGORY_ANOTHER      = 'payment_category_another';
 
-exports.PAYMENT_TYPE                  = 'payment_type';
-exports.PAYMENT_TYPE_DESPESA          = 'payment_type_despesa';
-exports.PAYMENT_TYPE_INVESTIMENTO     = 'payment_type_investimento';
+// exports.PAYMENT_TYPE                  = 'payment_type';
+// exports.PAYMENT_TYPE_DESPESA          = 'payment_type_despesa';
+// exports.PAYMENT_TYPE_INVESTIMENTO     = 'payment_type_investimento';
 
-exports.PAYMENT_MODE                  = 'payment_mode';
-exports.PAYMENT_MODE_TRANSFER         = 'payment_mode_transfer';
-exports.PAYMENT_MODE_BOLETO           = 'payment_mode_boleto';
+// exports.PAYMENT_MODE                  = 'payment_mode';
+// exports.PAYMENT_MODE_TRANSFER         = 'payment_mode_transfer';
+// exports.PAYMENT_MODE_BOLETO           = 'payment_mode_boleto';
 
 exports.ATTACH_NOTA_FISCAL            = 'attach_nota_fiscal';
 exports.ATTACH_BOLETO_PAGAMENTO       = 'attach_boleto_pagamento';
@@ -145,11 +145,14 @@ const requestSchema = new Schema({
                             }
                           }, // FOR exchange
     provider_extra:       {
-      payment_vehicle:      { type: String, enum: [exports.PAYMENT_VEHICLE_INKIRI, exports.PAYMENT_VEHICLE_INSTITUTO] }
-      , payment_category:   { type: String, enum: [exports.PAYMENT_CATEGORY_ALUGEL, exports.PAYMENT_CATEGORY_INVESTIMENTO, exports.PAYMENT_CATEGORY_INSUMOS, exports.PAYMENT_CATEGORY_ANOTHER]}
-      , payment_type:       { type: String, enum: [exports.PAYMENT_TYPE_DESPESA, exports.PAYMENT_TYPE_INVESTIMENTO] }
-      , payment_mode:       { type: String, enum: [exports.PAYMENT_MODE_TRANSFER, exports.PAYMENT_MODE_BOLETO]}
-
+      // payment_vehicle:      { type: String, enum: [exports.PAYMENT_VEHICLE_INKIRI, exports.PAYMENT_VEHICLE_INSTITUTO] }
+      // , payment_category:   { type: String, enum: [exports.PAYMENT_CATEGORY_ALUGEL, exports.PAYMENT_CATEGORY_INVESTIMENTO, exports.PAYMENT_CATEGORY_INSUMOS, exports.PAYMENT_CATEGORY_ANOTHER]}
+      // , payment_type:       { type: String, enum: [exports.PAYMENT_TYPE_DESPESA, exports.PAYMENT_TYPE_INVESTIMENTO] }
+      // , payment_mode:       { type: String, enum: [exports.PAYMENT_MODE_TRANSFER, exports.PAYMENT_MODE_BOLETO]}
+      payment_vehicle:      { type: String, required:true} 
+      , payment_category:   { type: String, required:true}
+      , payment_type:       { type: String, required:true}
+      , payment_mode:       { type: String, required:true}
     },
 
     service:              { type: Schema.Types.ObjectId,

@@ -5,14 +5,44 @@ const IuguLogModel  = require('../iugu_log/models/iugu_log.model');
 const ProviderModel = require('../providers/models/providers.model');
 const ServiceModel  = require('../services/models/services.model');
 const TeamModel     = require('../teams/models/teams.model');
+const ConfigModel   = require('../configuration/models/configuration.model');
 
 const queryHelper   = require('./query-helper');
 // const { buildSchema }          = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools');
 
+/*
+  type JobPosition{
+    key:                        String 
+    title:                      String 
+    wage:                       Float
+  }
 
+  jobPositions: [JobPosition]
+*/
 // GraphQL Types
 const typeDefs = `
+  type AccountConfig{
+    account_type:             String
+    fee:                      Float
+    overdraft:                Float
+  }
+
+  type Configuration{
+    _id:                        ID!
+    created_by:                 User!
+    updated_by:                 User
+    configurationCounterId:     Int
+    father:                     String
+    key:                        String
+    value:                      String
+    amount:                     Float
+    account:                    AccountConfig
+    bank_account:               BankAccount
+    created_at:                 String
+    updated_at:                 String   
+  }
+  
   type BankAccount{
     _id:                        ID
     bank_name:                  String!
@@ -125,12 +155,6 @@ const typeDefs = `
 
   }
 
-  type JobPosition{
-    key:                        String 
-    title:                      String 
-    wage:                       Float
-  }
-
   type Member{
     _id:                        ID!
     member:                     User
@@ -202,8 +226,6 @@ const typeDefs = `
     team(account_name:String, id:String, teamCounterId:String, created_by:String):                                    Team
     teams(page:String!, limit:String!, account_name:String, id:String, teamCounterId:String, created_by:String, member_position:String, member_wage:Float, member_account_name:String, member_name:String):      [Team]
   
-    jobPositions: [JobPosition]
-
     providers(page:String!, limit:String!, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): [Provider]
     provider(id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ):                Provider
 
@@ -212,6 +234,17 @@ const typeDefs = `
     
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
+    
+    configuration:                   [Configuration]
+    configurationItem(id:String):    Configuration
+    configurationsJobPositions:      [Configuration]
+    configurationsPayVehicles:       [Configuration]
+    configurationsPayCategory:       [Configuration]
+    configurationsPayType:           [Configuration]
+    configurationsPayMode:           [Configuration]
+    configurationsExternalTxFee:     [Configuration]
+    configurationsAccountConfig:     [Configuration]
+
   }
 
 
@@ -284,9 +317,9 @@ const resolvers = {
       const res = await TeamModel.list(query.limit, query.page, query.filter, query.populate);
       return res;
     },
-    jobPositions: async (_, args) => {
-      return TeamModel.job_positions;
-    },
+    // jobPositions: async (_, args) => {
+    //   return TeamModel.job_positions;
+    // },
     
     /* 
     *  PROVIDER 
@@ -325,6 +358,58 @@ const resolvers = {
       const res = await IuguLogModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
+
+    /*
+    * CONFIGURATION
+    */
+
+    configuration: async(_, args) =>
+    {
+      const rest = ConfigModel.getAll();
+      return res;
+    }, 
+    configurationItem: async(_, args) =>
+    {
+      const res = await ConfigModel.getById(args.id);
+      return res;
+      
+    },
+    configurationsJobPositions: async(_, args) =>
+    {
+      const res = await ConfigModel.getJobPositions();
+      return res; 
+    }, 
+    configurationsPayVehicles: async(_, args) =>
+    {
+      const res = await ConfigModel.getPayVehicles();
+      return res; 
+    } ,
+    configurationsPayCategory: async(_, args) =>
+    {
+      const res = await ConfigModel.getPayCategory();
+      return res; 
+    } ,
+    configurationsPayType: async(_, args) =>
+    {
+      const res = await ConfigModel.getPayType();
+      return res; 
+    } ,
+    configurationsPayMode: async(_, args) =>
+    {
+      const res = await ConfigModel.getPayMode();
+      return res; 
+    } ,
+    configurationsExternalTxFee: async(_, args) =>
+    {
+      const res = await ConfigModel.getExternalTxFee();
+      return res; 
+    } ,
+    configurationsAccountConfig : async(_, args) =>
+    {
+      const res = await ConfigModel.getAccountCconfig();
+      return res; 
+    } 
+
   },
 };
 

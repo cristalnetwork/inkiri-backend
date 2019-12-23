@@ -42,8 +42,8 @@ exports.routesConfig = function (app) {
         TeamsController.getByAccountName
     ]);
 
-    app.get(config.api_version+'/teams_positions', [
-        ValidationMiddleware.validJWTNeeded,
-        TeamsController.getPositions
-    ]);
+    // app.get(config.api_version+'/teams_positions', [
+    //     ValidationMiddleware.validJWTNeeded,
+    //     TeamsController.getPositions
+    // ]);
 };
