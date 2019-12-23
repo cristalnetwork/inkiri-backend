@@ -251,7 +251,7 @@ EJEMPLO#5
     created_at
     updated_at
   }
-  configurationsPayCategory{
+  configurationsPayCategories{
     _id
     created_by{
       _id
@@ -268,7 +268,7 @@ EJEMPLO#5
     created_at
     updated_at
   }
-  configurationsPayType{
+  configurationsPayTypes{
     _id
     created_by{
       _id
@@ -285,7 +285,7 @@ EJEMPLO#5
     created_at
     updated_at
   }
-  configurationsPayMode{
+  configurationsPayModes{
     _id
     created_by{
       _id
@@ -302,7 +302,7 @@ EJEMPLO#5
     created_at
     updated_at
   }
-  configurationsExternalTxFee{
+  configurationsExternalTxFees{
     _id
     created_by{
       _id
@@ -320,7 +320,7 @@ EJEMPLO#5
     created_at
     updated_at
   }
-  configurationsAccountConfig{
+  configurationsAccountConfigs{
     _id
     created_by{
       _id

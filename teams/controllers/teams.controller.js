@@ -12,9 +12,9 @@ exports.insert = (req, res) => {
         });
 };
 
-exports.getPositions = (req, res) => {
-  res.status(200).send({job_positions:TeamModel.job_positions});
-};
+// exports.getPositions = (req, res) => {
+//   res.status(200).send({job_positions:TeamModel.job_positions});
+// };
 
 exports.list = (req, res) => {
 

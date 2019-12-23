@@ -239,11 +239,11 @@ const typeDefs = `
     configurationItem(id:String):    Configuration
     configurationsJobPositions:      [Configuration]
     configurationsPayVehicles:       [Configuration]
-    configurationsPayCategory:       [Configuration]
-    configurationsPayType:           [Configuration]
-    configurationsPayMode:           [Configuration]
-    configurationsExternalTxFee:     [Configuration]
-    configurationsAccountConfig:     [Configuration]
+    configurationsPayCategories:     [Configuration]
+    configurationsPayTypes:          [Configuration]
+    configurationsPayModes:          [Configuration]
+    configurationsExternalTxFees:    [Configuration]
+    configurationsAccountConfigs:    [Configuration]
 
   }
 
@@ -384,27 +384,27 @@ const resolvers = {
       const res = await ConfigModel.getPayVehicles();
       return res; 
     } ,
-    configurationsPayCategory: async(_, args) =>
+    configurationsPayCategories: async(_, args) =>
     {
       const res = await ConfigModel.getPayCategory();
       return res; 
     } ,
-    configurationsPayType: async(_, args) =>
+    configurationsPayTypes: async(_, args) =>
     {
       const res = await ConfigModel.getPayType();
       return res; 
     } ,
-    configurationsPayMode: async(_, args) =>
+    configurationsPayModes: async(_, args) =>
     {
       const res = await ConfigModel.getPayMode();
       return res; 
     } ,
-    configurationsExternalTxFee: async(_, args) =>
+    configurationsExternalTxFees: async(_, args) =>
     {
       const res = await ConfigModel.getExternalTxFee();
       return res; 
     } ,
-    configurationsAccountConfig : async(_, args) =>
+    configurationsAccountConfigs: async(_, args) =>
     {
       const res = await ConfigModel.getAccountCconfig();
       return res; 
