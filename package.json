@@ -19,6 +19,7 @@
   "homepage": "https://github.com/cristalnetwork/inkiri-backend",
   "dependencies": {
     "@dfuse/client": "^0.2.10",
+    "apollo-server-express": "^2.9.14",
     "body-parser": "1.7.0",
     "eosjs": "^20.0.0",
     "eosjs-ecc": "^4.0.4",

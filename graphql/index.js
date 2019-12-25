@@ -21,7 +21,7 @@ const { makeExecutableSchema } = require('graphql-tools');
   jobPositions: [JobPosition]
 */
 // GraphQL Types
-const typeDefs = `
+exports.typeDefs = `
   type AccountConfig{
     account_type:             String
     fee:                      Float
@@ -251,7 +251,7 @@ const typeDefs = `
 `;
 
 // GraphQL resolvers
-const resolvers = {
+exports.resolvers = {
   Query: {
 
     /* 
@@ -415,8 +415,8 @@ const resolvers = {
 
 // Define a schema
 exports.schema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
+  typeDefs: exports.typeDefs,
+  resolvers: exports.resolvers
 });
 
 /*

@@ -153,21 +153,20 @@ exports.teamQuery = (args) => {
   filter = makeFilter('members.position', member_position, filter);
   filter = makeFilter('members.wage', member_wage, filter);
 
-  // filter = makeLikeFilter('members.member.account_name', member_account_name, filter);
-  if(member_name)
-  {
-    populate = {...populate||{}, 
-      path  : 'members.member',
-      match : {$or : [getLikeFilter('first_name', member_name), getLikeFilter('last_name', member_name)] }
-    }
-  }
-  if(account_name)
-  {
-    populate = {...populate||{}, 
-      path  : 'members.member',
-      match : getLikeFilter('account_name', member_account_name)
-    }
-  }
+  // if(member_name)
+  // {
+  //   populate = {...populate||{}, 
+  //     path  : 'members.member',
+  //     match : {$or : [getLikeFilter('first_name', member_name), getLikeFilter('last_name', member_name)] }
+  //   }
+  // }
+  // if(account_name)
+  // {
+  //   populate = {...populate||{}, 
+  //     path  : 'members.member',
+  //     match : getLikeFilter('account_name', member_account_name)
+  //   }
+  // }
 
   filter = makeFilter('_id', id, filter)
   filter = makeFilter('account_name', account_name, filter)

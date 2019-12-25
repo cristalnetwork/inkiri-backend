@@ -14,7 +14,8 @@ const ServicesRouter      = require('./services/routes.config');
 const ConfigurationRouter = require('./configuration/routes.config');
 
 const ExpressGraphQL      = require("express-graphql");
-const {schema, root}      = require('./graphql/index');
+const { ApolloServer, gql } = require('apollo-server-express');
+const {schema, typeDefs, resolvers}      = require('./graphql/index');
 
 
 app.use(function (req, res, next) {
@@ -44,13 +45,17 @@ ServicesRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
 
-// app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
-// app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
-
-app.use(`${config.api_version}/graphql`, ExpressGraphQL({
+app.use(`${config.api_version}/graphiql`, ExpressGraphQL({
     schema:     schema,
     graphiql:   true
 }));
+
+// app.use(`${config.api_version}/graphql`, bodyParser.json(), graphqlExpress({ schema: schema }));
+
+// const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers });
+const path = `${config.api_version}/graphql`;
+server.applyMiddleware({ app , path});
 
 app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);
