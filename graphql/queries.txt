@@ -132,8 +132,6 @@ EJEMPLO#2
 ---------------------------------------------------------
 EJEMPLO#3
 
-
-  
 {
   requests(page:"0", limit:"25", provider_id:"5de02e4500115e187dbd043f,5de02e4500115e187dbd043f"){
     provider{
@@ -348,4 +346,153 @@ EJEMPLO#5
     created_at
     updated_at
   }
+}
+
+---------------------------------------------------------
+EJEMPLO#4
+
+{
+  _id:                        
+  created_by{
+    _id
+    account_name
+    alias
+    first_name
+    last_name
+    email
+    legal_id
+    birthday
+    phone
+    bank_accounts{
+      _id
+      bank_name
+      agency
+      cc
+    }
+    account_type
+    business_name
+    created_at
+    userCounterId
+  }
+  requested_by{
+    _id
+    account_name
+    alias
+    first_name
+    last_name
+    email
+    legal_id
+    birthday
+    phone
+    bank_accounts{
+      _id
+      bank_name
+      agency
+      cc
+    }
+    account_type
+    business_name
+    created_at
+    userCounterId
+  }
+  from
+  requested_type
+  amount
+  requested_to{
+    _id
+    account_name
+    alias
+    first_name
+    last_name
+    email
+    legal_id
+    birthday
+    phone
+    bank_accounts{
+      _id
+      bank_name
+      agency
+      cc
+    }
+    account_type
+    business_name
+    created_at
+    userCounterId
+  }
+  to
+  state
+  tx_id
+  refund_tx_id
+  requestCounterId
+  description
+  attach_nota_fiscal_id
+  attach_boleto_pagamento_id
+  attach_comprobante_id
+  deposit_currency
+  bank_account{
+    bank_name
+    agency
+    cc
+  }
+  provider{
+    _id
+    name
+    cnpj
+    email
+    phone
+    address{
+      street
+      city
+      state
+      zip
+      country
+    }
+    category
+    products_services
+    state
+    bank_accounts{
+      _id
+      bank_name
+      agency
+      cc
+    }
+    providerCounterId
+  }
+  provider_extra{
+    payment_vehicle
+    payment_category
+    payment_type
+    payment_mode
+  }
+  service{
+    _id
+    created_by{
+      _id
+      account_name
+      alias
+      first_name
+      last_name
+      email
+      legal_id
+      birthday
+      phone
+      account_type
+      business_name
+      created_at
+      updated_at
+      userCounterId
+    }
+    account_name
+    serviceCounterId
+    title
+    description
+    amount
+    state
+  }
+  service_extra{
+    begins_at
+    expires_at
+  }
+  created_at
+  updated_at
 }

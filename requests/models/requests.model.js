@@ -293,22 +293,21 @@ exports.list = (perPage, page, query) => {
             .populate('requested_to')
             .populate('provider')
             .populate('service')
+            .populate('service.created_by')
             .limit(perPage)
             .skip(perPage * page)
             .sort({requestCounterId: -1 })
             .exec(function (err, requests) {
-                if (err) {
-                    reject(err);
-                } else {
-                //   resolve(requests);
-                //   const x = requests.map(req => toUIDict(req))
-                    const x = requests.map((req) => {
-                        const req_json  = req.toJSON();
-                        let xxx         = requestToUIDict(req);
-                        return Object.assign(req_json, xxx);
-                    })
-                    resolve(x);
-                }
+              if (err) {
+                  reject(err);
+              } else {
+                const x = requests.map((req) => {
+                    const req_json  = req.toJSON();
+                    let xxx         = requestToUIDict(req);
+                    return Object.assign(req_json, xxx);
+                })
+                resolve(x);
+              }
             })
     });
 };
@@ -363,7 +362,8 @@ requestToUIDict  = (request) => {
     , key               : request.id
      , block_time        : request.created_at.toISOString().split('.')[0]
      , quantity          : request.amount
-     , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
+     // , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
+     , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + config.eos.token.code
      , tx_type           : request.requested_type
      , i_sent            : true
      , flag              : flag

@@ -61,11 +61,11 @@ exports.typeDefs = `
 
   type User {
     _id:                        ID!
-    account_name:               String!
+    account_name:               String
     alias:                      String
     first_name:                 String
     last_name:                  String
-    email:                      String!
+    email:                      String
     legal_id:                   String
     birthday:                   String
     phone:                      String
@@ -126,7 +126,13 @@ exports.typeDefs = `
     bank_accounts:              [BankAccount]
     providerCounterId:          Int
   }
-
+  
+  type Flag{
+    ok:                         Boolean
+    message:                    String 
+    tag:                        String
+  }
+  
   type Request{
     _id:                        ID!
     created_by:                 User
@@ -152,6 +158,18 @@ exports.typeDefs = `
     service_extra:              ServiceExtra
     created_at:                 String
     updated_at:                 String
+
+    header:                     String
+    sub_header:                 String
+    sub_header_ex:              String
+    sub_header_admin:           String
+    key:                        String
+    block_time:                 String
+    quantity:                   String
+    quantity_txt:               String
+    tx_type:                    String
+    i_sent:                     Boolean
+    flag:                       Flag
 
   }
 
@@ -216,7 +234,7 @@ exports.typeDefs = `
   
     maxRequestId:                                   Int
     request(id:String, requestCounterId:String):    Request
-    requests(page:String!, limit:String!, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:String, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String) : [Request]
+    requests(page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:String, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String) : [Request]
     
     service(account_name:String, id:String, serviceCounterId:String):                                    Service
     services(page:String!, limit:String!, account_name:String, id:String, serviceCounterId:String):      [Service]
@@ -280,6 +298,7 @@ exports.resolvers = {
     requests: async (_, args) => {
       const query = queryHelper.requestQuery(args)
       const res = await RequestModel.list(query.limit, query.page, query.filter);
+      // console.log(res);
       return res;
     },
     maxRequestId: async (_, args) => {
