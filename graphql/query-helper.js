@@ -1,3 +1,4 @@
+var moment          = require('moment');
 
 /*
 * Operators
@@ -91,11 +92,11 @@ exports.usersQuery  = (args) => {
 exports.requestQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency} = args;
+  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency, date_from, date_to} = args;
 
   let filter = {};
 
-  if (from&&to) {
+  if (from&&to&&from==to) {
     filter = { $or : [{from: from}, {to: to}] };
   }
   else
@@ -103,7 +104,13 @@ exports.requestQuery = (args) => {
     filter = makeFilter('from', from, filter)
     filter = makeFilter('to', to, filter)
   }
-
+  
+  if(date_from && date_to)
+  {
+    const my_date_from = moment(date_from);
+    const my_date_to = moment(date_to);
+    filter = {...filter,  $or : [ {updated_at: { $gte: my_date_to, $lte: my_date_from }}, {created_at: { $gte: my_date_from, $lte: my_date_to}}] };
+  }
   filter = makeFilter('requestCounterId', requestCounterId, filter)
   filter = makeFilter('_id', id, filter)
   filter = makeFilter('provider', provider_id, filter)
