@@ -275,12 +275,12 @@ exports.resolvers = {
     /* 
     *  USERS 
     */
-    users: async (_, args) => {
+    users: async (parent, args, context) => {
       const query = queryHelper.usersQuery(args)
       const res = await UserModel.list(query.limit, query.page, query.filter);
       return res;
     },
-    user: async (_, args) => {
+    user: async (parent, args, context) => {
       const query = queryHelper.usersQuery(args)
       const res = await UserModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
@@ -290,18 +290,18 @@ exports.resolvers = {
     /* 
     *  REQUESTS 
     */
-    request: async (_, args) => {
+    request: async (parent, args, context) => {
       const query = queryHelper.requestQuery(args)
       const res = await RequestModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
-    requests: async (_, args) => {
+    requests: async (parent, args, context) => {
       const query = queryHelper.requestQuery(args)
       const res = await RequestModel.list(query.limit, query.page, query.filter);
       // console.log(res);
       return res;
     },
-    maxRequestId: async (_, args) => {
+    maxRequestId: async (parent, args, context) => {
       const res = await RequestModel.list(1, 0);
       return (Array.isArray(res))?res[0].requestCounterId:res.requestCounterId;
     },
@@ -309,46 +309,46 @@ exports.resolvers = {
     /* 
     *  SERVICES 
     */
-    service: async (_, args) => {
+    service: async (parent, args, context) => {
       const query = queryHelper.serviceQuery(args)
       const res = await ServiceModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
-    services: async (_, args) => {
+    services: async (parent, args, context) => {
       const query = queryHelper.serviceQuery(args)
       const res = await ServiceModel.list(query.limit, query.page, query.filter);
       return res;
     },
-    serviceStates: async (_, args) => {
+    serviceStates: async (parent, args, context) => {
       return ServiceModel.services_states;
     },
 
     /*
     *  TEAMS
     */
-    team: async (_, args) => {
+    team: async (parent, args, context) => {
       const query = queryHelper.teamQuery(args)
       const res = await TeamModel.list(1, 0, query.filter, query.populate);
       return (Array.isArray(res))?res[0]:res;    
     },
-    teams: async (_, args) => {
+    teams: async (parent, args, context) => {
       const query = queryHelper.teamQuery(args)
       const res = await TeamModel.list(query.limit, query.page, query.filter, query.populate);
       return res;
     },
-    // jobPositions: async (_, args) => {
+    // jobPositions: async (parent, args, context) => {
     //   return TeamModel.job_positions;
     // },
     
     /* 
     *  PROVIDER 
     */
-    providers: async (_, args) => {
+    providers: async (parent, args, context) => {
       const query = queryHelper.providerQuery(args)
       const res = await ProviderModel.list(query.limit, query.page, query.filter);
       return res;
     },
-    provider: async (_, args) => {
+    provider: async (parent, args, context) => {
       const query = queryHelper.providerQuery(args)
       const res = await ProviderModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
@@ -357,22 +357,22 @@ exports.resolvers = {
     /* 
     *  IUGU 
     */
-    iugu: async (_, args) => {
+    iugu: async (parent, args, context) => {
       const query = queryHelper.iuguQuery(args)
       const res = await IuguModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
-    iugus: async (_, args) => {
+    iugus: async (parent, args, context) => {
       const query = queryHelper.iuguQuery(args)
       const res = await IuguModel.list(query.limit, query.page, query.filter);
       return res;
     },
-    iuguLog: async (_, args) => {
+    iuguLog: async (parent, args, context) => {
       const query = queryHelper.iuguLogQuery(args)
       const res = await IuguLogModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
-    iuguLogs: async (_, args) => {
+    iuguLogs: async (parent, args, context) => {
       const query = queryHelper.iuguLogQuery(args)
       const res = await IuguLogModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
@@ -382,48 +382,48 @@ exports.resolvers = {
     * CONFIGURATION
     */
 
-    configuration: async(_, args) =>
+    configuration: async(parent, args, context) =>
     {
       const rest = ConfigModel.getAll();
       return res;
     }, 
-    configurationItem: async(_, args) =>
+    configurationItem: async(parent, args, context) =>
     {
       const res = await ConfigModel.getById(args.id);
       return res;
       
     },
-    configurationsJobPositions: async(_, args) =>
+    configurationsJobPositions: async(parent, args, context) =>
     {
       const res = await ConfigModel.getJobPositions();
       return res; 
     }, 
-    configurationsPayVehicles: async(_, args) =>
+    configurationsPayVehicles: async(parent, args, context) =>
     {
       const res = await ConfigModel.getPayVehicles();
       return res; 
     } ,
-    configurationsPayCategories: async(_, args) =>
+    configurationsPayCategories: async(parent, args, context) =>
     {
       const res = await ConfigModel.getPayCategory();
       return res; 
     } ,
-    configurationsPayTypes: async(_, args) =>
+    configurationsPayTypes: async(parent, args, context) =>
     {
       const res = await ConfigModel.getPayType();
       return res; 
     } ,
-    configurationsPayModes: async(_, args) =>
+    configurationsPayModes: async(parent, args, context) =>
     {
       const res = await ConfigModel.getPayMode();
       return res; 
     } ,
-    configurationsExternalTxFees: async(_, args) =>
+    configurationsExternalTxFees: async(parent, args, context) =>
     {
       const res = await ConfigModel.getExternalTxFee();
       return res; 
     } ,
-    configurationsAccountConfigs: async(_, args) =>
+    configurationsAccountConfigs: async(parent, args, context) =>
     {
       const res = await ConfigModel.getAccountCconfig();
       return res; 
@@ -438,23 +438,4 @@ exports.schema = makeExecutableSchema({
   resolvers: exports.resolvers
 });
 
-/*
-query getTodo($account_id : String!) {
 
- userById(id:$account_id) {
-    _id 
-    account_name
-    alias
-    address{
-      _id
-      street
-    }
-    bank_accounts{
-      _id
-      bank_name
-    }
-  
-  }
-}
-{"account_id":     "5de02d0400115e187dbd043d"}
-*/

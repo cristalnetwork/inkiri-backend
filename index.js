@@ -7,15 +7,17 @@ const UsersRouter         = require('./users/routes.config');
 const EosRouter           = require('./eos/routes.config');
 const RequestsRouter      = require('./requests/routes.config');
 const ProvidersRouter     = require('./providers/routes.config');
-const CommonRouter        = require('./common/routes.config');
 const IuguRouter          = require('./iugu/routes.config');
 const TeamsRouter         = require('./teams/routes.config');
 const ServicesRouter      = require('./services/routes.config');
 const ConfigurationRouter = require('./configuration/routes.config');
 
 const ExpressGraphQL      = require("express-graphql");
-const { ApolloServer, gql } = require('apollo-server-express');
+const { ApolloServer }    = require('apollo-server-express');
 const {schema, typeDefs, resolvers}      = require('./graphql/index');
+
+const PermissionMiddleware  = require('./common/middlewares/auth.permission.middleware');
+const ValidationMiddleware  = require('./common/middlewares/auth.validation.middleware');
 
 
 app.use(function (req, res, next) {
@@ -38,7 +40,6 @@ EosRouter.routesConfig(app);
 RequestsRouter.routesConfig(app);
 ProvidersRouter.routesConfig(app);
 ConfigurationRouter.routesConfig(app);
-CommonRouter.routesConfig(app);
 IuguRouter.routesConfig(app);
 TeamsRouter.routesConfig(app);
 ServicesRouter.routesConfig(app);
@@ -50,12 +51,28 @@ app.use(`${config.api_version}/graphiql`, ExpressGraphQL({
     graphiql:   true
 }));
 
-// app.use(`${config.api_version}/graphql`, bodyParser.json(), graphqlExpress({ schema: schema }));
+const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }) => {
+      try{
+        const jwt = ValidationMiddleware.getLoggedUser(req);
+        if(!jwt)
+          throw new AuthenticationError('you must be logged in'); 
 
-// const server = new ApolloServer({ typeDefs, resolvers });
-const server = new ApolloServer({ typeDefs, resolvers });
+        const is_admin = PermissionMiddleware.getLoggedPermission(jwt);
+
+        return {
+          account_name: jwt.account_name
+          , is_admin:   is_admin
+        }
+      }
+      catch(ex){
+        console.log(ex)
+        throw ex; 
+      }
+    }
+  });
+
 const path = `${config.api_version}/graphql`;
-server.applyMiddleware({ app , path});
+apollo_server.applyMiddleware({ app , path});
 
 app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);

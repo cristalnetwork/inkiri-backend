@@ -24,27 +24,59 @@ exports.validRefreshNeeded = (req, res, next) => {
 
 
 exports.validJWTNeeded = (req, res, next) => {
-    if (req.headers['authorization']) {
-        try {
-            let authorization = req.headers['authorization'].split(' ');
-            if (authorization[0] !== 'Bearer') {
-                return res.status(401).send({error:'no bearer'});
-            } else {
-                req.jwt = jwt.verify(authorization[1], config.jwt_secret);
+    // if (!req.headers['authorization']) 
+    //   return res.status(401).send({error:'Unauthorized.'});
 
-                if (req.jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
-                    return res.status(401).send({error:'expired token'});
-                }
-                // console.log('validJWTNeeded >> decoded >>', JSON.stringify(req.jwt));
-                return next();
-            }
+    // try {
+    //     const authorization = req.headers['authorization'].split(' ');
+    //     if (authorization[0] !== 'Bearer') {
+    //         return res.status(401).send({error:'no bearer'});
+    //     } 
+    //     req.jwt = jwt.verify(authorization[1], config.jwt_secret);
 
-        } catch (err) {
-            console.log('validJWTNeeded?? >> ', JSON.stringify(err));
-            return res.status(403).send(err);
-        }
-    } else {
-        // console.log('validJWTNeeded?? >> 401' );
-        return res.status(401).send({error:'Unauthorized.'});
+    //     if (req.jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
+    //         return res.status(401).send({error:'expired token'});
+    //     }
+    //     return next();
+
+    // } catch (err) {
+    //     console.log('validJWTNeeded?? >> ', JSON.stringify(err));
+    //     return res.status(403).send(err);
+    // }
+    try{
+      req.jwt = exports.getLoggedUser(req);
+      next();
     }
+    catch (err) {
+      console.log('validJWTNeeded?? >> ', JSON.stringify(err));
+      return res.status(403).send({error:err.message});
+    }
+    
 };
+
+exports.getLoggedUser = (req) => {
+
+  if (!req.headers['authorization']) 
+    throw new Error('Unauthorized');
+
+  try {
+    const authorization = req.headers['authorization'].split(' ');
+    if (authorization[0] !== 'Bearer') {
+        throw new Error('No Bearer');
+    } 
+
+    const _jwt = jwt.verify(authorization[1], config.jwt_secret);
+
+    if (_jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
+        throw new Error('Expired session');
+    }
+    // console.log('validJWTNeeded >> decoded >>', JSON.stringify(req.jwt));
+    return _jwt;
+      
+
+  } catch (err) {
+      console.log('validJWTNeeded?? >> ', JSON.stringify(err));
+      throw err;
+  }
+
+}

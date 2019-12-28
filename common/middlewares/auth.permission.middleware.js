@@ -5,9 +5,18 @@ const eos_helper       = require('../../eos/helper/helper');
 
 exports.loggedHasAdminWritePermission = async (req, res, next) => {
 
-    const auth_user    = req.jwt.account_name;
+    let is_admin = exports.getLoggedPermission(req.jwt);
+     
+    if(!is_admin)
+      return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+auth_user});
 
-    let is_admin        = auth_user==config.eos.bank.account;
+    return next();
+};
+
+exports.getLoggedPermission = async (jwt) => {
+
+    const auth_user = jwt.account_name;
+    let is_admin    = auth_user==config.eos.bank.account;
 
     if(!is_admin)
       try {
@@ -18,10 +27,7 @@ exports.loggedHasAdminWritePermission = async (req, res, next) => {
         }
       } catch (e) { }
 
-    if(!is_admin)
-      return res.status(404).send({error:'Account not authorized for this operation. Requested by:'+auth_user});
-
-    return next();
+    return is_admin;
 };
 
 /*
