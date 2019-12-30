@@ -32,15 +32,4 @@ exports.routesConfig = function (app) {
         ConfigController.removeById
     ]);
 
-    // list cfg
-    // get cfg byId
-
-    // job_positions
-    // payment_vehicle
-    // payment_category
-    // payment_type
-    // services_states
-    // bank bank accounts
-    // fees
-
 };

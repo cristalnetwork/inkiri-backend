@@ -10,13 +10,14 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const Schema = mongoose.Schema;
 
-exports.CONFIG_KEY_JOB_POSITIONS    = 'job_position_';
-exports.CONFIG_KEY_PAY_VEHICLES     = 'payment_vehicle_';
-exports.CONFIG_KEY_PAY_CATEGORY     = 'payment_category_';
-exports.CONFIG_KEY_PAY_TYPE         = 'payment_type_';
-exports.CONFIG_KEY_PAY_MODE         = 'payment_mode_';
-exports.CONFIG_KEY_EXTERNAL_TX_FEE  = 'external_tx_fee_';
-exports.CONFIG_KEY_ACCOUNT_CONFIG   = 'account_config_';
+exports.CONFIG_KEY_JOB_POSITIONS    = 'job_position';
+exports.CONFIG_KEY_PAY_VEHICLES     = 'payment_vehicle';
+exports.CONFIG_KEY_PAY_CATEGORY     = 'payment_category';
+exports.CONFIG_KEY_PAY_TYPE         = 'payment_type';
+exports.CONFIG_KEY_PAY_MODE         = 'payment_mode';
+exports.CONFIG_KEY_EXTERNAL_TX_FEE  = 'external_tx_fee';
+exports.CONFIG_KEY_ACCOUNT_CONFIG   = 'account_config';
+exports.CONFIG_KEY_TRANSFER_REASON  = 'transfer_reason';
 
 const configurationSchema = new Schema({
     created_by:                { type: Schema.Types.ObjectId, ref: 'Users', required : true},
@@ -113,8 +114,12 @@ exports.getExternalTxFee = () => {
   return exports.getByFather(exports.CONFIG_KEY_EXTERNAL_TX_FEE);
 }
   
-exports.getAccountCconfig = () => {
+exports.getAccountConfig = () => {
   return exports.getByFather(exports.CONFIG_KEY_ACCOUNT_CONFIG);
+}
+
+exports.getTransfersReasons = () => {
+  return exports.getByFather(exports.CONFIG_KEY_TRANSFER_REASON);
 }
 
 exports.getAll = () => {
@@ -189,7 +194,7 @@ exports.init = async () => {
     if(saved_jobs && Array.isArray(saved_jobs) && saved_jobs.length>0)
     {
       const x = await Configuration.deleteMany({});
-      // console.log('saved_jobs:', saved_jobs)  
+      // console.log(' -- deleteMany result:', x)  
       // return 'Already intiialized!';
     }
   }
@@ -211,11 +216,11 @@ exports.init = async () => {
   
   // JOBS
   let father = exports.CONFIG_KEY_JOB_POSITIONS;
-  exports.createConfiguration(newConfig (the_architect, father, father+'raiz',   'Raiz', undefined, 3000));
-  exports.createConfiguration(newConfig (the_architect, father, father+'tronco', 'Tronco', undefined, 2000));
-  exports.createConfiguration(newConfig (the_architect, father, father+'galho',  'Galho', undefined, 1500));
-  exports.createConfiguration(newConfig (the_architect, father, father+'folha',  'Folha', undefined, 1000));
-  exports.createConfiguration(newConfig (the_architect, father, father+'flor',   'Flor', undefined, 1000));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_raiz`,   'Raiz', undefined, 3000));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_tronco`, 'Tronco', undefined, 2000));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_galho`,  'Galho', undefined, 1500));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_folha`,  'Folha', undefined, 1000));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_flor`,   'Flor', undefined, 1000));
 
   father = exports.CONFIG_KEY_PAY_VEHICLES;
   const bank_account = {
@@ -223,44 +228,52 @@ exports.init = async () => {
     , agency:  'AGENCY'
     , cc:      'CC'
   }
-  exports.createConfiguration(newConfig (the_architect, father, father+'inkiri',      'Inkiri',    bank_account));
-  exports.createConfiguration(newConfig (the_architect, father, father+'institute',   'Institute', bank_account));  
-  exports.createConfiguration(newConfig (the_architect, father, father+'other',       'Other',     bank_account));  
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_inkiri`,      'Inkiri',    bank_account));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_institute`,   'Institute', bank_account));  
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_other`,       'Other',     bank_account));  
 
   father = exports.CONFIG_KEY_PAY_CATEGORY;
-  exports.createConfiguration(newConfig (the_architect, father, father+'alugel',       'Alugel'));
-  exports.createConfiguration(newConfig (the_architect, father, father+'investimento', 'Investimento'));
-  exports.createConfiguration(newConfig (the_architect, father, father+'insumos',      'Insumos'));
-  exports.createConfiguration(newConfig (the_architect, father, father+'another',      'Another'  ));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_alugel`,       'Alugel'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_investimento`, 'Investimento'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_insumos`,      'Insumos'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_another`,      'Another'  ));
 
   father = exports.CONFIG_KEY_PAY_TYPE;
-  exports.createConfiguration(newConfig (the_architect, father, father+'despesa',      'Despesa'));
-  exports.createConfiguration(newConfig (the_architect, father, father+'investimento', 'Investimento'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_despesa`,      'Despesa'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_investimento`, 'Investimento'));
 
   father = exports.CONFIG_KEY_PAY_MODE;
-  exports.createConfiguration(newConfig (the_architect, father, father+'transfer', 'Transfer'));
-  exports.createConfiguration(newConfig (the_architect, father, father+'boleto'  , 'Boleto'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_transfer`, 'Transfer'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_boleto`  , 'Boleto'));
 
   father = exports.CONFIG_KEY_EXTERNAL_TX_FEE ;
-  exports.createConfiguration(newConfig (the_architect, father, father+'provider', 'Provider', undefined, 0));
-  exports.createConfiguration(newConfig (the_architect, father, father+'exchange', 'Exchange', undefined, 15));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_provider`, 'Provider', undefined, 0));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_exchange`, 'Exchange', undefined, 15));
 
   father = exports.CONFIG_KEY_ACCOUNT_CONFIG;
-  exports.createConfiguration(newConfig (the_architect, father, father+'personal', 'Personal Account', undefined, undefined, {
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_personal`, 'Personal Account', undefined, undefined, {
       account_type:      UserModel.ACCOUNT_TYPE_PERSONAL
       , fee:             0
       , overdraft:       0
     }));
-  exports.createConfiguration(newConfig (the_architect, father, father+'business', 'Business Account', undefined, undefined, {
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_business`, 'Business Account', undefined, undefined, {
       account_type:      UserModel.ACCOUNT_TYPE_BUSINESS
       , fee:             0
       , overdraft:       0
     }));
-  exports.createConfiguration(newConfig (the_architect, father, father+'foundation', 'Fundo Account', undefined, undefined, {
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_foundation`, 'Fundo Account', undefined, undefined, {
       account_type:      UserModel.ACCOUNT_TYPE_FOUNDATION
       , fee:             0
       , overdraft:       0
     }));
 
+  father = exports.CONFIG_KEY_TRANSFER_REASON ;
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_distribute_profit`, 'Distribute profit'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_adjustment`, 'Adjustment'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_rent`, 'Rent'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_investment`, 'Investment'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_supplies`, 'Supplies'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_another`, 'Another...'));
+  
   return 'OK';
 }

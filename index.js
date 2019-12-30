@@ -52,24 +52,24 @@ app.use(`${config.api_version}/graphiql`, ExpressGraphQL({
 }));
 
 const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }) => {
-      try{
-        const jwt = ValidationMiddleware.getLoggedUser(req);
-        if(!jwt)
-          throw new AuthenticationError('you must be logged in'); 
+    try{
+      const jwt = ValidationMiddleware.getLoggedUser(req);
+      if(!jwt)
+        throw new AuthenticationError('you must be logged in'); 
 
-        const is_admin = PermissionMiddleware.getLoggedPermission(jwt);
+      const is_admin = PermissionMiddleware.getLoggedPermission(jwt);
 
-        return {
-          account_name: jwt.account_name
-          , is_admin:   is_admin
-        }
-      }
-      catch(ex){
-        console.log(ex)
-        throw ex; 
+      return {
+        account_name: jwt.account_name
+        , is_admin:   is_admin
       }
     }
-  });
+    catch(ex){
+      console.log(ex)
+      throw ex; 
+    }
+  }
+});
 
 const path = `${config.api_version}/graphql`;
 apollo_server.applyMiddleware({ app , path});

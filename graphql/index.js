@@ -262,7 +262,7 @@ exports.typeDefs = `
     configurationsPayModes:          [Configuration]
     configurationsExternalTxFees:    [Configuration]
     configurationsAccountConfigs:    [Configuration]
-
+    configurationsTransfersReasons:  [Configuration]
   }
 
 
@@ -384,7 +384,7 @@ exports.resolvers = {
 
     configuration: async(parent, args, context) =>
     {
-      const rest = ConfigModel.getAll();
+      const res = ConfigModel.getAll();
       return res;
     }, 
     configurationItem: async(parent, args, context) =>
@@ -423,9 +423,14 @@ exports.resolvers = {
       const res = await ConfigModel.getExternalTxFee();
       return res; 
     } ,
+    configurationsTransfersReasons: async(parent, args, context) =>
+    {
+      const res = await ConfigModel.getTransfersReasons();
+      return res; 
+    } ,
     configurationsAccountConfigs: async(parent, args, context) =>
     {
-      const res = await ConfigModel.getAccountCconfig();
+      const res = await ConfigModel.getAccountConfig();
       return res; 
     } 
 
