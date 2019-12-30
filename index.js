@@ -54,6 +54,7 @@ app.use(`${config.api_version}/graphiql`, ExpressGraphQL({
 const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }) => {
     try{
       const jwt = ValidationMiddleware.getLoggedUser(req);
+      
       if(!jwt)
         throw new AuthenticationError('you must be logged in'); 
 
@@ -67,6 +68,7 @@ const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }
     catch(ex){
       console.log(ex)
       throw ex; 
+      // return {account_name:'', is_admin:false}
     }
   }
 });
