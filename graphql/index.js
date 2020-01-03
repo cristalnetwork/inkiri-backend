@@ -135,6 +135,7 @@ exports.typeDefs = `
   
   type Request{
     _id:                        ID!
+    id:                         String
     created_by:                 User
     requested_by:               User
     from:                       String
