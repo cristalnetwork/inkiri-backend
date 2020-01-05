@@ -11,7 +11,7 @@ const Schema = mongoose.Schema;
 
 const providerSchema = new Schema({
     name:             { type:  String, required: true},
-    cnpj:             { type:  String, required: true},
+    cnpj:             { type:  String, required: true, unique : true},
     email:            { type:  String  , unique : true},
     phone:            { type:  String },
     address:          {

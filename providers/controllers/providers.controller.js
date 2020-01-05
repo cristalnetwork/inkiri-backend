@@ -9,7 +9,10 @@ exports.insert = (req, res) => {
             res.status(201).send({id: result._id});
         }, (err)=>{
             console.log(' ERROR# 1', JSON.stringify(err))
-            res.status(400).send({error:err.errmsg});            
+            const _err = (err.errmsg)
+                            ?err.errmsg
+                            :JSON.stringify(err);
+            res.status(400).send({error:_err});            
         });
 };
 
