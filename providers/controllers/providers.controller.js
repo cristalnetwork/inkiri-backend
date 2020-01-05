@@ -70,11 +70,18 @@ exports.patchById = (req, res) => {
     //     let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
     //     req.body.password = salt + "$" + hash;
     // }
-
+    console.log('providers.controlles::patchById', req.params.providerId);
     ProviderModel.patchProvider(req.params.providerId, req.body)
-        .then((result) => {
+        .then(
+            (result) => {
             // res.status(204).send({});
-            res.status(200).send({});
+            console.log('providers.controlles::patchById', req.params.providerId);
+            res.status(200).send({updated:'ok'});
+        }, (err) => {
+            const _err = (err.errmsg)
+                            ?err.errmsg
+                            :JSON.stringify(err);
+            res.status(400).send({error:_err});            
         });
 
 };
