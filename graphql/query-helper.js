@@ -23,6 +23,12 @@ const makeFilter = (name, value, filter) => {
   return filter;
 }
 
+exports.appendFromToFilter = (value, filter) => makeOrFilter ('from', 'to', value, filter);
+
+const makeOrFilter = (name1, name2, value, filter) => {
+  return { ...filter, $or : [{[name1]: value}, {[name2]: value}] }
+}
+
 const getLikeFilter = (name, value) => {
   return {[name]: {$regex: '.*' + value + '.*'}}
 }

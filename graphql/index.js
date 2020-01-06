@@ -293,7 +293,12 @@ exports.resolvers = {
     */
     request: async (parent, args, context) => {
       const query = queryHelper.requestQuery(args)
-      const res = await RequestModel.list(1, 0, query.filter);
+      let filter = query.filter;
+      if(!context.is_admin)
+      {
+        filter = queryHelper.appendFromToFilter(context.account_name, filter);
+      }
+      const res = await RequestModel.list(1, 0, filter);
       return (Array.isArray(res))?res[0]:res;
     },
     requests: async (parent, args, context) => {
