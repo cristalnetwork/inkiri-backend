@@ -98,7 +98,7 @@ exports.usersQuery  = (args) => {
 exports.requestQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency, date_from, date_to} = args;
+  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency, date_from, date_to, service_id} = args;
 
   let filter = {};
 
@@ -129,7 +129,7 @@ exports.requestQuery = (args) => {
   filter = makeFilter('attach_boleto_pagamento_id', attach_boleto_pagamento_id, filter)
   filter = makeFilter('attach_comprobante_id', attach_comprobante_id, filter)
   filter = makeFilter('deposit_currency', deposit_currency, filter)
-  
+  filter = makeFilter('service', service_id, filter)
 
   return {
     limit:   limit,

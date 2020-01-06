@@ -235,7 +235,7 @@ exports.typeDefs = `
   
     maxRequestId:                                   Int
     request(id:String, requestCounterId:String):    Request
-    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:String, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String) : [Request]
+    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:String, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String) : [Request]
     
     service(account_name:String, id:String, serviceCounterId:String):                                    Service
     services(page:String!, limit:String!, account_name:String, id:String, serviceCounterId:String):      [Service]
