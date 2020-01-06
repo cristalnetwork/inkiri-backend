@@ -245,7 +245,7 @@ exports.typeDefs = `
     team(account_name:String, id:String, teamCounterId:String, created_by:String):                                    Team
     teams(page:String!, limit:String!, account_name:String, id:String, teamCounterId:String, created_by:String, member_position:String, member_wage:Float, member_account_name:String, member_name:String):      [Team]
   
-    providers(page:String!, limit:String!, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): [Provider]
+    providers(page:String!, limit:String, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): [Provider]
     provider(id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ):                Provider
 
     iugu(id:String, iugu_id:String):   Iugu
