@@ -21,24 +21,6 @@ exports.STATE_CANCELED                = 'state_canceled';
 exports.STATE_REFUNDED                = 'state_refunded';
 exports.STATE_REVERTED                = 'state_reverted';
 
-// exports.PAYMENT_VEHICLE               = 'payment_vehicle';
-// exports.PAYMENT_VEHICLE_INKIRI        = 'payment_vehicle_inkiri';
-// exports.PAYMENT_VEHICLE_INSTITUTO     = 'payment_vehicle_institute';
-
-// exports.PAYMENT_CATEGORY              = 'payment_category';
-// exports.PAYMENT_CATEGORY_ALUGEL       = 'payment_category_alugel';
-// exports.PAYMENT_CATEGORY_INVESTIMENTO = 'payment_category_investimento';
-// exports.PAYMENT_CATEGORY_INSUMOS      = 'payment_category_insumos';
-// exports.PAYMENT_CATEGORY_ANOTHER      = 'payment_category_another';
-
-// exports.PAYMENT_TYPE                  = 'payment_type';
-// exports.PAYMENT_TYPE_DESPESA          = 'payment_type_despesa';
-// exports.PAYMENT_TYPE_INVESTIMENTO     = 'payment_type_investimento';
-
-// exports.PAYMENT_MODE                  = 'payment_mode';
-// exports.PAYMENT_MODE_TRANSFER         = 'payment_mode_transfer';
-// exports.PAYMENT_MODE_BOLETO           = 'payment_mode_boleto';
-
 exports.ATTACH_NOTA_FISCAL            = 'attach_nota_fiscal';
 exports.ATTACH_BOLETO_PAGAMENTO       = 'attach_boleto_pagamento';
 exports.ATTACH_COMPROBANTE            = 'attach_comprobante';
@@ -329,11 +311,6 @@ getHeader = (request) => {
             , sub_header_ex:      `${req_types[request.requested_type]} request`
             , sub_header_admin:   `${request.requested_by.account_name} has requested a ${req_types[request.requested_type]} ${ request.to?(' to '+request.to):''}`
     }
-    // return {
-    //     sub_header:          'You have requested a '+req_types[request.requested_type]
-    //     , sub_header_admin:  request.requested_by.account_name + ' has requested a ' + req_types[request.requested_type]
-    // }
-
 }
 requestToUIDict  = (request) => {
   const headers = getHeader(request)
