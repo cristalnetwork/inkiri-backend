@@ -1,24 +1,23 @@
-const config     = require('./common/config/env.config.js');
+const config     = require('./src/common/config/env.config.js');
 const express    = require('express');
 const app        = express();
 const bodyParser = require('body-parser');
 
-const UsersRouter         = require('./users/routes.config');
-const EosRouter           = require('./eos/routes.config');
-const RequestsRouter      = require('./requests/routes.config');
-const ProvidersRouter     = require('./providers/routes.config');
-const IuguRouter          = require('./iugu/routes.config');
-const TeamsRouter         = require('./teams/routes.config');
-const ServicesRouter      = require('./services/routes.config');
-const ConfigurationRouter = require('./configuration/routes.config');
+const UsersRouter         = require('./src/users/routes.config');
+const EosRouter           = require('./src/eos/routes.config');
+const RequestsRouter      = require('./src/requests/routes.config');
+const ProvidersRouter     = require('./src/providers/routes.config');
+const IuguRouter          = require('./src/iugu/routes.config');
+const TeamsRouter         = require('./src/teams/routes.config');
+const ServicesRouter      = require('./src/services/routes.config');
+const ConfigurationRouter = require('./src/configuration/routes.config');
 
 const ExpressGraphQL      = require("express-graphql");
 const { ApolloServer }    = require('apollo-server-express');
-const {schema, typeDefs, resolvers}      = require('./graphql/index');
+const {schema, typeDefs, resolvers}      = require('./src/graphql/index');
 
-const PermissionMiddleware  = require('./common/middlewares/auth.permission.middleware');
-const ValidationMiddleware  = require('./common/middlewares/auth.validation.middleware');
-
+const PermissionMiddleware  = require('./src/common/middlewares/auth.permission.middleware');
+const ValidationMiddleware  = require('./src/common/middlewares/auth.validation.middleware');
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -52,23 +51,27 @@ app.use(`${config.api_version}/graphiql`, ExpressGraphQL({
 }));
 
 const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }) => {
+    
+    let jwt = null;
     try{
-      const jwt = ValidationMiddleware.getLoggedUser(req);
-      
-      if(!jwt)
-        throw new AuthenticationError('you must be logged in'); 
-
-      const is_admin = PermissionMiddleware.getLoggedPermission(jwt);
-
-      return {
-        account_name: jwt.account_name
-        , is_admin:   is_admin
-      }
+      jwt = ValidationMiddleware.getLoggedUser(req);
     }
     catch(ex){
       console.log(ex)
-      throw ex; 
-      // return {account_name:'', is_admin:false}
+      // throw ex; 
+      console.log('.... apollo returning null name')
+      return {account_name:'', is_admin:false}
+    }
+
+    if(!jwt)
+      // throw new AuthenticationError('you must be logged in'); 
+      return {account_name:'', is_admin:false}
+
+    const is_admin = PermissionMiddleware.getLoggedPermission(jwt);
+
+    return {
+      account_name: jwt.account_name
+      , is_admin:   is_admin
     }
   }
 });
