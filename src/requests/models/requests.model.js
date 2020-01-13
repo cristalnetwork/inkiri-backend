@@ -16,6 +16,7 @@ exports.TYPE_SERVICE                  = 'type_service';
 exports.TYPE_IUGU                     = 'type_iugu';
 
 exports.STATE_REQUESTED               = 'state_requested';
+exports.STATE_RECEIVED                = 'state_received';
 exports.STATE_PROCESSING              = 'state_processing';
 exports.STATE_REJECTED                = 'state_rejected';
 exports.STATE_ACCEPTED                = 'state_accepted';
@@ -57,6 +58,7 @@ const requestSchema = new Schema({
     state:                {
                             type: String
                             , enum: [ exports.STATE_REQUESTED,
+                                      exports.STATE_RECEIVED,
                                       exports.STATE_PROCESSING,
                                       exports.STATE_REJECTED,
                                       exports.STATE_ACCEPTED,
@@ -69,7 +71,8 @@ const requestSchema = new Schema({
     tx_id:                { type: String },
     refund_tx_id:         { type: String ,
       required: function() {
-        return ([exports.STATE_REJECTED, exports.STATE_REVERTED, exports.STATE_REFUNDED].includes(this.requested_type));
+        // return ([exports.STATE_REJECTED, exports.STATE_REVERTED, exports.STATE_REFUNDED].includes(this.requested_type));
+        return ([exports.STATE_REVERTED].includes(this.requested_type));
       }
     },
 
@@ -83,10 +86,10 @@ const requestSchema = new Schema({
         return this.requested_type == exports.TYPE_PAYMENT && this.provider_extra.payment_mode==exports.PAYMENT_MODE_BOLETO;
       }
     },
-    [exports.ATTACH_COMPROBANTE_ID]:       { type: String , default:'' ,
-      required: function() {
-        return (this.requested_type == exports.TYPE_PROVIDER || this.requested_type == exports.TYPE_EXCHANGE) && this.state==exports.STATE_ACCEPTED;
-      }
+    [exports.ATTACH_COMPROBANTE_ID]:       { type: String , default:''
+      // , required: function() {
+      //   return (this.requested_type == exports.TYPE_PROVIDER || this.requested_type == exports.TYPE_EXCHANGE) && this.state==exports.STATE_ACCEPTED;
+      // }
     },
 
     //deposit
@@ -323,15 +326,15 @@ requestToUIDict  = (request) => {
     flag = {
              ok:        false
              , tag:     'PENDING'
-             , message: 'NOTA FISCAL PENDING!'
+             , message: 'NOTA_FISCAL_PENDING!'
             }
   }
   if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE, exports.TYPE_WITHDRAW].includes(request.requested_type) && !request.tx_id)
   {
     flag = {
              ok:        false
-             , tag:     'INVALID'
-             , message: 'NO MONEY RECEIVED FOR THIS OPERATION!'
+             , tag:     'PENDING' // 'INVALID'
+             , message: 'WAITING_FOR_MONEY_TRANSACTION' //'NO MONEY RECEIVED FOR THIS OPERATION!'
             }
   }
   return {

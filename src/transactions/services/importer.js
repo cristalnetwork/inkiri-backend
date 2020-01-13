@@ -56,9 +56,15 @@ exports.import = async () => {
   const txs = await Promise.all( raw_txs.map( async raw_tx => {
       if(raw_tx.undo)
         return null;
-      const from_account_name = (raw_tx.trace && raw_tx.trace.length>0 && raw_tx.trace[0].data && raw_tx.trace[0].data.from) ? raw_tx.trace[0].data.from : null;
-      const to_account_name   = (raw_tx.trace && raw_tx.trace.length>0 && raw_tx.trace[0].data && raw_tx.trace[0].data.to) ? raw_tx.trace[0].data.to : null;
-      const amount            = raw_tx.trace && raw_tx.trace.length>0 && raw_tx.trace[0].data && dfuse.quantityToNumber(raw_tx.trace[0].data.quantity || raw_tx.trace[0].data.amount || raw_tx.trace[0].data.price) || 0.0;
+      const from_account_name = (raw_tx.trace && raw_tx.trace.topLevelActions && raw_tx.trace.topLevelActions.length>0 && raw_tx.trace.topLevelActions[0].data && raw_tx.trace.topLevelActions[0].data.from) 
+        ? raw_tx.trace.topLevelActions[0].data.from 
+        : null;
+      const to_account_name   = (raw_tx.trace && raw_tx.trace.topLevelActions && raw_tx.trace.topLevelActions.length>0 && raw_tx.trace.topLevelActions[0].data && raw_tx.trace.topLevelActions[0].data.to) 
+        ? raw_tx.trace.topLevelActions[0].data.to 
+        : null;
+      const amount            = (raw_tx.trace && raw_tx.trace.topLevelActions && raw_tx.trace.topLevelActions.length>0 && raw_tx.trace.topLevelActions[0].data && raw_tx.trace.topLevelActions[0].data.quantity) 
+        ? dfuse.quantityToNumber(raw_tx.trace.topLevelActions[0].data.quantity || raw_tx.trace.topLevelActions[0].data.amount || raw_tx.trace.topLevelActions[0].data.price) 
+        : 0.0;
       const state             = TxsModel.STATE_NOT_PROCESSED
 
       return {

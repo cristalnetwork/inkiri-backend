@@ -106,7 +106,7 @@ exports.findByEmail = (email) => {
 exports.byAccountNameOrNull = async (account_name) => {
     if(!account_name)
         return null;
-    console.log(' == >> UsersModel::byAccountNameOrNull:', account_name)
+    // console.log(' == >> UsersModel::byAccountNameOrNull:', account_name)
     const  _account_name = account_name?account_name.trim():'';
     const  user = await User.findOne({account_name: _account_name}).exec();
     return user;
@@ -198,7 +198,7 @@ exports.patchUser = (id, userData) => {
 
 exports.patchUserByAccountName = (account_name, userData) => {
 
-    console.log( ' >> users.model::patchUserByAccountName() params ' , account_name, JSON.stringify(userData))
+    // console.log( ' >> users.model::patchUserByAccountName() params ' , account_name, JSON.stringify(userData))
     return new Promise((resolve, reject) => {
         const filter = { account_name: account_name };
         const update = userData;
@@ -245,6 +245,16 @@ exports.removeById = (userId) => {
             }
         });
     });
+};
+
+exports.bankAccountByIdOrNull = (user, bank_account_id) => {
+  if(!user)
+    return null;
+  if(!user.bank_accounts)
+    return null;
+  if(user.bank_accounts.length==0)
+    return null;
+  return user.bank_accounts.find(bank_account => bank_account._id==bank_account_id)
 };
 
 exports.model = User;

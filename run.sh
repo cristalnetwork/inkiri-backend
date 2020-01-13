@@ -6,6 +6,14 @@ npm start
 
 
 
+db.transactions.find({}).sort({transactionCounterId:-1})
+db.requests.find({}).sort({requestCounterId:-1})
+
+db.transactions.update({ _id:  ObjectId("5e189d8d9bc2f83f4c06ab48") }, {  "state": "state_not_processed" } )
+db.requests.find({"_id":ObjectId("5e189c2be7c02e3df75db2b1")})
+
+
+
 
 
 #sudo service mongod start

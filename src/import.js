@@ -8,5 +8,7 @@ const importer = require('./transactions/services/importer');
   console.log (' == Transactions imported!!')
 
   console.log('END o_O');
+
+  return process.exit(0);
 })();
 

@@ -11,8 +11,7 @@ const createClient = (api_key, network) => {
   return client;
 } 
 
-
-const IMPORT_TXS_INITIAL_BLOCK = 69467212;
+const IMPORT_TXS_INITIAL_BLOCK = 70190562;
 
 exports.queryTransactionsBB = async (config, contract, cursor, last_block) => new Promise(async(res,rej)=> {
   
@@ -43,7 +42,7 @@ exports.queryTransactionsBB = async (config, contract, cursor, last_block) => ne
     const response = await client.graphql(searchTransactions, {
       variables: { limit:             100
                   , irreversibleOnly: false
-                  , lowBlockNum:      parseInt(last_block)
+                  , lowBlockNum:      parseInt(last_block)||IMPORT_TXS_INITIAL_BLOCK
                   , cursor:           cursor||null
         }
     })
@@ -105,21 +104,9 @@ exports.queryTransactions = async (config, contract, cursor, last_block) => new 
                   , cursor:           cursor||null
         }
     })
-
-    console.log('================================ DFUSE response:', response)
     const results = response.data.searchTransactionsForward.results || []
-    // if (results.length <= 0) {
-    //   res ({data:{txs:[], cursor:''}})
-    //   console.log("Oups nothing found")
-    //   return;
-    // }
-
-    // console.log(' dfuse::queryTransactions >> RAW data >>', JSON.stringify(response));
-
     const txs = results;
-    console.log(' ========================== DFUSE txs.length:', txs.length)
-    // console.log(' dfuse::listTransactions >> RAW data >>', JSON.stringify(data));
-    res ({txs:txs.reverse(), cursor:response.data.searchTransactionsForward.cursor})
+    res ({txs:txs, cursor:response.data.searchTransactionsForward.cursor})
     
   } catch (error) {
     rej(error);

@@ -9,7 +9,7 @@ exports.insert = (req, res) => {
 //   console.log(' request.Controller::ABOUT TO SAVE')
   RequestModel.createRequest(req.body)
   .then((result) => {
-      res.status(201).send({id: result._id});
+      res.status(201).send({id: result._id, requestCounterId: result.requestCounterId});
   }, (err)=>{
       console.log(' request.Controller::ERROR', JSON.stringify(err));
       res.status(400).send({error:err.errmsg});
@@ -29,7 +29,7 @@ exports.insert_files = (req, res) => {
 
   RequestModel.createRequest(req.body)
   .then((result) => {
-      res.status(201).send({id: result._id});
+      res.status(201).send({id: result._id, requestCounterId: result.requestCounterId});
   }, (err)=>{
       console.log(' request.Controller::ERROR', JSON.stringify(err));
       res.status(400).send({error:err.errmsg});

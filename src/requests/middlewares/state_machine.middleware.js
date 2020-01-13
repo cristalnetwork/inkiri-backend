@@ -7,33 +7,37 @@ const loadStatesForAdmin = (current_state) =>{
  return new StateMachine({
     init: current_state,
     transitions: [
-      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_PROCESSING),
-          from: RequestsModel.STATE_REQUESTED,
-          to: RequestsModel.STATE_PROCESSING },
       { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_REJECTED),
           from: RequestsModel.STATE_REQUESTED,
           to: RequestsModel.STATE_REJECTED },
-      { name: toTransition(RequestsModel.STATE_REQUESTED, RequestsModel.STATE_CANCELED),
-          from: RequestsModel.STATE_REQUESTED,
-          to: RequestsModel.STATE_CANCELED
-          // If I'm an admin and I'm a business GESTOR.
-      },
+      // { name: toTransition(RequestsModel.STATE_REQUESTED, RequestsModel.STATE_CANCELED),
+      //     from: RequestsModel.STATE_REQUESTED,
+      //     to: RequestsModel.STATE_CANCELED
+      //     // If I'm an admin and I'm a business GESTOR.
+      // },
 
       // HACK FOR DEPOSITS!!!
       { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_REQUESTED,
-          to: RequestsModel.STATE_ACCEPTED
-          // FOR DEPOSITS!
-      },
+          to: RequestsModel.STATE_ACCEPTED},
+      
+      // { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_ACCEPTED),  
+      //     from: RequestsModel.STATE_RECEIVED,  
+      //     to: RequestsModel.STATE_ACCEPTED },
+      { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_REVERTED),  
+          from: RequestsModel.STATE_RECEIVED,  
+          to: RequestsModel.STATE_REVERTED },
+      { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_PROCESSING),  
+          from: RequestsModel.STATE_RECEIVED,  
+          to: RequestsModel.STATE_PROCESSING },
+
       { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_PROCESSING,
           to: RequestsModel.STATE_ACCEPTED },
       { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_REVERTED),
           from: RequestsModel.STATE_PROCESSING,
-          to: RequestsModel.STATE_REVERTED },
-      { name: toTransition(RequestsModel.STATE_CANCELED,   RequestsModel.STATE_REFUNDED),
-          from: RequestsModel.STATE_CANCELED,
-          to: RequestsModel.STATE_REFUNDED }
+          to: RequestsModel.STATE_REVERTED }
+      
     ]
   });
 }
@@ -43,6 +47,7 @@ const loadStatesForUser = (current_state) =>{
     transitions: [
       // { name: 'cancel',  from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_CANCELED },
       { name: toTransition(RequestsModel.STATE_REQUESTED, RequestsModel.STATE_CANCELED),  from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_CANCELED },
+      { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_REFUNDED),  from: RequestsModel.STATE_RECEIVED,  to: RequestsModel.STATE_REFUNDED },
     ]
   });
 }
