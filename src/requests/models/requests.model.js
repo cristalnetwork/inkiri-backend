@@ -12,6 +12,7 @@ exports.TYPE_PROVIDER                 = 'type_provider';
 exports.TYPE_SEND                     = 'type_send';
 exports.TYPE_WITHDRAW                 = 'type_withdraw';
 exports.TYPE_SERVICE                  = 'type_service';
+exports.TYPE_SALARY                   = 'type_salary';
 
 exports.TYPE_IUGU                     = 'type_iugu';
 
@@ -83,7 +84,7 @@ const requestSchema = new Schema({
     [exports.ATTACH_NOTA_FISCAL_ID]:       { type: String , default:'' },
     [exports.ATTACH_BOLETO_PAGAMENTO_ID]:  { type: String , default:'' ,
       required: function() {
-        return this.requested_type == exports.TYPE_PAYMENT && this.provider_extra.payment_mode==exports.PAYMENT_MODE_BOLETO;
+        return this.requested_type == exports.TYPE_PROVIDER && this.provider_extra.payment_mode==exports.PAYMENT_MODE_BOLETO;
       }
     },
     [exports.ATTACH_COMPROBANTE_ID]:       { type: String , default:''
@@ -330,6 +331,15 @@ requestToUIDict  = (request) => {
             }
   }
   if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE, exports.TYPE_WITHDRAW].includes(request.requested_type) && request.state==exports.STATE_REQUESTED && !request.tx_id)
+  {
+    flag = {
+             ok:        false
+             , tag:     'PENDING' // 'INVALID'
+             , message: 'WAITING_FOR_MONEY_TRANSACTION' //'NO MONEY RECEIVED FOR THIS OPERATION!'
+            }
+  }
+
+  if([exports.TYPE_PAYMENT].includes(request.requested_type) && request.state==exports.STATE_ACCEPTED && !request.tx_id)
   {
     flag = {
              ok:        false

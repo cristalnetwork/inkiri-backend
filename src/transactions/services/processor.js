@@ -239,7 +239,7 @@ const getAction = async (operation, operation_data, tx) => {
     case helper.KEY_TRANSFER_PRV:
       // MEMO:   'prv|' + request_id
       // ACTION: CREATE provider payment request
-      const prv_account = await UserModel.byAccountNameOrNull(operation.data.to);
+      // const prv_account = await UserModel.byAccountNameOrNull(operation.data.to);
       return {
         context:    REQUEST_CONTEXT
         , action:   'findOneAndUpdate'
@@ -254,11 +254,17 @@ const getAction = async (operation, operation_data, tx) => {
     case helper.KEY_TRANSFER_PAY:
       // MEMO:   'pay|' + request_id + '|' + memo)
       // ACTION: UPDATE ref payment request
-      return  { 
-              type:               helper._at(memo_parts, 0)
-              , request_id:       helper._at(memo_parts, 1)
-              , memo:             helper._at(memo_parts, 2)
-            };
+      // const pay_account = await UserModel.byAccountNameOrNull(operation.data.to);
+      return {
+        context:    REQUEST_CONTEXT
+        , action:   'findOneAndUpdate'
+        , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
+        , params: { 
+                    amount:         tx.amount
+                    // , state:        RequestModel.STATE_ACCEPTED
+                    , tx_id:        tx.tx_id
+                  }
+      }
       break;
     case helper.KEY_TRANSFER_PAP:
       // MEMO:   
