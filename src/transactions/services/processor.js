@@ -178,21 +178,28 @@ const getAction = async (operation, operation_data, tx) => {
       }
       break;
     case helper.KEY_TRANSFER_WTH:
-      // MEMO:   'wth|' + request_id
+      // MEMO:   'wth|' + requestCounterId
       // ACTION: CREATE withdraw request
       const wth_account = await UserModel.byAccountNameOrNull(operation.data.to);
       return {
         context:    REQUEST_CONTEXT
-        , action:   'create'
-        , params:   [{ 
-                    created_by:       wth_account
-                    , requested_by:   wth_account
-                    , from:           operation.data.from
-                    , requested_type: RequestModel.TYPE_WITHDRAW
-                    , amount:         tx.amount
-                    , state:          RequestModel.STATE_REQUESTED
-                    , tx_id:          tx.tx_id 
-                  }]
+        , action:   'findOneAndUpdate'
+        , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
+        , params:   { 
+                      amount:         tx.amount
+                      , state:          RequestModel.STATE_RECEIVED
+                      , tx_id:          tx.tx_id 
+                    }
+        // , action:   'create'
+        // , params:   [{ 
+        //             created_by:       wth_account
+        //             , requested_by:   wth_account
+        //             , from:           operation.data.from
+        //             , requested_type: RequestModel.TYPE_WITHDRAW
+        //             , amount:         tx.amount
+        //             , state:          RequestModel.STATE_RECEIVED
+        //             , tx_id:          tx.tx_id 
+        //           }]
       }
       break;
     // case helper.KEY_ISSUE_OFT:
@@ -222,29 +229,27 @@ const getAction = async (operation, operation_data, tx) => {
         , action:   'findOneAndUpdate'
         , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
         , params: { 
-                    created_by:       await UserModel.byAccountNameOrNull(operation.data.from)
-                    , requested_by:   await UserModel.byAccountNameOrNull(operation.data.from)
-                    , from:           operation.data.from
-                    , requested_type: RequestModel.TYPE_EXCHANGE
-                    , amount:         tx.amount
-                    , state:          RequestModel.STATE_RECEIVED
-                    , tx_id:          tx.tx_id
-                    , bank_account:   UserModel.bankAccountByIdOrNull(xch_account, helper._at(memo_parts, 2))
+                    amount:          tx.amount
+                    , state:         RequestModel.STATE_RECEIVED
+                    , tx_id:         tx.tx_id
+                    , bank_account:  UserModel.bankAccountByIdOrNull(xch_account, helper._at(memo_parts, 2))
                   }
       }
-      return  { 
-              type:               helper._at(memo_parts, 0)
-              , request_id:       helper._at(memo_parts, 1)
-              , bank_account_id:  helper._at(memo_parts, 2)
-            };
       break;
     case helper.KEY_TRANSFER_PRV:
       // MEMO:   'prv|' + request_id
       // ACTION: CREATE provider payment request
-      return  { 
-              type:               helper._at(memo_parts, 0)
-              , request_id:       helper._at(memo_parts, 1)
-            };
+      const prv_account = await UserModel.byAccountNameOrNull(operation.data.to);
+      return {
+        context:    REQUEST_CONTEXT
+        , action:   'findOneAndUpdate'
+        , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
+        , params: { 
+                    amount:         tx.amount
+                    , state:        RequestModel.STATE_RECEIVED
+                    , tx_id:        tx.tx_id
+                  }
+      }
       break;
     case helper.KEY_TRANSFER_PAY:
       // MEMO:   'pay|' + request_id + '|' + memo)

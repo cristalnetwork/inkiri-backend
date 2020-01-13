@@ -17,9 +17,9 @@ const loadStatesForAdmin = (current_state) =>{
       // },
 
       // HACK FOR DEPOSITS!!!
-      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_ACCEPTED),
+      { name: toTransition(RequestsModel.STATE_REQUESTED,  RequestsModel.STATE_PROCESSING),
           from: RequestsModel.STATE_REQUESTED,
-          to: RequestsModel.STATE_ACCEPTED},
+          to: RequestsModel.STATE_PROCESSING},
       
       // { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_ACCEPTED),  
       //     from: RequestsModel.STATE_RECEIVED,  
@@ -30,6 +30,11 @@ const loadStatesForAdmin = (current_state) =>{
       { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_PROCESSING),  
           from: RequestsModel.STATE_RECEIVED,  
           to: RequestsModel.STATE_PROCESSING },
+
+      // HACK FOR WITHDRAW!!!
+      { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_ACCEPTED),  
+          from: RequestsModel.STATE_RECEIVED,  
+          to: RequestsModel.STATE_ACCEPTED },
 
       { name: toTransition(RequestsModel.STATE_PROCESSING, RequestsModel.STATE_ACCEPTED),
           from: RequestsModel.STATE_PROCESSING,
@@ -158,7 +163,7 @@ exports.validateTransition = async(req, res, next) => {
   const new_state = req.body.state;
   if(!new_state)
   {
-    console.log(' ## STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
+    console.log(' ## USER - STATE MACHINE ISSUE#2 -> NO NEW STATE ON REQUEST')
     return next();
   }
 
@@ -167,7 +172,7 @@ exports.validateTransition = async(req, res, next) => {
 
   if(!request)
   {
-    console.log(' ## STATE MACHINE ERROR#1 -> Request NOT FOUND')
+    console.log(' ## USER - STATE MACHINE ERROR#1 -> Request NOT FOUND')
     return res.status(404).send({error:'Request NOT FOUND'});
   }
 
@@ -190,7 +195,7 @@ exports.validateTransition = async(req, res, next) => {
 
   if(new_state==request.state)
   {
-    console.log(' ## STATE MACHINE ISSUE#3 -> NO TRANSITION REQUIRED')
+    console.log(' ## USER - STATE MACHINE ISSUE#3 -> NO TRANSITION REQUIRED')
     return next();
   }
 
@@ -200,7 +205,7 @@ exports.validateTransition = async(req, res, next) => {
 
   if (!fsm.can(transition))
   {
-    console.log(' ## STATE MACHINE ISSUE#4 -> New Request STATE NOT ALLOWED', 'Current state:'+request.state+' - New state: '+new_state );
+    console.log(' ## USER - STATE MACHINE ISSUE#4 -> New Request STATE NOT ALLOWED', 'Current state:'+request.state+' - New state: '+new_state );
     return res.status(404).send({error:'New Request STATE NOT ALLOWED', message: 'Current state:'+request.state+' - New state: '+new_state });
   }
   return next();

@@ -27,7 +27,7 @@ exports.import = async () => {
   try{
     lastImported = await TxsModel.lastImported()
     if(lastImported)
-      last_block = lastImported.block_num;
+      last_block = parseInt(lastImported.block_num)+1;
     // console.log(' == lastImported:', lastImported)
   }
   catch(e){

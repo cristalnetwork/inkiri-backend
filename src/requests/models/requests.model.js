@@ -320,16 +320,16 @@ requestToUIDict  = (request) => {
   let flag = { ok:true, message:'', tag:''};
 
   if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE].includes(request.requested_type)
-    && ![exports.STATE_REJECTED, exports.STATE_ACCEPTED, exports.STATE_ERROR, exports.STATE_CANCELED, exports.STATE_REFUNDED, exports.STATE_REVERTED].includes(request.state)
+    && ![exports.STATE_REJECTED, exports.STATE_ERROR, exports.STATE_CANCELED, exports.STATE_REFUNDED, exports.STATE_REVERTED].includes(request.state)
     && (!request[exports.ATTACH_NOTA_FISCAL_ID] || request[exports.ATTACH_NOTA_FISCAL_ID].length<=0) )
   {
     flag = {
              ok:        false
              , tag:     'PENDING'
-             , message: 'NOTA_FISCAL_PENDING!'
+             , message: 'NOTA_FISCAL_PENDING'
             }
   }
-  if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE, exports.TYPE_WITHDRAW].includes(request.requested_type) && !request.tx_id)
+  if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE, exports.TYPE_WITHDRAW].includes(request.requested_type) && request.state==exports.STATE_REQUESTED && !request.tx_id)
   {
     flag = {
              ok:        false
@@ -337,6 +337,16 @@ requestToUIDict  = (request) => {
              , message: 'WAITING_FOR_MONEY_TRANSACTION' //'NO MONEY RECEIVED FOR THIS OPERATION!'
             }
   }
+  
+  if([exports.TYPE_PROVIDER, exports.TYPE_EXCHANGE, exports.TYPE_WITHDRAW].includes(request.requested_type) && request.state==exports.STATE_REFUNDED && !request.refund_tx_id)
+  {
+    flag = {
+             ok:        false
+             , tag:     'PENDING' // 'INVALID'
+             , message: 'WAITING_FOR_REFUND_TRANSACTION' //'NO MONEY RECEIVED FOR THIS OPERATION!'
+            }
+  }
+
   return {
      ...headers
     , key               : request.id
