@@ -42,7 +42,7 @@ exports.typeDefs = `
     created_at:                 String
     updated_at:                 String   
   }
-  
+
   type BankAccount{
     _id:                        ID
     bank_name:                  String!
@@ -79,6 +79,24 @@ exports.typeDefs = `
     userCounterId:              Int
   }
   
+  type Iugu{
+    _id:                        ID!
+    amount:                     Float
+    iugu_id:                    String
+    paid_at:                    String
+    receipt:                    User
+    receipt_alias:              String
+    receipt_accountname:        String
+    original:                   String
+    iuguCounterId:              Int
+    issued_at:                  String
+    issued_tx_id:               String
+    error:                      String
+    state:                      String
+    created_at:                 String
+    updated_at:                 String
+  }
+
   type Contract  {
     _id:                        ID!
     customer:                   User 
@@ -88,6 +106,19 @@ exports.typeDefs = `
     expires_at:                 String
   }
   
+  type Pad{
+    period:                     String   
+  }
+
+  type Wage{
+    account_name:               String
+    member:                     User
+    position:                   String
+    wage:                       Float
+    description:                String
+    period:                     String
+  }
+
   type ServiceExtra  {
     begins_at:                  String
     expires_at:                 String
@@ -157,9 +188,12 @@ exports.typeDefs = `
     provider_extra:             ProviderExtra
     service:                    Service
     service_extra:              ServiceExtra
+    pad:                        Pad
+    wages:                      [Wage]
+    iugu:                       Iugu
     created_at:                 String
     updated_at:                 String
-
+    
     header:                     String
     sub_header:                 String
     sub_header_ex:              String
@@ -171,7 +205,6 @@ exports.typeDefs = `
     tx_type:                    String
     i_sent:                     Boolean
     flag:                       Flag
-
   }
 
   type Member{
@@ -186,24 +219,6 @@ exports.typeDefs = `
     account_name:               String
     teamCounterId:              Int
     members:                    [Member]
-  }
-
-  type Iugu{
-    _id:                        ID!
-    amount:                     Float
-    iugu_id:                    String
-    paid_at:                    String
-    receipt:                    User
-    receipt_alias:              String
-    receipt_accountname:        String
-    original:                   String
-    iuguCounterId:              Int
-    issued_at:                  String
-    issued_tx_id:               String
-    error:                      String
-    state:                      String
-    created_at:                 String
-    updated_at:                 String
   }
 
   type IuguLogInfo{
@@ -235,7 +250,7 @@ exports.typeDefs = `
   
     maxRequestId:                                   Int
     request(id:String, requestCounterId:Int):    Request
-    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String) : [Request]
+    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
     
     service(account_name:String, id:String, serviceCounterId:String):                                    Service
     services(page:String!, limit:String!, account_name:String, id:String, serviceCounterId:String):      [Service]

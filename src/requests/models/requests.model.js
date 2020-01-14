@@ -203,6 +203,7 @@ requestSchema.set('toJSON', {
     transform: function(doc, ret, options) {
         ret.id = ret._id;
         // delete ret._id;
+        // ret.__typename = ret.requested_type;
         delete ret.__v;
         return ret;
     }
@@ -309,6 +310,8 @@ exports.list = (perPage, page, query) => {
             .populate('provider')
             .populate('service')
             .populate('service.created_by')
+            .populate('iugu')
+            .populate('wages.member')
             .limit(perPage)
             .skip(perPage * page)
             .sort({requestCounterId: -1 })
@@ -334,7 +337,7 @@ const req_types = {
     [exports.TYPE_PROVIDER]:  'PROVIDER PAYMENT',
     [exports.TYPE_SEND]:      'SEND',
     [exports.TYPE_WITHDRAW]:  'WITHDRAW',
-    [exports.TYPE_SERVICE]:   'SERVICE AGREEMENT',
+    [exports.TYPE_SERVICE]:   'SERVICE AGREEMENT'
 }
 
 getHeader = (request) => {
