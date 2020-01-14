@@ -11,7 +11,8 @@ const createClient = (api_key, network) => {
   return client;
 } 
 
-const IMPORT_TXS_INITIAL_BLOCK = 70301352;
+// const IMPORT_TXS_INITIAL_BLOCK = 70301352;
+const IMPORT_TXS_INITIAL_BLOCK = 70393495; // Leer de config!
 
 exports.queryTransactionsBB = async (config, contract, cursor, last_block) => new Promise(async(res,rej)=> {
   
