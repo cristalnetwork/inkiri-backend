@@ -366,21 +366,26 @@ const getAction = async (operation, operation_data, tx) => {
         const service = await ServiceModel.byCounterIdOrNull(operation.data.service_id);
         const payer   = await UserModel.byAccountNameOrNull(operation.data.from); 
         const payee   = await UserModel.byAccountNameOrNull(operation.data.to); 
-        return {
+        const ret = {
           context:    REQUEST_CONTEXT
           , action:   'create'
           , params:   [{ 
                       created_by:       payee
                       , requested_by:   payer
                       , from:           payer.account_name
+                      , requested_to:   payee
+                      , to:             payee.account_name
                       , requested_type: RequestModel.TYPE_PAD
                       , amount:         dfuse.quantityToNumber(operation.data.quantity)
                       , state:          RequestModel.STATE_ACCEPTED
                       , tx_id:          tx.tx_id 
                       , pad:            { period: parseInt(helper._at(memo_parts, 2))}
+                      ,service:         service
                       
                     }]
         }
+        console.log(ret)
+        return ret;
       break;
     case helper.KEY_ERASE_PAP:
         // MEMO:   -
