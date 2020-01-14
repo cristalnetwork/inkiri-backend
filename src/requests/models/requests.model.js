@@ -12,6 +12,7 @@ exports.TYPE_PROVIDER                 = 'type_provider';
 exports.TYPE_SEND                     = 'type_send';
 exports.TYPE_WITHDRAW                 = 'type_withdraw';
 exports.TYPE_SERVICE                  = 'type_service';
+exports.TYPE_PAD                      = 'type_pad';
 exports.TYPE_SALARY                   = 'type_salary';
 
 exports.TYPE_IUGU                     = 'type_iugu';
@@ -44,7 +45,7 @@ const requestSchema = new Schema({
     requested_type:       {
                             type: String
                             , enum: [exports.TYPE_DEPOSIT, exports.TYPE_EXCHANGE, exports.TYPE_PAYMENT, exports.TYPE_PROVIDER, exports.TYPE_SEND, exports.TYPE_WITHDRAW, exports.TYPE_SERVICE
-                                    , exports.TYPE_IUGU]
+                                    , exports.TYPE_IUGU, exports.TYPE_SALARY, exports.TYPE_PAD]
                           },
 
     amount:               { type: String },
@@ -93,13 +94,22 @@ const requestSchema = new Schema({
       // }
     },
 
-    //deposit
+    // *********************************************************************************
+    // Pre Authorized Debit
+    pad: {
+                period:   { type:  String, trim:true},
+    },
+
+    // *********************************************************************************
+    // Deposit
     deposit_currency:     {
                             type: String,
                             required: function() {
                               return this.requested_type == exports.TYPE_DEPOSIT;
                             }
     },
+
+    // *********************************************************************************
     // User Exchange
     bank_account:         {
                             bank_name:        { type:  String
@@ -121,6 +131,20 @@ const requestSchema = new Schema({
                             // , ref: 'BankAccounts'
 
     },
+
+    // *********************************************************************************
+    // Provider payment
+    wages: [
+            {
+                account_name:   { type:  String, trim:true},
+                member:         { type: Schema.Types.ObjectId, ref: 'Users'},
+                position:       { type: String },
+                wage:           { type: Number },
+                description:    { type:  String, trim:true},
+                period:         { type:  String, trim:true},
+            }],
+    
+    // *********************************************************************************
     // Provider payment
     provider:             {
                             type: Schema.Types.ObjectId,
@@ -140,6 +164,8 @@ const requestSchema = new Schema({
       , payment_mode:       { type: String, required: function() { return this.requested_type == exports.TYPE_PROVIDER; } } 
     },
 
+    // *********************************************************************************
+    // Service request
     service:              { type: Schema.Types.ObjectId,
                             ref: 'Services',
                             required: function() {
@@ -158,6 +184,9 @@ const requestSchema = new Schema({
                             }
                           }
     },
+    
+    // *********************************************************************************
+    // IUGU payment & issuing
     iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu' },
 
   },

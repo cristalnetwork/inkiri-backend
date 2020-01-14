@@ -9,40 +9,6 @@ const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const Schema = mongoose.Schema;
 
-// exports.ENUM_JOB_POSITION_RAIZ   = 'job_position_raiz';
-// exports.ENUM_JOB_POSITION_TRONCO = 'job_position_tronco';
-// exports.ENUM_JOB_POSITION_GALHO  = 'job_position_galho';
-// exports.ENUM_JOB_POSITION_FOLHA  = 'job_position_folha';
-// exports.ENUM_JOB_POSITION_FLOR   = 'job_position_flor';
-
-// exports.job_positions = [
-//   {
-//     key   : exports.ENUM_JOB_POSITION_RAIZ,
-//     title : 'RAIZ',
-//     wage  : 3000
-//   },
-//   {
-//     key   : exports.ENUM_JOB_POSITION_TRONCO,
-//     title : 'TRONCO',
-//     wage  : 2000
-//   },
-//   {
-//     key   : exports.ENUM_JOB_POSITION_GALHO,
-//     title : 'GALHO',
-//     wage  : 1500
-//   },
-//   {
-//     key   : exports.ENUM_JOB_POSITION_FOLHA,
-//     title : 'FOLHA',
-//     wage  : 1000
-//   },
-//   {
-//     key   : exports.ENUM_JOB_POSITION_FLOR,
-//     title : 'FLOR',
-//     wage  : 1000
-//   },
-// ];
-
 const teamSchema = new Schema({
     created_by:       { type: Schema.Types.ObjectId, ref: 'Users', required : true},
     account_name:     { type:  String  , unique : true, index: true},
@@ -161,3 +127,16 @@ exports.removeById = (teamId) => {
         });
     });
 };
+
+
+exports.byAccountNameOrNull = async (account_name) => {
+    if(!account_name)
+        return null;
+    // console.log(' == >> UsersModel::byAccountNameOrNull:', account_name)
+    const  _account_name = account_name?account_name.trim():'';
+    const  team = await Team.findOne({account_name: _account_name}).populate('members.member').exec();
+    return team;
+};
+
+
+exports.model = Team;

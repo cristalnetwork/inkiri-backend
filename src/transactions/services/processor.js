@@ -3,11 +3,13 @@ const mongoose       = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true});
 global.mongoose_connected = true;
 
-
+const dfuse          = require('./dfuse');
 const TxsModel       = require('../models/transactions.model');
 const UserModel      = require('../../users/models/users.model');
+const TeamModel      = require('../../teams/models/teams.model');
 const IuguModel      = require('../../iugu/models/iugu.model');
 const RequestModel   = require('../../requests/models/requests.model');
+const ServiceModel   = require('../../services/models/services.model');
 const helper         = require('./txs-helper.js');
 
 const REQUEST_CONTEXT = 'request';
@@ -72,17 +74,15 @@ exports.process = async () => {
     const opts    = { session: session };
     
     try {
-      let res       = true;
+      let res       = false;
       let update_tx = null;
-      // console.log( ' == Trying to process: ', action.operation_data)
-      // console.log('action.action:', action.action)
       if(action.action)
       {
         console.log(' == Trying to process: ', action.action);
         console.log(' ==== with params: ', toLog(action.params));
         console.log(' ==== query:', action.query);
-        console.log(' ====== tx: ', action.tx.block_num);
-        console.log(' ====== ts: ', action.tx.block_timestamp);
+        // console.log(' ====== tx: ', action.tx.block_num);
+        // console.log(' ====== ts: ', action.tx.block_timestamp);
 
         if(action.query)
         {
@@ -266,32 +266,62 @@ const getAction = async (operation, operation_data, tx) => {
                   }
       }
       break;
+    case helper.KEY_TRANSFER_SLR:
+      // MEMO:   slr|Ref. Dezembro 2019|2019/11
+      // ACTION: CREATE 1 salary request for all wages
+      let wages = [];
+      let total_amount = 0;
+      const team = await TeamModel.byAccountNameOrNull(operation.data.from)
+      for(var i=0; i<tx.trace.topLevelActions.length; i++){
+        const oper   = tx.trace.topLevelActions[i];
+        const user   = await UserModel.byAccountNameOrNull(oper.data.to);
+        const member = await team.members.find( member => member.member.account_name==oper.data.to)
+        const amount = dfuse.quantityToNumber(oper.data.quantity);
+        const cur_memo_parts  = helper.splitMemo(oper);
+        wages.push(
+          {
+                account_name:   oper.data.to,
+                member:         user,
+                position:       member.position,
+                wage:           amount,
+                description:    helper._at(cur_memo_parts, 1),
+                period:         helper._at(cur_memo_parts, 2)  
+          }
+        );
+        total_amount+=amount;
+      } 
+      const slr_account = await UserModel.byAccountNameOrNull(operation.data.from);
+      return {
+        context:    REQUEST_CONTEXT
+        , action:   'create'
+        , params:   [{ 
+                    created_by:       slr_account
+                    , requested_by:   slr_account
+                    , from:           operation.data.from
+                    , requested_type: RequestModel.TYPE_SALARY
+                    , amount:         total_amount
+                    , state:          RequestModel.STATE_ACCEPTED
+                    , tx_id:          tx.tx_id 
+                    , wages:          wages
+                    , description:    `${helper._at(memo_parts, 1) + '/' + helper._at(memo_parts, 2)}`
+                  }]
+      }
+      
     case helper.KEY_TRANSFER_PAP:
       // MEMO:   
       // ACTION: CREATE payment request
-      break;
-    case helper.KEY_TRANSFER_SLR:
-      // MEMO:   'slr|'+(ref||'')+'|'+(month||'');
-      // ACTION: CREATE 1 salary request for all wages
-      // ACTION2: CREATE salary request for every wage/employee
-      return  { 
-              type:               helper._at(memo_parts, 0)
-              , memo:             helper._at(memo_parts, 1)
-              , period:           helper._at(memo_parts, 2)
-            };
+      return {};
       break;
     case helper.KEY_TRANSFER_SND:
       // MEMO:   'snd|'+memo
       // ACTION: CREATE request
-      return  { 
-              type:               helper._at(memo_parts, 0)
-              , memo:             helper._at(memo_parts, 1)
-            };
+      return {};
       break;
     case helper.KEY_NEW_ACCOUNT:
         const oper = helper.operationByName(tx, helper.KEY_UPSERT_PAP)
         // MEMO:   ?
         // ACTION: CREATE new account request (NEW)
+        return {};
       break;
     case helper.KEY_UPSERT_CUST:
         // MEMO:   ?
@@ -302,12 +332,14 @@ const getAction = async (operation, operation_data, tx) => {
         // account_type
         // state
         // memo
+        return {};
       break;
     case helper.KEY_ERASE_CUST:
         // MEMO:   ?
         // ACTION: CREATE erasu cust request (NEW)
         // to
         // memo
+        return {};
       break;
     case helper.KEY_UPSERT_PAP:
         // MEMO:   ?
@@ -321,20 +353,34 @@ const getAction = async (operation, operation_data, tx) => {
         // last_charged
         // enabled
         // memo
+        return {};
       break;
     case helper.KEY_CHARGE_PAP:
         // MEMO:   pap|pay|period_to_charge
         // ACTION: CREATE service payment (pap) request (NEW?)
-        return  { 
-              type:                helper._at(memo_parts, 0)
-              , action:            helper._at(memo_parts, 1)
-              , period_to_charge:  helper._at(memo_parts, 2)
-            };
-        // from
-        // to
-        // service_id
-        // quantity
-        // memo
+        // "from": "wawrzeniakdi",
+        // "memo": "pap|pay|1",
+        // "quantity": "200.0000 INK",
+        // "service_id": 7,
+        // "to": "centroinkiri"
+        const service = await ServiceModel.byCounterIdOrNull(operation.data.service_id);
+        const payer   = await UserModel.byAccountNameOrNull(operation.data.from); 
+        const payee   = await UserModel.byAccountNameOrNull(operation.data.to); 
+        return {
+          context:    REQUEST_CONTEXT
+          , action:   'create'
+          , params:   [{ 
+                      created_by:       payee
+                      , requested_by:   payer
+                      , from:           payer.account_name
+                      , requested_type: RequestModel.TYPE_PAD
+                      , amount:         dfuse.quantityToNumber(operation.data.quantity)
+                      , state:          RequestModel.STATE_ACCEPTED
+                      , tx_id:          tx.tx_id 
+                      , pad:            { period: parseInt(helper._at(memo_parts, 2))}
+                      
+                    }]
+        }
       break;
     case helper.KEY_ERASE_PAP:
         // MEMO:   -

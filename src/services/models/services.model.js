@@ -137,3 +137,14 @@ exports.removeById = (serviceId) => {
         });
     });
 };
+
+exports.byCounterIdOrNull = async (counterId) => {
+    if(!counterId || isNaN(counterId))
+        return null;
+    const  _account_name = parseInt(counterId);
+    const  service = await Service.findOne({serviceCounterId: counterId}).populate('created_by').exec();
+    return service;
+};
+
+
+exports.model = Service;
