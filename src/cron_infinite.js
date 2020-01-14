@@ -20,8 +20,8 @@ const _do = async () => {
 
 } 
 const tick  = 10000;
-// const loops = 3600 * 1000 / 10000; 
-const loops = 5; 
+const loops = 3600 * 1000 / 10000; 
+// const loops = 5; 
 (async () => {
   
   let i = 0;
