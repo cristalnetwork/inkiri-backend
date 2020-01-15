@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 // if(global.mongoose_connected!==undefined && global.mongoose_connected!=true)
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true, useUnifiedTopology: true });
 
 exports.TYPE_DEPOSIT                  = 'type_deposit';
 exports.TYPE_EXCHANGE                 = 'type_exchange';

@@ -19,23 +19,23 @@ const _do = async () => {
   console.log('END o_O');
 
 } 
-const tick  = 10000;
+const tick  = 30000;
 // const loops = 3600 * 1000 / 10000; 
-const loops = 5; 
+const loops = 1; 
 (async () => {
   
   let i = 0;
-  _do();
+  let x = await _do();
   const interval_id = setInterval(function() {
     i++;
     if (i < loops) {
-      _do();
+      x = await _do();
     }
     else{
       clearInterval(interval_id );
       return process.exit(0);
     }
-  }, 10000);  
+  }, tick);  
   
   
 })();

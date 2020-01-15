@@ -41,6 +41,7 @@
     "reload": "^3.0.1",
     "swagger-ui-express": "^2.0.13",
     "sync-request": "^4.0.2",
+    "utf8": "^3.0.0",
     "ws": "^7.2.1"
   }
 }

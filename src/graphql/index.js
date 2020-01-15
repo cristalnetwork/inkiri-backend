@@ -279,6 +279,7 @@ exports.typeDefs = `
     configurationsExternalTxFees:    [Configuration]
     configurationsAccountConfigs:    [Configuration]
     configurationsTransfersReasons:  [Configuration]
+    configurationsBanks:             [Configuration]
   }
 
 
@@ -453,7 +454,12 @@ exports.resolvers = {
     {
       const res = await ConfigModel.getAccountConfig();
       return res; 
-    } 
+    },
+    configurationsBanks: async(parent, args, context) =>
+    {
+      const res = await ConfigModel.getBanks();
+      return res; 
+    } , 
 
   },
 };

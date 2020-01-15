@@ -1,6 +1,6 @@
 const config         = require('../../common/config/env.config.js');
 const mongoose       = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true, useUnifiedTopology: true });
 global.mongoose_connected = true;
 
 const dfuse          = require('./dfuse');

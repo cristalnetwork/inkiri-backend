@@ -4,7 +4,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 
 // if(global.mongoose_connected!==undefined && global.mongoose_connected!=true)
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true, useUnifiedTopology: true });
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;

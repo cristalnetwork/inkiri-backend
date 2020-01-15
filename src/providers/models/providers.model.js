@@ -2,7 +2,7 @@ const config = require('../../common/config/env.config.js');
 const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true});
+mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true, useUnifiedTopology: true });
 
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 // const AutoIncrementFactory = require('mongoose-sequence');
