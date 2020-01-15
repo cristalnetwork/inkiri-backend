@@ -1,4 +1,9 @@
-module.exports = {
+var local_config         = null;
+try {
+    local_config         = require('./env.cristaltoken.config.js');
+} catch (ex) {}
+
+const the_config = {
     "api_version": '/api/v1',
     "port": 3600,
     "appEndpoint": "http://localhost:3600",
@@ -48,5 +53,9 @@ module.exports = {
       "api":{
           "endpoint"    : "https://api.iugu.com/v1"
       }
-    },
+    }
 };
+
+const exports_config = local_config || the_config;
+
+module.exports = exports_config;

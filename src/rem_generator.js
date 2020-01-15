@@ -1,4 +1,6 @@
-// var RequestModel   = require('./requests/models/requests.model');
+var RequestModel   = require('./requests/models/requests.model');
+var ProviderModel  = require('./providers/models/providers.model');
+var UserModel      = require('./users/models/users.model');
 var rem_utils      = require('./rem_utils.js');
 var moment         = require('moment');
 const utf8         = require('utf8');
@@ -197,7 +199,7 @@ const criar_cabecalho_lote_ab = (conta_pagamento) => {
 
 const criar_segmento_ab = (registro, nome, CPF_CNPJ, documento, codigo_banco, agencia, conta, data_pagamento, valor) => {
 
-    const __criar_segmento_a = () =>{
+    const __criar_segmento_a = (registro, nome, CPF_CNPJ, documento, codigo_banco, agencia, conta, data_pagamento, valor) =>{
 
       // '''Todos os dados somente número'''
       const CONTROLE_BANCO_3                       = '001'      // fixo
@@ -245,7 +247,7 @@ const criar_segmento_ab = (registro, nome, CPF_CNPJ, documento, codigo_banco, ag
       return segmento_a;
     }
     
-    const __criar_segmento_b = () =>{
+    const __criar_segmento_b = (registro, nome, CPF_CNPJ, documento, codigo_banco, agencia, conta, data_pagamento, valor) =>{
       const CONTROLE_BANCO_3                       = '001';  // fixo
       const CONTROLE_LOTE_4                        = '0001'; // numero do lote igual do header
       const CONTROLE_REGISTRO_1                    = '3';    // fixo
@@ -287,10 +289,10 @@ const criar_segmento_ab = (registro, nome, CPF_CNPJ, documento, codigo_banco, ag
       return segmento_b
     }
 
-    const segmento_a = __criar_segmento_a();
-    const segmento_b = __criar_segmento_b();
+    const segmento_a = __criar_segmento_a(registro, nome, CPF_CNPJ, documento, codigo_banco, agencia, conta, data_pagamento, valor);
+    const segmento_b = __criar_segmento_b(registro, nome, CPF_CNPJ, documento, codigo_banco, agencia, conta, data_pagamento, valor);
 
-    return segmento_a + segmento_b
+    return segmento_a.concat(segmento_b);
 }
 
 const criar_trailer_lote = (qtde_pagamentos, total_valor) =>{
@@ -332,33 +334,37 @@ const criar_trailer_arquivo = (qtde_pagamentos) => {
     return trailer
 }
 
+const nome_valido = (character) => { return isalpha(character) || character == ' ';}
+
 const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos) => {
 
-    const qtde_pagamentos     = lista_pagamentos.legth;
+    const qtde_pagamentos     = lista_pagamentos.length;
     const cabecalho           = criar_cabecalho(conta_pagamento);
     const cabecalho_lote_ab   = criar_cabecalho_lote_ab(conta_pagamento);
-    let remessa               = cabecalho + cabecalho_lote_ab;
+    let remessa               = cabecalho.concat(cabecalho_lote_ab);
     
     const total        = lista_pagamentos.reduce((acc, pagamento) => acc + parseFloat(pagamento['valor'] ), 0);
     const segmentos_ab = lista_pagamentos.map( (pagamento, idx)=>{
       
       let nome = pagamento['nome'];
-      const nome_valido = (caracter) => { return isalpha(character) || caracter == ' ';}
-      
-      nome = utf8.encode(nome).split('').map(  char => nome_valido(char) ).join('');
+      console.log(`${idx} - #1 - nome: ${nome}`)
+      nome = utf8.encode(nome).split('').filter(  char => nome_valido(char) ).join('');
+      console.log(`${idx} - #2 - nome: ${nome}`)
       if(nome.length>30)
         nome = nome.substring(0, 30)
-      return criar_segmento_ab((2 * (idx + 1) - 1)
-                            , nome.toUpperCase()
-                            , pagamento['cpf_cnpj']
-                            , utf8.encode(pagamento['inscricao']).split('').map(  char => isdigit(char) ).join('')  // filter(str.isdigit, pagamento['inscricao'].encode('utf8')),
-                            , utf8.encode(pagamento['banco']).split('').map(  char => isdigit(char) ).join('')      // filter(str.isdigit, pagamento['banco'].encode('utf8'))
-                            , utf8.encode(pagamento['ag']).split('').map(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['ag'].encode('utf8'))
-                            , utf8.encode(pagamento['cc']).split('').map(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['cc'].encode('utf8'))
-                            , data_pagamento
-                            , parseFloat(pagamento['valor']))
+      console.log(`${idx} - #3 - nome: ${nome}`)
+      return criar_segmento_ab((2 * (idx + 1) - 1)                
+                            , nome.toUpperCase()                
+                            , pagamento['cpf_cnpj']                
+                            , utf8.encode(pagamento['documento']).split('').map(  char => isdigit(char) ).join('')  // filter(str.isdigit, pagamento['inscricao'].encode('utf8')),                
+                            , utf8.encode(pagamento['codigo_banco']).split('').map(  char => isdigit(char) ).join('')      // filter(str.isdigit, pagamento['banco'].encode('utf8'))                
+                            , utf8.encode(pagamento['agencia']).split('').map(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['ag'].encode('utf8'))                
+                            , utf8.encode(pagamento['conta']).split('').map(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['cc'].encode('utf8'))                
+                            , data_pagamento                
+                            , parseFloat(pagamento['valor']))                
     })
 
+    remessa = remessa.concat(segmentos_ab)
     /*
       def nome_valido(caracter):
         return caracter.isalpha() or caracter == ' '        
@@ -367,9 +373,11 @@ const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos
       print nome
     */
 
-    remessa = remessa + criar_trailer_lote(qtde_pagamentos, total)
-    remessa = remessa + criar_trailer_arquivo(qtde_pagamentos)
+    const _trailer_lote = criar_trailer_lote(qtde_pagamentos, total)
+    const _trailer_arquivo = criar_trailer_arquivo(qtde_pagamentos)
 
+    remessa = remessa.concat(_trailer_lote)
+    remessa = remessa.concat(_trailer_arquivo)
     // f = open(caminho_completo, 'a')
     // f.write(remessa)
     // f.close()
@@ -434,36 +442,30 @@ const test2 = () => {
     // const conta_pagamento    = rem_utils.PAGAMENTO_INSTITUTO_PPA;
     const lista_pagamentos   = [
       {
-        registro         : 1 
-        , nome           : 'Quelsia da Luz Bonfim'.toUpperCase()
-        , CPF_CNPJ       : rem_utils.IDENTIFICACAO_TIPO_CPF
+        nome           : 'Quelsia da Luz Bonfim'.toUpperCase()
+        , cpf_cnpj       : rem_utils.IDENTIFICACAO_TIPO_CPF
         , documento      : 35330444837
         , codigo_banco   : 237
         , agencia        : 3066
         , conta          : 10790
-        , data_pagamento : moment('30012019', 'DDMMYYYY')
         , valor          : parseFloat('1000.00')
       },
       {
-        registro         : 3, 
-        , nome           : 'EMPORIO ILEOS LTDA ME'.toUpperCase(),
-        , CPF_CNPJ       : rem_utils.IDENTIFICACAO_TIPO_CNPJ,
-        , documento      : 12339555000141,
-        , codigo_banco   : 237,
-        , agencia        : 237,
-        , conta          : 73555,
-        , data_pagamento : moment('30012019', 'DDMMYYYY'),
+        nome           : 'EMPORIO ILEOS LTDA ME'.toUpperCase()
+        , cpf_cnpj       : rem_utils.IDENTIFICACAO_TIPO_CNPJ
+        , documento      : 12339555000141
+        , codigo_banco   : 237
+        , agencia        : 237
+        , conta          : 73555
         , valor          : parseFloat('116.55')
       },
       {
-        registro         : 5, 
-        , nome           : 'Edimilson Moreira Santos ME'.toUpperCase(),
-        , CPF_CNPJ       : rem_utils.IDENTIFICACAO_TIPO_CNPJ,
-        , documento      : 10303498000115,
-        , codigo_banco   : 237,
-        , agencia        : 3522,
-        , conta          : 387827,
-        , data_pagamento : moment('30012019', 'DDMMYYYY'),
+        nome           : 'Edimilson Moreira Santos ME'.toUpperCase()
+        , cpf_cnpj       : rem_utils.IDENTIFICACAO_TIPO_CNPJ
+        , documento      : 10303498000115
+        , codigo_banco   : 237
+        , agencia        : 3522
+        , conta          : 387827
         , valor          : parseFloat('207.00')
       }
     ];
@@ -472,26 +474,79 @@ const test2 = () => {
     // f = open(datetime.now().strftime("%Y-%m-%d") + "remessa.REM", 'a')
     // f.write(remessa)
     // f.close()
-    return remessa;
+    return arquivo_remessa;
 }
-(async () => {
-  
-  const x1 = await test();
-  console.log('---------------------------------------');
-  console.log('test1:');
-  console.log('---------------------------------------');
-  console.log(x1);
-  console.log('---------------------------------------');
 
-  const x2 = await test2();
-  console.log('---------------------------------------');
-  console.log('test2:');
-  console.log('---------------------------------------');
-  console.log(x2);
-  console.log('---------------------------------------');
+const trimAndUppercase = (str) => {
+  if(!str)
+    return '';
+  return str.trim().toUpperCase();
+}
+const _trim = (str) => {
+  if(!str)
+    return '';
+  return str.trim();
+}
+exports.generateREMForRequests = async (requests_ids, payer_account) =>{
+  const requests = await RequestModel.model.find({_id: {$in : requests_ids.split(',')}}).populate('created_by').populate('requested_by').populate('requested_to').populate('provider').exec()
+  if(!requests)
+    return null;
 
-  return process.exit(0);
+  console.log(' == about to loop:', requests.length)
+  const request_list = requests.map( request => {
+    console.log(' ====== request._id:', request._id)
+    const is_biz       = request.requested_type == RequestModel.TYPE_PROVIDER;
+    const provider     = request.provider;
+    const customer     = request.requested_by;
+    if(is_biz && (!provider || !provider.bank_accounts || !provider.bank_accounts.length>0) )
+      return null;
+    if(!is_biz && (!customer || !request.bank_account) )
+      return null;
+    const bank_account = is_biz?provider.bank_accounts[0]:request.bank_account;
+    const legal_id = (is_biz  ? provider.cnpj : customer.legal_id)||'';
+    return {
+      nome             : is_biz  ? trimAndUppercase(provider.name) : `${trimAndUppercase(customer.name)} ${trimAndUppercase(customer.last_name) }` 
+      , cpf_cnpj       : is_biz  ? rem_utils.IDENTIFICACAO_TIPO_CNPJ : rem_utils.IDENTIFICACAO_TIPO_CPF
+      , documento      : legal_id
+      , codigo_banco   : 237
+      , agencia        : _trim(bank_account.agency)
+      , conta          : _trim(bank_account.cc)
+      , data_pagamento : moment().format('DDMMYYYY')
+      , valor          : parseFloat(request.amount)      
+    }
+  }).filter(req => req!=null)
+  console.log(' == about to respond...')
+  const res = await criar_arquivo_remessa(moment(), parseInt(payer_account), request_list);
+  return res;
+}
+
+// (async () => {
+    
+//   // const nome = 'tripanosoma'
+//   // console.log(utf8.encode(nome).split('').filter(  char => nome_valido(char) ).join(''))
+//   // console.log('padR:', padRight(nome.trim(), 30, ' '))
+//   // return;
+
+//   // const x1 = await test();
+//   // console.log('---------------------------------------');
+//   // console.log('test1:');
+//   // console.log('---------------------------------------');
+//   // console.log(x1);
+//   // console.log('---------------------------------------');
+
+//   const x2 = await test2();
+//   console.log('---------------------------------------');
+//   console.log('test2: --');
+//   console.log(x2);
+//   console.log('---------------------------------------');
+
+//   const x3 = await exports.generateREMForRequests('5e1ee8b9d4fb5f00175029f8,5e1ee88dd4fb5f00175029f7', 0);
+//   console.log('---------------------------------------');
+//   console.log('generateREMForRequests: --');
+//   console.log(x3);
+//   console.log('---------------------------------------');
+
+//   return process.exit(0);
   
   
-})();
-
+// })();

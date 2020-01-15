@@ -143,4 +143,8 @@ exports.routesConfig = function (app) {
         ]
     );
 
+    app.get(config.api_version+'/requests_rem_generator/:requests_ids/:payer_account', [
+        // ValidationMiddleware.validJWTNeeded,
+        RequestsController.generate_rem
+    ]);
 };
