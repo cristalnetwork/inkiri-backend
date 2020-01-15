@@ -223,7 +223,7 @@ const getAction = async (operation, operation_data, tx) => {
     case helper.KEY_TRANSFER_XCH:
       // MEMO:   'xch|' + requestCounterId + '|' + bank_account_id)
       // ACTION: CREATE exchange request
-      const xch_account = await UserModel.byAccountNameOrNull(operation.data.to);
+      const xch_account = await UserModel.byAccountNameOrNull(operation.data.from);
       return {
         context:    REQUEST_CONTEXT
         , action:   'findOneAndUpdate'
