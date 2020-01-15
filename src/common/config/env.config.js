@@ -7,8 +7,7 @@ module.exports = {
     "jwt_expiration_in_seconds": 2592000,
     "environment": "dev",
     "email_domain": "inkiri.com",
-    "mongodb_uriOLD": "mongodb://localhost/cristal_dfuse?replicaSet=rs",
-    "mongodb_uri": "mongodb://localhost:27017,localhost:27017,localhost:27017/cristal_dfuse?replicaSet=rs",
+    "mongodb_uri": "mongodb://localhost/cristal_dfuse?replicaSet=rs",
     "eos" : {
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         "blockchain_endpoint": "https://jungle2.cryptolions.io:443",

@@ -21,12 +21,13 @@ const _do = async () => {
 } 
 const tick  = 30000;
 // const loops = 3600 * 1000 / 10000; 
-const loops = 1; 
+const loops = 2; 
 (async () => {
   
   let i = 0;
   let x = await _do();
-  const interval_id = setInterval(function() {
+  const interval_id = setInterval(
+    async() => {
     i++;
     if (i < loops) {
       x = await _do();

@@ -26,7 +26,7 @@ const loops = 3600 * 1000 / tick;
   
   let i = 0;
   let res = await _do();
-  const interval_id = setInterval(function() {
+  const interval_id = setInterval( async() =>{
     i++;
     if (i < loops) {
       res = await _do();
