@@ -347,12 +347,12 @@ const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos
     const segmentos_ab = lista_pagamentos.map( (pagamento, idx)=>{
       
       let nome = pagamento['nome'];
-      console.log(`${idx} - #1 - nome: ${nome}`)
+      // console.log(`${idx} - #1 - nome: ${nome}`)
       nome = utf8.encode(nome).split('').filter(  char => nome_valido(char) ).join('');
-      console.log(`${idx} - #2 - nome: ${nome}`)
+      // console.log(`${idx} - #2 - nome: ${nome}`)
       if(nome.length>30)
         nome = nome.substring(0, 30)
-      console.log(`${idx} - #3 - nome: ${nome}`)
+      // console.log(`${idx} - #3 - nome: ${nome}`)
       return criar_segmento_ab((2 * (idx + 1) - 1)                
                             , nome.toUpperCase()                
                             , pagamento['cpf_cnpj']                
