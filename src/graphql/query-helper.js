@@ -6,143 +6,131 @@ var moment          = require('moment');
 * $gt:, $gte:
 */
 
-const makeFilter = (name, value, filter) => {
+const getFilter = (name, value) => {
   
   if(!value || !name)
-    return filter;
+    return {};
   
-  if(typeof value === 'number')
-    return {...filter, [name]: value};
+  if(typeof value === 'number' || !isNaN(value))
+    return {[name]: Number(value)};
 
   if (!value.includes(','))
-    return {...filter, [name]: value};
+  return {[name]: value};
   
   if (value.includes(',')) 
-    return {...filter,  $or : value.split(',').map(req_item=> {return { [name]: req_item}}) };
+    return value.split(',').map(req_item=> {return { [name]: req_item}})
   
-  return filter;
+  return {};
 }
 
 exports.appendFromToFilter = (value, filter) => makeOrFilter ('from', 'to', value, filter);
 
-const makeOrFilter = (name1, name2, value, filter) => {
-  return { ...filter, $or : [{[name1]: value}, {[name2]: value}] }
+const makeOrFilter = (name1, name2, value) => {
+  if(filter[$or])
+    return [...filter[$or], {[name1]: value}, {[name2]: value}];
+  return {...filter, $or: [{[name1]: value}, {[name2]: value}] };
 }
 
 const getLikeFilter = (name, value) => {
+  if(!value || !name)
+    return {};
   return {[name]: {$regex: '.*' + value + '.*'}}
 }
 
-const makeLikeFilter = (name, value, filter) => {
-  
-  if(!value || !name)
-    return filter;
-  
-  return {...filter, ...getLikeFilter(name, value)}
-}
-
 const getBetweenFilter = (name, from, to) => {
+  if(!name || !from || !to)
+    return {};
   return {[name]: { $gte: from, $lte: to }}
 }
 
-const makeBetweenFilter = (name, from, to, filter) => {
-  
-  if(!name || !from || !to)
-    return filter;
-  
-  return {...filter, ...getBetweenFilter(name, from, to)}
+const append = (filter, new_filter) => {
+  if(Array.isArray(new_filter))
+    filter.or_filter = [...filter.or_filter, ...new_filter]
+  else
+    filter.filter = {...filter.filter, ...new_filter}
+  return filter;
 }
-
-const makeCollectionFilter = (col, name, value, filter, isLike) => {
-  
-  if(!value || !name || !col)
-    return filter;
-  
-  let _filter = {[name]: value};
-  if(isLike) 
-    _filter = {[name]: {$regex: '.*' + value + '.*'}};
-  
-  return {...filter, [col]: {$all: _filter}} 
-}
-
 
 exports.usersQuery  = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {email, account_type, account_name, id, alias, last_name, business_name, bank_name, bank_agency, bank_cc} = args;
 
-  let filter = {};
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
 
-  filter = makeLikeFilter('email', email, filter)
-  filter = makeFilter('account_type', account_type, filter)
-  filter = makeLikeFilter('account_name', account_name, filter)
-  filter = makeFilter('_id', id, filter)
-  filter = makeLikeFilter('alias', alias, filter)
-  filter = makeFilter('last_name', last_name, filter)
-  filter = makeLikeFilter('business_name', business_name, filter)
-  filter = makeLikeFilter('bank_accounts.bank_name', bank_name, filter)
-  filter = makeLikeFilter('bank_accounts.bank_agency', bank_agency, filter)
-  filter = makeLikeFilter('bank_accounts.bank_cc', bank_cc, filter)
-  // filter = makeCollectionFilter('bank_accounts', 'bank_name', bank_name, filter, true);
-  // filter = makeCollectionFilter('bank_accounts', 'bank_agency', bank_agency, filter, true);
-  // filter = makeCollectionFilter('bank_accounts', 'bank_cc', bank_cc, filter, true);
-
+  filter = append(filter, getLikeFilter('email', email) );
+  filter = append(filter, getFilter('account_type', account_type) );
+  filter = append(filter, getLikeFilter('account_name', account_name) );
+  filter = append(filter, getFilter('_id', id) );
+  filter = append(filter, getLikeFilter('alias', alias) );
+  filter = append(filter, getFilter('last_name', last_name) );
+  filter = append(filter, getLikeFilter('business_name', business_name) );
+  filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
+  filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
+  filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
+  
+  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  filter
+    filter:  the_filter
   };    
 }
-
 
 exports.requestQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency, date_from, date_to, service_id, wage_filter} = args;
 
-  let filter = {};
-
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
+  
   if (from&&to&&from==to) {
-    
-    if(!wage_filter)
-      filter = { $or : [{from: from}, {to: to}] };
-    else
-      // filter = { $or : [{from: from}, {to: to}] };
-      // filter = { $or : [{from: from}, {to: to}, {'wages.account_name': to}] };
-      filter = { $or : [{from: from}, {to: to}, {wages : { $elemMatch: {account_name: wage_filter} } }] };
-
-    
+    // console.log(' ## graphql-server::requests-query-builder:wage_filter:', wage_filter);
+    // filter = { $or : [{from: from}, {to: to}] };
+    filter = append(filter, [{from: from}, {to: to}] ); 
+    // if(!wage_filter || wage_filter)
+    //   filter = { $or : [{from: from}, {to: to}] };
+    // else
+    //   filter = { $or : [{from: from}, {to: to}, {wages : { $elemMatch: {account_name: wage_filter} } }] };
   }
   else
   {
-    filter = makeFilter('from', from, filter)
-    filter = makeFilter('to', to, filter)
+    filter = append(filter, getFilter('from', from) );
+    filter = append(filter, getFilter('to', to) );
   }
   
   if(date_from && date_to)
   {
     const my_date_from = moment(date_from);
     const my_date_to = moment(date_to);
-    filter = {...filter,  $or : [ {updated_at: { $gte: my_date_to, $lte: my_date_from }}, {created_at: { $gte: my_date_from, $lte: my_date_to}}] };
+    filter = append(filter,  {updated_at: { $gte: my_date_from, $lte: my_date_to }});
+    // filter = append(filter,  {updated_at: { $gte: my_date_to, $lte: my_date_from }}, {created_at: { $gte: my_date_from, $lte: my_date_to}});
   }
-  filter = makeFilter('requestCounterId', requestCounterId, filter)
-  filter = makeFilter('_id', id, filter)
-  filter = makeFilter('provider', provider_id, filter)
-  filter = makeFilter('state', state, filter)
-  filter = makeFilter('requested_type', requested_type, filter)
-  
-  filter = makeFilter('tx_id', tx_id, filter)
-  filter = makeFilter('refund_tx_id', refund_tx_id, filter)
-  filter = makeFilter('attach_nota_fiscal_id', attach_nota_fiscal_id, filter)
-  filter = makeFilter('attach_boleto_pagamento_id', attach_boleto_pagamento_id, filter)
-  filter = makeFilter('attach_comprobante_id', attach_comprobante_id, filter)
-  filter = makeFilter('deposit_currency', deposit_currency, filter)
-  filter = makeFilter('service', service_id, filter)
+  filter = append(filter, getFilter('requestCounterId', requestCounterId) );
+  filter = append(filter, getFilter('_id', id) );
+  filter = append(filter, getFilter('provider', provider_id) );
+  filter = append(filter, getFilter('state', state) );
+  filter = append(filter, getFilter('requested_type', requested_type) );
+  filter = append(filter, getFilter('tx_id', tx_id) );
+  filter = append(filter, getFilter('refund_tx_id', refund_tx_id) );
+  filter = append(filter, getFilter('attach_nota_fiscal_id', attach_nota_fiscal_id) );
+  filter = append(filter, getFilter('attach_boleto_pagamento_id', attach_boleto_pagamento_id) );
+  filter = append(filter, getFilter('attach_comprobante_id', attach_comprobante_id) );
+  filter = append(filter, getFilter('deposit_currency', deposit_currency) );
+  filter = append(filter, getFilter('service', service_id) );
 
+  const the_filter = {...filter.filter, $or: filter.or_filter};
+  console.log(' ## graphql-server::requests-query-builder::query:', JSON.stringify(the_filter));
   return {
     limit:   limit,
     page:    page,
-    filter:  filter
+    filter:  the_filter
   };    
 }
 
@@ -151,15 +139,20 @@ exports.serviceQuery = (args) => {
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {account_name, id, serviceCounterId} = args;
 
-  let filter = {};
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
 
-  filter = makeFilter('_id', id, filter)
-  filter = makeFilter('account_name', account_name, filter)
-  filter = makeFilter('serviceCounterId', serviceCounterId, filter)
+  filter = append(filter, getFilter('_id', id) );
+  filter = append(filter, getFilter('account_name', account_name) );
+  filter = append(filter, getFilter('serviceCounterId', serviceCounterId) );
+
+  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  filter
+    filter:  the_filter
   };    
 }
 
@@ -168,11 +161,14 @@ exports.teamQuery = (args) => {
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {account_name, id, teamCounterId, created_by, member_position, member_wage, member_account_name, member_name} = args;
 
-  let filter   = {};
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
   let populate = null;
 
-  filter = makeFilter('members.position', member_position, filter);
-  filter = makeFilter('members.wage', member_wage, filter);
+  filter = append(filter, getFilter('members.position', member_position) );
+  filter = append(filter, getFilter('members.wage', member_wage) );
 
   // if(member_name)
   // {
@@ -189,14 +185,16 @@ exports.teamQuery = (args) => {
   //   }
   // }
 
-  filter = makeFilter('_id', id, filter)
-  filter = makeFilter('account_name', account_name, filter)
-  filter = makeFilter('teamCounterId', teamCounterId, filter)
-  filter = makeFilter('created_by', created_by, filter)
+  filter = append(filter, getFilter('_id', id) );
+  filter = append(filter, getFilter('account_name', account_name) );
+  filter = append(filter, getFilter('teamCounterId', teamCounterId) );
+  filter = append(filter, getFilter('created_by', created_by) );
+  
+  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
-    limit:    limit,
-    page:     page,
-    filter:   filter,
+    limit:   limit,
+    page:    page,
+    filter:  the_filter,
     populate: populate
   };    
 }
@@ -205,26 +203,24 @@ exports.providerQuery  = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {id, name, cnpj, email, category, products_services, state, providerCounterId, bank_name, bank_agency, bank_cc} = args;
-         
+  
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
 
-  let filter = {};
+  filter = append(filter, getFilter('_id', id) );
+  filter = append(filter, getLikeFilter('name', name) );
+  filter = append(filter, getLikeFilter('cnpj', cnpj) );
+  filter = append(filter, getLikeFilter('email', email) );
+  filter = append(filter, getLikeFilter('category', category) );
+  filter = append(filter, getLikeFilter('products_services', products_services) );
+  filter = append(filter, getFilter('state', state) );
+  filter = append(filter, getFilter('providerCounterId', providerCounterId) );
 
-  filter = makeFilter('_id', id, filter)
-  filter = makeLikeFilter('name', name, filter)
-  filter = makeLikeFilter('cnpj', cnpj, filter)
-  filter = makeLikeFilter('email', email, filter)
-  filter = makeLikeFilter('category', category, filter)
-  filter = makeLikeFilter('products_services', products_services, filter)
-  filter = makeFilter('state', state, filter)
-  filter = makeFilter('providerCounterId', providerCounterId, filter)
-
-  // filter = makeCollectionFilter('bank_accounts', 'bank_name', bank_name, filter, true);
-  // filter = makeCollectionFilter('bank_accounts', 'bank_agency', bank_agency, filter, true);
-  // filter = makeCollectionFilter('bank_accounts', 'bank_cc', bank_cc, filter, true);
-
-  filter = makeLikeFilter('bank_accounts.bank_name', bank_name, filter)
-  filter = makeLikeFilter('bank_accounts.bank_agency', bank_agency, filter)
-  filter = makeLikeFilter('bank_accounts.bank_cc', bank_cc, filter)
+  filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
+  filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
+  filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
   
   return {
     limit:   limit,
@@ -238,26 +234,30 @@ exports.iuguQuery = (args) => {
   const limit = args.limit ? parseInt(args.limit) : 100;
   const { iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state} = args;
 
-  let filter = {};
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
 
-  filter = makeFilter('_id', id, filter)
-  filter = makeFilter('iugu_id', iugu_id, filter)
-  filter = makeFilter('receipt.business_name', business_name, filter)
-  filter = makeFilter('receipt_accountname', account_name, filter)
-  filter = makeFilter('receipt_alias', alias, filter)
-  filter = makeFilter('iuguCounterId', iuguCounterId, filter)
-  filter = makeFilter('state', state, filter)
+  filter = append(filter, getFilter('_id', id) );
+  filter = append(filter, getFilter('iugu_id', iugu_id) );
+  filter = append(filter, getFilter('receipt.business_name', business_name) );
+  filter = append(filter, getFilter('receipt_accountname', account_name) );
+  filter = append(filter, getFilter('receipt_alias', alias) );
+  filter = append(filter, getFilter('iuguCounterId', iuguCounterId) );
+  filter = append(filter, getFilter('state', state) );
 
-  filter = makeBetweenFilter('paid_at', paid_at_from, paid_at_to, filter)
-  filter = makeBetweenFilter('issued_at', issued_at_from, issued_at_to, filter)
+  filter = append(filter, getBetweenFilter('paid_at', paid_at_from, paid_at_to) );
+  filter = append(filter, getBetweenFilter('issued_at', issued_at_from, issued_at_to) );
 
-  filter = makeFilter('issued_tx_id', issued_tx_id, filter)
+  filter = append(filter, getFilter('issued_tx_id', issued_tx_id) );
 
+  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  filter
-  };    
+    filter:  the_filter,
+  };   
 }
 
 exports.iuguLogQuery = (args) => {
@@ -265,13 +265,17 @@ exports.iuguLogQuery = (args) => {
   const limit = args.limit ? parseInt(args.limit) : 100;
   const { id } = args;
 
-  let filter = {};
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
 
-  filter = makeFilter('_id', id, filter)
-  
+  filter = append(filter, getFilter('_id', id) );
+
+  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  filter
+    filter:  the_filter,
   };    
 }

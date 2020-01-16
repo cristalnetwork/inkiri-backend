@@ -319,6 +319,7 @@ exports.resolvers = {
     },
     requests: async (parent, args, context) => {
       const query = queryHelper.requestQuery(args)
+      console.log(' ## graphql-server::requests-filter:', query.filter);
       const res = await RequestModel.list(query.limit, query.page, query.filter);
       // console.log(res);
       return res;

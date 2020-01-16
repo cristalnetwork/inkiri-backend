@@ -14,7 +14,6 @@ exports.TYPE_WITHDRAW                 = 'type_withdraw';
 exports.TYPE_SERVICE                  = 'type_service';
 exports.TYPE_PAD                      = 'type_pad';
 exports.TYPE_SALARY                   = 'type_salary';
-
 exports.TYPE_IUGU                     = 'type_iugu';
 
 exports.STATE_REQUESTED               = 'state_requested';
