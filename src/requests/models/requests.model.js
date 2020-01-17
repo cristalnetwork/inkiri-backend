@@ -52,7 +52,8 @@ const requestSchema = new Schema({
                             type: Schema.Types.ObjectId
                             , ref: 'Users'
                             , required: function() {
-                              return (this.requested_type == exports.TYPE_SEND || this.requested_type == exports.TYPE_PAYMENT || this.requested_type == exports.TYPE_SERVICE);
+                              // return (this.requested_type == exports.TYPE_SEND || this.requested_type == exports.TYPE_PAYMENT || this.requested_type == exports.TYPE_SERVICE);
+                              return (this.requested_type == exports.TYPE_SERVICE);
                             }
                           },
     to:                   { type: String },

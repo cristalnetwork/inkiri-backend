@@ -251,6 +251,28 @@ const getAction = async (operation, operation_data, tx) => {
                   }
       }
       break;
+    case helper.KEY_TRANSFER_SND:
+      // MEMO:   'snd|'+memo
+      // ACTION: CREATE request
+      const snd_sender   = await UserModel.byAccountNameOrNull(operation.data.from);
+      const snd_receiver = await UserModel.byAccountNameOrNull(operation.data.to);
+      return {
+        context:    REQUEST_CONTEXT
+        , action:   'create'
+        , params:   [{ 
+                    created_by:       snd_sender
+                    , requested_by:   snd_sender
+                    , from:           operation.data.from
+                    , requested_to:   snd_receiver
+                    , to:             operation.data.to
+                    , requested_type: RequestModel.TYPE_SEND
+                    , amount:         tx.amount
+                    , description:    helper._at(memo_parts, 1)
+                    , state:          RequestModel.STATE_ACCEPTED
+                    , tx_id:          tx.tx_id 
+                  }]
+      }
+      break;
     case helper.KEY_TRANSFER_PAY:
       // MEMO:   'pay|' + request_id + '|' + memo)
       // ACTION: UPDATE ref payment request
@@ -310,11 +332,6 @@ const getAction = async (operation, operation_data, tx) => {
     case helper.KEY_TRANSFER_PAP:
       // MEMO:   
       // ACTION: CREATE payment request
-      return {};
-      break;
-    case helper.KEY_TRANSFER_SND:
-      // MEMO:   'snd|'+memo
-      // ACTION: CREATE request
       return {};
       break;
     case helper.KEY_NEW_ACCOUNT:
