@@ -34,9 +34,10 @@ const providerSchema = new Schema({
     // bank_accounts:    [{ type: Schema.Types.ObjectId, ref: 'BankAccounts' }],
     bank_accounts:    [
             {
-                bank_name:        { type:  String},
-                agency:           { type:  String },
-                cc:               { type:  String },
+                bank_name:        { type:  String, trim:true},
+                bank_keycode:     { type:  String, trim:true },
+                agency:           { type:  String, trim:true },
+                cc:               { type:  String, trim:true },
             }],
 
     providerCounterId:    { type: Number, unique : true},

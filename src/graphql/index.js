@@ -46,6 +46,7 @@ exports.typeDefs = `
   type BankAccount{
     _id:                        ID
     bank_name:                  String!
+    bank_keycode:               String
     agency:                     String!
     cc:                         String!
   }
@@ -319,7 +320,7 @@ exports.resolvers = {
     },
     requests: async (parent, args, context) => {
       const query = queryHelper.requestQuery(args)
-      console.log(' ## graphql-server::requests-filter:', query.filter);
+      // console.log(' ## graphql-server::requests-filter:', query.filter);
       const res = await RequestModel.list(query.limit, query.page, query.filter);
       // console.log(res);
       return res;
@@ -366,17 +367,18 @@ exports.resolvers = {
     /* 
     *  PROVIDER 
     */
-    providers: async (parent, args, context) => {
-      const query = queryHelper.providerQuery(args)
-      const res = await ProviderModel.list(query.limit, query.page, query.filter);
-      return res;
-    },
     provider: async (parent, args, context) => {
       const query = queryHelper.providerQuery(args)
       const res = await ProviderModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
-
+    providers: async (parent, args, context) => {
+      const query = queryHelper.providerQuery(args)
+      console.log(' ## graphql-server::providers-filter:', query.filter);
+      const res = await ProviderModel.list(query.limit, query.page, query.filter);
+      return res;
+    },
+    
     /* 
     *  IUGU 
     */

@@ -143,7 +143,7 @@ exports.routesConfig = function (app) {
         ]
     );
 
-    app.get(config.api_version+'/requests_rem_generator/:requests_ids/:payer_account', [
+    app.get(config.api_version+'/requests_rem_generator/:requests_ids/:payer_account/:payment_date', [
         // ValidationMiddleware.validJWTNeeded,
         RequestsController.generate_rem
     ]);

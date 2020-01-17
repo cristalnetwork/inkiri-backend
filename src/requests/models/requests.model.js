@@ -116,6 +116,11 @@ const requestSchema = new Schema({
                                 return this.requested_type == exports.TYPE_EXCHANGE;
                               }
                             }
+                            , bank_keycode:        { type:  String
+                              , required: function() {
+                                return this.requested_type == exports.TYPE_EXCHANGE;
+                              }
+                            }
                             , agency:           { type:  String
                               , required: function() {
                                 return this.requested_type == exports.TYPE_EXCHANGE;

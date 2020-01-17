@@ -166,6 +166,25 @@ module.exports = {
   "CC_ASSOCIACAO"                                : "14347-2",
   "CC_EMPRESA"                                   : "16620-0",
 
+  "INSTITUTO":{
+    "BANK_NAME" :     "BANCO DO BRASIL"
+    , "BANK_CODE" :   "001"
+    , "BANK_EGENCY" : "04105X"
+    , "BANK_CC" :     "14347-2"
+  },
+  "INSTITUTO_PPA":{
+    "BANK_NAME" :     "BANCO DO BRASIL"
+    , "BANK_CODE" :   "001"
+    , "BANK_EGENCY" : "04105X"
+    , "BANK_CC" :     "16966-8"
+  },
+  "EMPRESA":{
+    "BANK_NAME" :     "BANCO DO BRASIL"
+    , "BANK_CODE" :   "001"
+    , "BANK_EGENCY" : "04105X"
+    , "BANK_CC" :     "16620-0"
+  },
+  
   "PAGAMENTO_EMPRESA"                            : 0,
   "PAGAMENTO_INSTITUTO_PROJETO"                  : 1, //PAGAMENTO_EMPRESA + 1,
   "PAGAMENTO_INSTITUTO_PPA"                      : 2, //PAGAMENTO_INSTITUTO_PROJETO + 1,

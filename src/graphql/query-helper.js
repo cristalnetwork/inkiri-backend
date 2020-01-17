@@ -23,6 +23,12 @@ const getFilter = (name, value) => {
   return {};
 }
 
+const getQuery = (filter) => {
+  if(!filter.or_filter || !Array.isArray(filter.or_filter) || filter.or_filter.length==0)
+    return filter.filter;
+  return {...filter.filter, $or: filter.or_filter};
+}
+
 exports.appendFromToFilter = (value, filter) => makeOrFilter ('from', 'to', value, filter);
 
 const makeOrFilter = (name1, name2, value) => {
@@ -72,11 +78,10 @@ exports.usersQuery  = (args) => {
   filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
   filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
   
-  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  the_filter
+    filter:  getQuery(filter)
   };    
 }
 
@@ -125,12 +130,11 @@ exports.requestQuery = (args) => {
   filter = append(filter, getFilter('deposit_currency', deposit_currency) );
   filter = append(filter, getFilter('service', service_id) );
 
-  const the_filter = {...filter.filter, $or: filter.or_filter};
-  console.log(' ## graphql-server::requests-query-builder::query:', JSON.stringify(the_filter));
+  // console.log(' ## graphql-server::requests-query-builder::query:', JSON.stringify(getQuery(filter)));
   return {
     limit:   limit,
     page:    page,
-    filter:  the_filter
+    filter:  getQuery(filter)
   };    
 }
 
@@ -148,11 +152,10 @@ exports.serviceQuery = (args) => {
   filter = append(filter, getFilter('account_name', account_name) );
   filter = append(filter, getFilter('serviceCounterId', serviceCounterId) );
 
-  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  the_filter
+    filter:  getQuery(filter)
   };    
 }
 
@@ -190,11 +193,10 @@ exports.teamQuery = (args) => {
   filter = append(filter, getFilter('teamCounterId', teamCounterId) );
   filter = append(filter, getFilter('created_by', created_by) );
   
-  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  the_filter,
+    filter:  getQuery(filter),
     populate: populate
   };    
 }
@@ -225,7 +227,7 @@ exports.providerQuery  = (args) => {
   return {
     limit:   limit,
     page:    page,
-    filter:  filter
+    filter:  getQuery(filter)
   };    
 }
 
@@ -252,11 +254,10 @@ exports.iuguQuery = (args) => {
 
   filter = append(filter, getFilter('issued_tx_id', issued_tx_id) );
 
-  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  the_filter,
+    filter:  getQuery(filter)
   };   
 }
 
@@ -272,10 +273,9 @@ exports.iuguLogQuery = (args) => {
 
   filter = append(filter, getFilter('_id', id) );
 
-  const the_filter = {...filter.filter, $or: filter.or_filter};
   return {
     limit:   limit,
     page:    page,
-    filter:  the_filter,
+    filter:  getQuery(filter)
   };    
 }

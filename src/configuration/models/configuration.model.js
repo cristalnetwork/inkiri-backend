@@ -41,6 +41,7 @@ const configurationSchema = new Schema({
     // for payment vehicles
     bank_account:              {
                 bank_name:        { type:  String, trim:true},
+                bank_keycode:     { type:  String, trim:true },
                 agency:           { type:  String, trim:true},
                 cc:               { type:  String, trim:true},
             },
@@ -230,6 +231,7 @@ exports.init = async () => {
   father = exports.CONFIG_KEY_PAY_VEHICLES;
   const bank_account = {
     bank_name: 'BANK'
+    , bank_keycode: 'KEYCODE'
     , agency:  'AGENCY'
     , cc:      'CC'
   }

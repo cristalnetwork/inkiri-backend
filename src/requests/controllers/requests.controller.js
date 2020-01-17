@@ -1,7 +1,7 @@
 const config         = require('../../common/config/env.config.js');
 const RequestModel   = require('../models/requests.model');
 const crypto         = require('crypto');
-const rem_generator  = require('../../rem_generator');
+const rem_generator  = require('../../rem/rem_generator');
 var moment           = require('moment');
 
 exports.insert = (req, res) => {
@@ -174,10 +174,10 @@ exports.removeById = (req, res) => {
 exports.generate_rem = async (req, res) => {
   const requests_ids  = req.params.requests_ids;
   const payer_account = req.params.payer_account;
-  
+  const payment_date  = req.params.payment_date;
   let ret = '';
   try{
-    ret = await rem_generator.generateREMForRequests(requests_ids, payer_account);
+    ret = await rem_generator.generateREMForRequests(requests_ids, payer_account, payment_date);
   }catch(e){
     console.log(' **** generate_rem ERROR: ',e)
     res.status(500).send({error:JSON.stringify(e)});    
@@ -187,7 +187,10 @@ exports.generate_rem = async (req, res) => {
   // res.statusCode = 200;
   // res.setHeader('Content-Type', 'text/plain');
   res.set('Content-Type', 'text/plain');
-  res.set('Content-Disposition', `attachment; filename=REM.${moment().format('YYYY-MM-DD_HH-mm-ss')}.txt`);
+  const payers = ['EMPRESA',
+                  'INSTITUTO',
+                  'INSTITUTO_PPA']
+  res.set('Content-Disposition', `attachment; filename=REM.${payers[parseInt(payer_account)]}.${moment().format('YYYY-MM-DD_HH-mm-ss')}.rem`);
   res.status(200).send(ret);
   return;
   // res.status(200).send(ret, { 'Content-Disposition': `attachment; filename=REM.${moment().format('YYYY-MM-DD_HH:mm:ss')}.txt` }); 

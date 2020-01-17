@@ -53,6 +53,7 @@ const userSchema = new Schema({
     bank_accounts:    [
             {
                 bank_name:        { type:  String, trim:true},
+                bank_keycode:     { type:  String, trim:true},
                 agency:           { type:  String, trim:true},
                 cc:               { type:  String, trim:true},
             }],

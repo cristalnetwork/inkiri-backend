@@ -1,23 +1,10 @@
-var RequestModel   = require('./requests/models/requests.model');
-var ProviderModel  = require('./providers/models/providers.model');
-var UserModel      = require('./users/models/users.model');
+var RequestModel   = require('../requests/models/requests.model');
+var ProviderModel  = require('../providers/models/providers.model');
+var UserModel      = require('../users/models/users.model');
 var rem_utils      = require('./rem_utils.js');
 var moment         = require('moment');
 const utf8         = require('utf8');
 
-/*
-
-eu faço chamadas dessa função:
-def criar_arquivo_remessa(caminho_completo, data_pagamento, conta_pagamento, lista_pagamentos)
-
-pagamento['nome'] -> nome fornecedor
-pagamento['cpf_cnpj'] -> se tem cpf ou cnpj (tipo de documento brasileiro, cnpj para empresas e cpf não empresas)
-pagamento['inscricao'] -> o número do documento acima
-pagamento['banco'] -> código do banco
-pagamento['ag'] -> número da agência
-pagamento['cc'] -> número da conta corrente
-pagamento['valor']
-*/
 const isalpha = (character) =>{
   return 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.indexOf(character) >= 0 ;
 }
@@ -26,8 +13,10 @@ const isdigit = (character) =>{
 }
 const getMoment = (value) => {
   let moment_value = value;
+  
   if(typeof moment_value === 'object')
     return moment_value;
+  
   if(isNaN(value)==false)
   {
     let my_value = value;
@@ -38,7 +27,8 @@ const getMoment = (value) => {
   else
     if(typeof value === 'string')
       moment_value = moment(value);
-  return moment_value;
+  
+  return moment_value || moment();
 }
 const pad = (pad, str, padLeft) => {
   // pad(padding,123,true)  -> '0000000123'
@@ -52,8 +42,7 @@ const pad = (pad, str, padLeft) => {
   }
 }
 const doPad = (_len, char=' ') => {
-  // var padding = Array(256).join(' '), // make a string of 255 spaces
-  return Array(_len).join(char);
+  return Array(_len+1).join(char);
 }
 const padRight = (str, _len, _char) => {
   // padRight('abc',10,'0')  -> 'abc0000000'
@@ -113,7 +102,7 @@ const criar_cabecalho = (conta_pagamento) =>{
 
     const NOME_BANCO_30           = 'BANCO DO BRASIL S/A           ' // 30 characters
 
-    const CNAB_10                 = Array(10).join(' '); // '          '; // Fixed data: 10 spaces
+    const CNAB_10                 = doPad(10, ' '); // '          '; // Fixed data: 10 spaces
 
     const ARQUIVO_CODIGO_1        = '1'; // fixo remessa=1 retorno=2
 
@@ -177,10 +166,10 @@ const criar_cabecalho_lote_ab = (conta_pagamento) => {
     if(conta_pagamento == rem_utils.PAGAMENTO_EMPRESA)
         EMPRESA_NOME_30 = 'INKIRI EDUCACAO DO SER LTDA   ';
 
-    const ESPACOS_EM_BRANCO_152 = doPad(152,' ');
+    const ESPACOS_EM_BRANCO_152 = doPad(138,' ');
     // const ESPACOS_EM_BRANCO_152 = '                                                                                                                                          ';
     //ESPACOS_EM_BRANCO_152 = '                                                                                                                                              V.PAG20020';
-
+    /* 40+30+5+15+20+5+3+2+8+10 */
     const cabecalho = `${CONTROLE_BANCO_CODIGO_3}${CONTROLE_LOTE_4}${CONTROLE_REGISTRO_1}${SERVICO_OPERACAO_TIPO_1}${SERVICO_TIPO_2}${SERVICO_FORMA_LANCAMENTO_2}${SERVICO_LAYOUT_3}${CNAB_1}${EMPRESA_INSCRICAO_TIPO_1}${EMPRESA_INSCRICAO_NUMERO_14}${EMPRESA_CONVENIO_NUMERO_9}${EMPRESA_CONVENIO_CODIGO_4}${EMPRESA_CONVENIO_RES_BANCO_5}${EMPRESA_CONVENIO_ARQ_TESTE_2}${EMPRESA_CC_AGENCIA_6}${EMPRESA_CC_CONTA_13}${EMPRESA_CC_DV_1}${EMPRESA_NOME_30}${ESPACOS_EM_BRANCO_152}\n`;
 
     return cabecalho
@@ -211,7 +200,7 @@ const criar_segmento_ab = (registro, nome, CPF_CNPJ, documento, codigo_banco, ag
       const SERVICO_MOVIMENTO_TIPO_1               = '0';   // Inclusão = '0' Exclusão = '9'
       const SERVICO_MOVIMENTO_CODIGO_2             = '00';  // Inclusão = '00' Exclusão = '99'
       const FAVORECIDO_CAMARA_3                    = '018'; // TED (STR, CIP) = '018' DOC (COMPE) = '700' TED (STR/CIP) = '988'
-      const FAVORECIDO_BANCO_3                     = codigo_banco.toString()
+      const FAVORECIDO_BANCO_3                     = padLeft(codigo_banco, 3, '0');
 
       // # ATENÇÃO AQUI, ALTERAR SE NÃO TIVER DV
       const FAVORECIDO_CC_AGENCIA_5                = padLeft(agencia, 5, '0');  // str(agencia).zfill(5) # AGENCIA COM DV, SE DV FOR X COLOCAR X MAIUSCULO VAZIO SEM DV
@@ -334,7 +323,7 @@ const criar_trailer_arquivo = (qtde_pagamentos) => {
     return trailer
 }
 
-const nome_valido = (character) => { return isalpha(character) || character == ' ';}
+const valid_alpha_char = (character) => { return isalpha(character) || character == ' ';}
 
 const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos) => {
 
@@ -348,7 +337,7 @@ const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos
       
       let nome = pagamento['nome'];
       // console.log(`${idx} - #1 - nome: ${nome}`)
-      nome = utf8.encode(nome).split('').filter(  char => nome_valido(char) ).join('');
+      nome = utf8.encode(nome).split('').filter(  char => valid_alpha_char(char) ).join('');
       // console.log(`${idx} - #2 - nome: ${nome}`)
       if(nome.length>30)
         nome = nome.substring(0, 30)
@@ -356,10 +345,10 @@ const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos
       return criar_segmento_ab((2 * (idx + 1) - 1)                
                             , nome.toUpperCase()                
                             , pagamento['cpf_cnpj']                
-                            , utf8.encode(pagamento['documento']).split('').map(  char => isdigit(char) ).join('')  // filter(str.isdigit, pagamento['inscricao'].encode('utf8')),                
-                            , utf8.encode(pagamento['codigo_banco']).split('').map(  char => isdigit(char) ).join('')      // filter(str.isdigit, pagamento['banco'].encode('utf8'))                
-                            , utf8.encode(pagamento['agencia']).split('').map(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['ag'].encode('utf8'))                
-                            , utf8.encode(pagamento['conta']).split('').map(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['cc'].encode('utf8'))                
+                            , utf8.encode(pagamento['documento']).split('').filter(  char => isdigit(char) ).join('')  // filter(str.isdigit, pagamento['inscricao'].encode('utf8')),                
+                            , utf8.encode(pagamento['codigo_banco']).split('').filter(  char => isdigit(char) ).join('')      // filter(str.isdigit, pagamento['banco'].encode('utf8'))                
+                            , utf8.encode(pagamento['agencia']).split('').filter(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['ag'].encode('utf8'))                
+                            , utf8.encode(pagamento['conta']).split('').filter(  char => isdigit(char) ).join('')         // filter(str.isdigit, pagamento['cc'].encode('utf8'))                
                             , data_pagamento                
                             , parseFloat(pagamento['valor']))                
     })
@@ -487,36 +476,41 @@ const _trim = (str) => {
     return '';
   return str.trim();
 }
-exports.generateREMForRequests = async (requests_ids, payer_account) =>{
+
+exports.generateREMForRequests = async (requests_ids, payer_account, payment_date) =>{
   const requests = await RequestModel.model.find({_id: {$in : requests_ids.split(',')}}).populate('created_by').populate('requested_by').populate('requested_to').populate('provider').exec()
   if(!requests)
     return null;
-
+  const data_pagamento = getMoment(payment_date) ;
   console.log(' == about to loop:', requests.length)
   const request_list = requests.map( request => {
     console.log(' ====== request._id:', request._id)
-    const is_biz       = request.requested_type == RequestModel.TYPE_PROVIDER;
-    const provider     = request.provider;
-    const customer     = request.requested_by;
-    if(is_biz && (!provider || !provider.bank_accounts || !provider.bank_accounts.length>0) )
+    const is_provider_payment = request.requested_type == RequestModel.TYPE_PROVIDER;
+    const provider            = request.provider;
+    const customer            = request.requested_by;
+    if(is_provider_payment && (!provider || !provider.bank_accounts || !provider.bank_accounts.length>0) )
       return null;
-    if(!is_biz && (!customer || !request.bank_account) )
+    if(!is_provider_payment && (!customer || !request.bank_account) )
       return null;
-    const bank_account = is_biz?provider.bank_accounts[0]:request.bank_account;
-    const legal_id = (is_biz  ? provider.cnpj : customer.legal_id)||'';
+    const bank_account       = is_provider_payment?provider.bank_accounts[0]:request.bank_account;
+    const legal_id           = (is_provider_payment  ? provider.cnpj : customer.legal_id)||'';
+    const clean_legal_id     = utf8.encode(legal_id).split('').filter(  char => isdigit(char) ).join('');
+    const TIPO_CNPJ_OR_CPF   = clean_legal_id.length > 11 
+      ? rem_utils.IDENTIFICACAO_TIPO_CNPJ 
+      : rem_utils.IDENTIFICACAO_TIPO_CPF
     return {
-      nome             : is_biz  ? trimAndUppercase(provider.name) : `${trimAndUppercase(customer.name)} ${trimAndUppercase(customer.last_name) }` 
-      , cpf_cnpj       : is_biz  ? rem_utils.IDENTIFICACAO_TIPO_CNPJ : rem_utils.IDENTIFICACAO_TIPO_CPF
+      nome             : is_provider_payment  ? trimAndUppercase(provider.name) : `${trimAndUppercase(customer.name)} ${trimAndUppercase(customer.last_name) }` 
+      , cpf_cnpj       : TIPO_CNPJ_OR_CPF
       , documento      : legal_id
-      , codigo_banco   : 237
+      , codigo_banco   : bank_account.bank_keycode || '0'
       , agencia        : _trim(bank_account.agency)
       , conta          : _trim(bank_account.cc)
-      , data_pagamento : moment().format('DDMMYYYY')
+      , data_pagamento : data_pagamento
       , valor          : parseFloat(request.amount)      
     }
   }).filter(req => req!=null)
   console.log(' == about to respond...')
-  const res = await criar_arquivo_remessa(moment(), parseInt(payer_account), request_list);
+  const res = await criar_arquivo_remessa(data_pagamento, parseInt(payer_account), request_list);
   return res;
 }
 
