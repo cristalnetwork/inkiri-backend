@@ -235,9 +235,9 @@ exports.init = async () => {
     , agency:  'AGENCY'
     , cc:      'CC'
   }
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_inkiri`,      'Inkiri',    bank_account));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_institute`,   'Institute', bank_account));  
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_other`,       'Other',     bank_account));  
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_inkiri`,      'Empresa',    bank_account));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_institute`,   'Instituto', bank_account));  
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_other`,       'Other',     bank_account));  
 
   father = exports.CONFIG_KEY_PAY_CATEGORY;
   exports.createConfiguration(newConfig (the_architect, father, `${father}_alugel`,       'Alugel'));
