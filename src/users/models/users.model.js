@@ -113,6 +113,17 @@ exports.byAccountNameOrNull = async (account_name) => {
     return user;
 };
 
+exports.byAliasOrNull = async (alias) => {
+    if(!alias)
+        return null;
+    // console.log(' == >> UsersModel::byAccountNameOrNull:', alias)
+    const  _alias = alias?alias.trim():'';
+    if(_alias=='')
+        return null;
+    const  user = await User.findOne({alias: _alias}).exec();
+    return user;
+};
+
 exports.findByAccountName = (account_name) => {
     const _account_name = account_name?account_name.trim():'';
     return User.find({account_name: _account_name});

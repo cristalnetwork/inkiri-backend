@@ -36,6 +36,12 @@ exports.routesConfig = function (app) {
         IuguController.reprocess
     ]);
 
+    app.post(config.api_version+'/iugu_alias/:invoiceId/:accountName', [
+        ValidationMiddleware.validJWTNeeded,
+        PermissionMiddleware.loggedHasAdminWritePermission,
+        IuguController.updateAlias
+    ]);
+
     app.delete(config.api_version+'/iugu/:invoiceId', [
         ValidationMiddleware.validJWTNeeded,
         PermissionMiddleware.loggedHasAdminWritePermission,

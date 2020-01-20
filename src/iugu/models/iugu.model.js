@@ -124,6 +124,17 @@ const lastImportedImpl = async () => {
   });
 }
 
+exports.lastImportedOrNull = async () => {
+  const iugu = await Iugu.findOne()
+          .populate('receipt')
+          .limit(1)
+          .skip(0)
+          .sort({paid_at : -1, iuguCounterId: -1 })
+          .exec();
+
+  return iugu;
+};
+
 exports.canReprocess = (invoice) => {
   return (invoice)?
     [exports.STATE_NOT_PROCESSED, exports.STATE_ERROR, exports.STATE_ISSUE_ERROR].includes(invoice.state)
@@ -178,19 +189,22 @@ exports.list = (perPage, page, query) => {
 };
 
 exports.patchById = async (id, iuguData) => {
-  return new Promise((resolve, reject) => {
-    Iugu.findOneAndUpdate(
-      {_id: id}
-      , iuguData
-      , function (err, result) {
-          if (err) {
-              reject(err);
-          } else {
-            resolve(result);
-          }
-        }
-    );
-  });
+  // return new Promise((resolve, reject) => {
+  //   Iugu.findOneAndUpdate(
+  //     {_id: id}
+  //     , iuguData
+  //     , function (err, result) {
+  //         if (err) {
+  //             reject(err);
+  //         } else {
+  //           resolve(result);
+  //         }
+  //       }
+  //   );
+  // });
+  const res = await Iugu.findOneAndUpdate({_id: id}, iuguData).exec();
+  return res;
+  
 };
 
 exports.updateMany = async(filter, update, options, callback) => {
@@ -222,9 +236,6 @@ exports.removeById = (iuguId) => {
     });
 };
 
-// exports.findByIuguId = (iugu_id) => {
-//     return Iugu.find({iugu_id: iugu_id});
-// };
 
 exports.findByIuguId = (iugu_id, null_if_not_found) => {
   return new Promise((resolve, reject) => {
@@ -245,3 +256,5 @@ exports.findByIuguId = (iugu_id, null_if_not_found) => {
   });
 
 };
+
+exports.model = Iugu;

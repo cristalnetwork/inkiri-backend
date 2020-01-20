@@ -3,6 +3,7 @@ const IuguModel    = require('../models/iugu.model');
 const IuguLogModel = require('../../iugu_log/models/iugu_log.model');
 const importer     = require('../services/importer');
 const issuer       = require('../services/issuer');
+const UserModel    = require('../../users/models/users.model');
 
 const TASK_IMPORT            = 'import';
 const TASK_ISSUE             = 'issue';
@@ -65,31 +66,33 @@ exports.import = async(req, res) => {
   }
 };
 
-exports.reprocess = (req, res) => {
-  importer.reProcessInvoice(req.params.invoiceId)
-    .then( (result) => {
-        console.log('importController::repsocess()::result-> ', JSON.stringify(result));
-        res.status(200).send({message: 'OK', result: result});
+exports.reprocess = async (req, res) => {
+  
+  try{
+    const result = await importer.reProcessInvoice(req.params.invoiceId)
+    console.log('importController::reprocess()::result-> ', JSON.stringify(result));
+    
+    res.status(200).send({message: 'OK', result: result});
 
-        const issued_ok    = [result];
-        const issued_error = [];
-        IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice.id), null,
-                                   issued_error.length,    issued_error.map(obj => obj.invoice.id),    issued_error.map(obj => obj.error)
-                                   , false)
-        return;
-    }, (err)=>{
-        console.log('importController::repsocess()::ERROR', req.params.invoiceId, JSON.stringify(err))
-        res.status(500).send({error:err});
+    const issued_ok    = [result];
+    const issued_error = [];
+    IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice && obj.invoice._id), null,
+                               issued_error.length,    issued_error.map(obj => obj.invoice && obj.invoice._id),    issued_error.map(obj => obj.error)
+                               , false)
+    return;
+  }catch(err)
+  {
+    console.log('importController::reprocess()::ERROR', req.params.invoiceId, JSON.stringify(err))
+    res.status(500).send({error:err});
 
-        const issued_ok    = [err];
-        const issued_error = [];
-        IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice.id), null,
-                                   issued_error.length,    issued_error.map(obj => obj.invoice.id),    issued_error.map(obj => obj.error)
-                                   , false)
+    const issued_ok    = [];
+    const issued_error = [err];
+    IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice && obj.invoice._id), null,
+                               issued_error.length,    issued_error.map(obj => obj.invoice && obj.invoice._id),    issued_error.map(obj => obj.error)
+                               , false)
 
-        return;
-    });
-  return;
+  }
+  
 }
 
 exports.insert = (req, res) => {
@@ -156,29 +159,55 @@ exports.getById = async (req, res) => {
           });
   };
 
-exports.getByCounter = async (req, res) => {
-    console.log(' >> getById:', req.params.counterId);
-    let filter = { requestCounterId : req.params.counterId};
-    IuguModel.list(1, 0, filter)
-      .then((result) => {
-        if(!result || !result[0])
-          return res.status(404).send({error:'NOT FOUND'});
-        return res.status(200).send(result[0]);
-      },
-       (err)=> {
-        return res.status(404).send({error:JSON.stringify(err)});
-      });
+// exports.getByCounter = async (req, res) => {
+//     console.log(' >> getById:', req.params.counterId);
+//     let filter = { requestCounterId : req.params.counterId};
+//     IuguModel.list(1, 0, filter)
+//       .then((result) => {
+//         if(!result || !result[0])
+//           return res.status(404).send({error:'NOT FOUND'});
+//         return res.status(200).send(result[0]);
+//       },
+//        (err)=> {
+//         return res.status(404).send({error:JSON.stringify(err)});
+//       });
 
+//     };
+
+// exports.patchById = (req, res) => {
+//     console.log(' ABOUT TO PATCH REQUEST ', req.params.invoiceId)
+//     console.log(JSON.stringify(req.body));
+
+//     IuguModel.patchRequest(req.params.invoiceId, req.body)
+//         .then((result) => {
+//             res.status(200).send({});
+//         });
+
+// };
+
+// /iugu_alias/:invoiceId/:accountName
+exports.updateAlias = async (req, res) => {
+    console.log(' ABOUT TO UPDATE ALIAS ', req.params.invoiceId, req.params.accountName)
+    
+    const user = await UserModel.byAccountNameOrNull(req.params.accountName);
+    if(!user)
+      return res.status(500).send({error:'User not found'});
+    const fields = {
+      receipt               : user
+      , receipt_alias       : user.alias
+      , receipt_accountname : user.account_name
+      , error               : null
     };
-
-exports.patchById = (req, res) => {
-    console.log(' ABOUT TO PATCH REQUEST ', req.params.invoiceId)
-    console.log(JSON.stringify(req.body));
-
-    IuguModel.patchRequest(req.params.invoiceId, req.body)
-        .then((result) => {
-            res.status(200).send({});
-        });
+    console.log(fields);
+    try{
+      const update_res = IuguModel.patchById(req.params.invoiceId, fields);
+      return res.status(200).send({res:update_res});
+    }
+    catch(ex)
+    {
+      console.log('Error updating alias:', ex)
+      return res.status(500).send({error: ex});
+    }
 
 };
 
