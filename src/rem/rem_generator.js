@@ -5,6 +5,11 @@ var rem_utils      = require('./rem_utils.js');
 var moment         = require('moment');
 const utf8         = require('utf8');
 
+
+const is_cnpj = (legal_id) =>{
+  const clean_legal_id = utf8.encode(legal_id).split('').filter(  char => isdigit(char) ).join('');
+  return clean_legal_id.length > 11 
+}
 const isalpha = (character) =>{
   return 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.indexOf(character) >= 0 ;
 }
@@ -494,8 +499,7 @@ exports.generateREMForRequests = async (requests_ids, payer_account, payment_dat
       return null;
     const bank_account       = is_provider_payment?provider.bank_accounts[0]:request.bank_account;
     const legal_id           = (is_provider_payment  ? provider.cnpj : customer.legal_id)||'';
-    const clean_legal_id     = utf8.encode(legal_id).split('').filter(  char => isdigit(char) ).join('');
-    const TIPO_CNPJ_OR_CPF   = clean_legal_id.length > 11 
+    const TIPO_CNPJ_OR_CPF   = is_cnpj(legal_id)
       ? rem_utils.IDENTIFICACAO_TIPO_CNPJ 
       : rem_utils.IDENTIFICACAO_TIPO_CPF
     return {

@@ -21,12 +21,26 @@ const log = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs) => {
   LogModel.createEx(ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs);
 }
 
+// exports.importAndSave = async () => {
+  
+//   try{
+//     const result = importImpl();
+//     if(!result || !result.items)
+//       return;
+//     const result2 = saveImpl(result.items);
+//     return {...result2, qs:result.qs};
+//   }
+//   catch(e){
+//     console.log('iugu-importer::importAndSave ERROR = ', e);
+//   }
+  
+// }
+
 exports.importAndSave = async () => new Promise(async(res, rej) => {
   importImpl()
     .then( (result) => {
         saveImpl(result.items)
           .then( (result2) => {
-              log
               res({...result2, qs:result.qs});
               return;
           }, (err2)=>{
