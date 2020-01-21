@@ -1,4 +1,5 @@
 var moment          = require('moment');
+const RequestModel  = require('../requests/models/requests.model');
 
 /*
 * Operators
@@ -6,7 +7,7 @@ var moment          = require('moment');
 * $gt:, $gte:
 */
 
-const getFilter = (name, value) => {
+const getFilter = (name, value, allowed_values) => {
   
   if(!value || !name)
     return {};
@@ -18,15 +19,16 @@ const getFilter = (name, value) => {
   return {[name]: value};
   
   if (value.includes(',')) 
-    return value.split(',').map(req_item=> {return { [name]: req_item}})
+    // return value.split(',').map(req_item=> {return { [name]: req_item}})
+    return { [name]: { $in: value.split(',').filter(item => (allowed_values?allowed_values.includes(item):true) ) } }
   
   return {};
 }
 
-const getQuery = (filter) => {
+const getQuery = (filter, new_or_filter) => {
   if(!filter.or_filter || !Array.isArray(filter.or_filter) || filter.or_filter.length==0)
     return filter.filter;
-  return {...filter.filter, $or: filter.or_filter};
+  return {...filter.filter, $or: [...filter.or_filter, ...(new_or_filter||[])]};
 }
 
 exports.appendFromToFilter = (value, filter) => makeOrFilter ('from', 'to', value, filter);
@@ -83,6 +85,104 @@ exports.usersQuery  = (args) => {
     page:    page,
     filter:  getQuery(filter)
   };    
+}
+
+exports.extratoQuery = (context, args) => {
+  const page  = args.page ? parseInt(args.page) : 0;
+  const limit = args.limit ? parseInt(args.limit) : 100;
+  const {requested_type, from, to, provider_id, state, date_from, date_to, wage_filter, account_name} = args;
+  
+  const the_account_name = context.account_name || account_name;
+
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
+  
+  // If one of from/to filters is set, then the other one should be the account_name.
+  let account_filter = null;
+  if (from!=''&&to!='') {
+    if (from!=the_account_name)
+    {
+      filter = append(filter, getFilter('from', from) );
+      filter = append(filter, getFilter('to', the_account_name) );
+    }
+    else
+      if (to!=the_account_name)
+      {
+        filter = append(filter, getFilter('from', the_account_name) );
+        filter = append(filter, getFilter('to', to) );
+      }
+  }
+  else
+    if (from!='')
+    {
+      filter = append(filter, getFilter('from', from) );
+      filter = append(filter, getFilter('to', the_account_name) );
+    }
+    else
+      if (to!='')
+      {
+        filter = append(filter, getFilter('from', the_account_name) );
+        filter = append(filter, getFilter('to', to) );
+      }
+      else{
+        filter = append(filter, { $or : [{from: the_account_name}, {to: the_account_name}, {wages : { $elemMatch: {account_name: the_account_name} } }] } );
+        // account_filter = { $or : [{from: from}, {to: to}, {wages : { $elemMatch: {account_name: wage_filter} } }] };
+      }
+  
+  if(date_from && date_to)
+  {
+    const my_date_from = moment(date_from);
+    const my_date_to = moment(date_to);
+    filter = append(filter,  {updated_at: { $gte: my_date_from, $lte: my_date_to }});
+    // filter = append(filter,  {updated_at: { $gte: my_date_to, $lte: my_date_from }}, {created_at: { $gte: my_date_from, $lte: my_date_to}});
+  }
+  filter = append(filter, getFilter('provider', provider_id) );
+  
+  // const accepted_states = [RequestModel.STATE_REQUESTED, RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED, RequestModel.STATE_REJECTED, RequestModel.STATE_ERROR, RequestModel.STATE_CANCELED, RequestModel.STATE_REFUNDED, RequestModel.STATE_REVERTED];
+  const accepted_states = [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED, RequestModel.STATE_REFUNDED, RequestModel.STATE_REVERTED];
+  filter = append(filter, getFilter('state', state) );
+  if(!state || state.trim()=='')
+    filter = append(filter, { 'state' : { $in : accepted_states } } );
+
+  const accepted_request_types = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_SEND, RequestModel.TYPE_PAD, RequestModel.TYPE_SALARY];
+  filter = append(filter, getFilter('requested_type', requested_type, accepted_request_types) );
+  if(!requested_type || requested_type.trim()=='')
+    filter = append(filter, { 'requested_type' : { $in : accepted_request_types } } );
+  
+  const ors_filter = [
+        { $and : [ { requested_type : RequestModel.TYPE_DEPOSIT  }, { state : RequestModel.STATE_ACCEPTED} ] },
+        { $and : [ { requested_type : RequestModel.TYPE_EXCHANGE }, { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
+        { $and : [ { requested_type : RequestModel.TYPE_PROVIDER }, { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
+        { $and : [ { requested_type : RequestModel.TYPE_WITHDRAW }, { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
+        { $and : [ { requested_type : RequestModel.TYPE_PAYMENT },  { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_ACCEPTED] } } ] },
+        { $and : [ { requested_type : RequestModel.TYPE_SEND },     { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_ACCEPTED] } } ] },
+        { $and : [ { requested_type : RequestModel.TYPE_PAD },      { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
+        { $and : [ { requested_type : RequestModel.TYPE_SALARY },   { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
+
+        { $and : [ { requested_type : RequestModel.TYPE_SALARY },   { from : { $ne: the_account_name } } , { wages : { $elemMatch: {account_name: the_account_name} } } ] }, 
+        { $and : [ { requested_type : RequestModel.TYPE_SALARY },   { from : the_account_name  }] }, 
+
+        { $and : [ { state : { $in : [RequestModel.STATE_REFUNDED, RequestModel.STATE_REVERTED] } },  { refund_tx_id: {$in : [null, '' ]} }] },
+    ];
+
+
+
+    // state: { $in: [  ] } }
+    //  $and : [
+    //     { $or : [ { price : 0.99 }, { price : 1.99 } ] },
+    //     { $or : [ { sale : true }, { qty : { $lt : 20 } } ] }
+    // ]
+
+
+  const query = getQuery(filter, ors_filter);
+  console.log(' ## graphql-server::extrato-query-builder::query:', JSON.stringify(query)  );
+  return {
+    limit:   limit
+    , page:    page
+    , filter:  query
+  };  
 }
 
 exports.requestQuery = (args) => {

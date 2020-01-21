@@ -252,6 +252,7 @@ exports.typeDefs = `
     maxRequestId:                                   Int
     request(id:String, requestCounterId:Int):    Request
     requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
+    extrato(page:String, limit:String, account_name: String, requested_type:String, from:String, to:String, provider_id:String, state:String, date_from:String, date_to:String) : [Request]
     
     service(account_name:String, id:String, serviceCounterId:String):                                    Service
     services(page:String!, limit:String!, account_name:String, id:String, serviceCounterId:String):      [Service]
@@ -308,6 +309,10 @@ exports.resolvers = {
     /* 
     *  REQUESTS 
     */
+    maxRequestId: async (parent, args, context) => {
+      const res = await RequestModel.list(1, 0);
+      return (Array.isArray(res))?res[0].requestCounterId:res.requestCounterId;
+    },
     request: async (parent, args, context) => {
       const query = queryHelper.requestQuery(args)
       let filter = query.filter;
@@ -325,11 +330,15 @@ exports.resolvers = {
       // console.log(res);
       return res;
     },
-    maxRequestId: async (parent, args, context) => {
-      const res = await RequestModel.list(1, 0);
-      return (Array.isArray(res))?res[0].requestCounterId:res.requestCounterId;
+    
+    extrato: async (parent, args, context) => {
+      const query = queryHelper.extratoQuery(context, args)
+      console.log(' ## graphql-server::extrato-query:', query.filter);
+      const res = await RequestModel.list(query.limit, query.page, query.filter);
+      // console.log(res);
+      return res;
     },
-
+    
     /* 
     *  SERVICES 
     */
