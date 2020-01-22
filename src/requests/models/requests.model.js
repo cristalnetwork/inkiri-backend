@@ -371,6 +371,7 @@ getSimpleState = (request) =>
     , [exports.STATE_REFUNDED]     : exports.STATE_CANCELED
     , [exports.STATE_REVERTED ]    : exports.STATE_CANCELED
   }
+  return simpleStates[request.state];
 }
 requestToUIDict  = (request) => {
   const headers = getHeader(request)
