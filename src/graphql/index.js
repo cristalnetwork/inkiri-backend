@@ -266,7 +266,7 @@ exports.typeDefs = `
     provider(id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ):                Provider
 
     iugu(id:String, iugu_id:String):   Iugu
-    iugus(page:String!, limit:String!, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String):  [Iugu]
+    iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String):  [Iugu]
     
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
@@ -394,12 +394,19 @@ exports.resolvers = {
     iugu: async (parent, args, context) => {
       const query = queryHelper.iuguQuery(args)
       const res = await IuguModel.list(1, 0, query.filter);
-      return (Array.isArray(res))?res[0]:res;
+      const __res = res.map( item => {
+        item.original = JSON.stringify(item.original);
+        return item;
+      })
+      return (Array.isArray(__res))?__res[0]:__res;
     },
     iugus: async (parent, args, context) => {
       const query = queryHelper.iuguQuery(args)
       const res = await IuguModel.list(query.limit, query.page, query.filter);
-      return res;
+      return res.map( item => {
+        item.original = JSON.stringify(item.original);
+        return item;
+      });
     },
     iuguLog: async (parent, args, context) => {
       const query = queryHelper.iuguLogQuery(args)
