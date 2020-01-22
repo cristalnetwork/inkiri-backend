@@ -196,6 +196,7 @@ exports.typeDefs = `
     updated_at:                 String
     
     header:                     String
+    simple_state:               String
     sub_header:                 String
     sub_header_ex:              String
     sub_header_admin:           String

@@ -174,7 +174,7 @@ exports.removeById = (req, res) => {
 exports.generate_rem = async (req, res) => {
   const requests_ids  = req.params.requests_ids;
   const payer_account = req.params.payer_account;
-  const payment_date  = req.params.payment_date;
+  const payment_date  = moment.unix(req.params.payment_date);
   let ret = '';
   try{
     ret = await rem_generator.generateREMForRequests(requests_ids, payer_account, payment_date);

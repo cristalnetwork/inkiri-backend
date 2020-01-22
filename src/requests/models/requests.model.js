@@ -353,6 +353,25 @@ getHeader = (request) => {
             , sub_header_admin:   `${request.requested_by.account_name} has requested a ${req_types[request.requested_type]} ${ request.to?(' to '+request.to):''}`
     }
 }
+
+getSimpleState = (request) =>
+{
+//   REQUESTED
+// PROCESSING
+// DONE
+// CANCELADO
+  const simpleStates = {
+    [exports.STATE_REQUESTED]      : exports.STATE_REQUESTED
+    , [exports.STATE_RECEIVED]     : exports.STATE_PROCESSING 
+    , [exports.STATE_PROCESSING]   : exports.STATE_PROCESSING
+    , [exports.STATE_REJECTED]     : exports.STATE_CANCELED 
+    , [exports.STATE_ACCEPTED]     : exports.STATE_ACCEPTED
+    , [exports.STATE_ERROR]        : exports.STATE_CANCELED
+    , [exports.STATE_CANCELED]     : exports.STATE_CANCELED
+    , [exports.STATE_REFUNDED]     : exports.STATE_CANCELED
+    , [exports.STATE_REVERTED ]    : exports.STATE_CANCELED
+  }
+}
 requestToUIDict  = (request) => {
   const headers = getHeader(request)
   let flag = { ok:true, message:'', tag:''};
@@ -395,15 +414,15 @@ requestToUIDict  = (request) => {
   }
 
   return {
-     ...headers
+    ...headers
+    , simple_state      : getSimpleState(request)
     , key               : request.id
-     , block_time        : request.created_at.toISOString().split('.')[0]
-     , quantity          : request.amount
-     // , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + request._doc.deposit_currency
-     , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + config.eos.token.code
-     , tx_type           : request.requested_type
-     , i_sent            : true
-     , flag              : flag
+    , block_time        : request.created_at.toISOString().split('.')[0]
+    , quantity          : request.amount
+    , quantity_txt      : Number(request.amount).toFixed(2) + ' ' + config.eos.token.code
+    , tx_type           : request.requested_type
+    , i_sent            : true
+    , flag              : flag
   }
 }
 
