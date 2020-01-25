@@ -359,6 +359,17 @@ const getAction = async (operation, operation_data, tx) => {
         return {};
       break;
     case helper.KEY_UPSERT_PAP:
+        //pap|88
+        return {
+          context:    REQUEST_CONTEXT
+          , action:   'findOneAndUpdate'
+          , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
+          , params: { 
+                      amount:         tx.amount
+                      , state:        RequestModel.STATE_ACCEPTED
+                      , tx_id:        tx.tx_id
+                    }
+        }
         // MEMO:   ?
         // ACTION: CREATE upsert pap request (NEW)
         // from

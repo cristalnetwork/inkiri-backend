@@ -43,14 +43,14 @@ const serviceSchema = new Schema({
     amount:           { type: Number , required: true },
     state:            { type: String, enum:[exports.ENUM_STATE_PENDING, exports.ENUM_STATE_ACTIVE, exports.ENUM_STATE_ERROR, exports.ENUM_STATE_INACTIVE] },
 
-    contracts: [
-      {
-        customer:                { type: Schema.Types.ObjectId, ref: 'Users', required: true },
-        customer_account_name:   { type: String, required: true },
-        amount:                  { type: Number , required: true },
-        begins_at:               { type: Date , required: true },
-        expires_at:              { type: Date , required: true }
-      }],
+    // contracts: [
+    //   {
+    //     customer:                { type: Schema.Types.ObjectId, ref: 'Users', required: true },
+    //     customer_account_name:   { type: String, required: true },
+    //     amount:                  { type: Number , required: true },
+    //     begins_at:               { type: Date , required: true },
+    //     expires_at:              { type: Date , required: true }
+    //   }],
   },
   { timestamps: { createdAt: 'created_at' } });
 
@@ -79,7 +79,7 @@ exports.getById = (id) => {
   return new Promise((resolve, reject) => {
       Service.findById(id)
           .populate('created_by')
-          .populate('contracts.customer')
+          // .populate('contracts.customer')
           .exec(function (err, result) {
               if (err) {
                   reject(err);
@@ -106,7 +106,7 @@ exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
         Service.find(query)
             .populate('created_by')
-            .populate('contracts.customer')
+            // .populate('contracts.customer')
             .limit(perPage)
             .skip(perPage * page)
             .exec(function (err, services) {

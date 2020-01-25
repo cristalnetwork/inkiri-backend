@@ -134,6 +134,10 @@ exports.typeDefs = `
     description:                String
     amount:                     Float
     state:                      String
+    customers:                  String
+    not_answered:               String
+    other:                      String
+    none:                       String
   }
 
   type ProviderExtra{
@@ -255,9 +259,9 @@ exports.typeDefs = `
     requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
     extrato(page:String, limit:String, account_name: String, requested_type:String, from:String, to:String, provider_id:String, state:String, date_from:String, date_to:String) : [Request]
     
-    service(account_name:String, id:String, serviceCounterId:String):                                    Service
-    services(page:String!, limit:String!, account_name:String, id:String, serviceCounterId:String):      [Service]
-
+    service(account_name:String, id:String, serviceCounterId:String):                                                 Service
+    services(page:String, limit:String, account_name:String, id:String, serviceCounterId:String):                     [Service]
+    servicesWithCustomers(page:String, limit:String, account_name:String, id:String, serviceCounterId:String):        [Service]
     serviceStates: [ServiceState]
 
     team(account_name:String, id:String, teamCounterId:String, created_by:String):                                    Team
@@ -352,6 +356,70 @@ exports.resolvers = {
       const query = queryHelper.serviceQuery(args)
       const res = await ServiceModel.list(query.limit, query.page, query.filter);
       return res;
+    },
+    servicesWithCustomers: async (parent, args, context) => {
+      const query = queryHelper.serviceQuery(args)
+
+      // SOURCE: https://stackoverflow.com/questions/36459983/aggregation-filter-after-lookup
+      const res = await ServiceModel.model.aggregate([
+        { $match: { account_name: args.account_name || context.account_name } }
+        , { $lookup: {
+               from:           'requests',
+               localField:     '_id',
+               foreignField:   'service',
+               as:             'customers'
+            }
+          }
+        , { $unwind: { path: '$customers', preserveNullAndEmptyArrays: true } }
+        // , { $match:  { 'customers.requested_type' : RequestModel.TYPE_SERVICE } }
+        , { 
+            $match: { 
+              $expr: { 
+                $and: [
+                  { $eq: [
+                    {$ifNull: ['$customers.requested_type', RequestModel.TYPE_SERVICE]},
+                    RequestModel.TYPE_SERVICE
+                  ]}, 
+                  
+                ]
+              } 
+            } 
+          }
+        , { $group: {
+              _id:                "$_id"
+              , customers: {
+                "$sum": { $cond: { if:   { $eq : [ '$customers.state', RequestModel.STATE_ACCEPTED ] }, then: 1, else: 0 } }
+              }
+              , not_answered: {
+                "$sum": { $cond: { if:   { $eq : [ '$customers.state', RequestModel.STATE_REQUESTED ] }, then: 1, else: 0 } }
+              }
+              , other: {
+                "$sum": { $cond: { if:   { $ne : [ '$customers.state', RequestModel.STATE_ACCEPTED], 
+                                           $ne : [ '$customers.state', RequestModel.STATE_REQUESTED]  }, then: 1, else: 0 } }
+              }
+              , none: {
+                "$sum": { $cond: { if:   { $eq : [ '$customers.state', null] }, then: 1, else: 0 } }
+              }
+              , created_by:                  { $first : "$created_by"}
+              // , created_by:   { _id:              {$first : "$created_by._id"}
+              //                   , account_name:   {$first : "$created_by.account_name"}
+              //                   , business_name:  {$first : "$created_by.business_name"} }
+              , account_name:                { $first : "$account_name"}         
+              , serviceCounterId:            { $first : "$serviceCounterId"}         
+              , title:                       { $first : "$title"}         
+              , description:                 { $first : "$description"}         
+              , amount:                      { $first : "$amount"}         
+              , state:                       { $first : "$state"}         
+          }
+        }
+        , { $sort: { title : 1} }
+        , { $limit : query.limit}
+        , { $skip  : (query.limit * query.page) }
+        
+      ])
+
+      // return res;
+      return await UserModel.model.populate( res, {path: 'created_by'});
     },
     serviceStates: async (parent, args, context) => {
       return ServiceModel.services_states;
