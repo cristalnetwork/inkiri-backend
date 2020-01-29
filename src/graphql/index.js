@@ -184,6 +184,7 @@ exports.typeDefs = `
     refund_tx_id:               String
     requestCounterId:           Int
     description:                String
+    cancel_reason:              String
     attach_nota_fiscal_id:      String
     attach_boleto_pagamento_id: String
     attach_comprobante_id:      String

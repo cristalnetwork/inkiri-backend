@@ -81,7 +81,8 @@ const requestSchema = new Schema({
     requestCounterId:     { type: Number,  unique : true},
 
     description:          { type: String }, // or MEMO
-
+    cancel_reason:        { type: String }, 
+    
     [exports.ATTACH_NOTA_FISCAL_ID]:       { type: String , default:'' },
     [exports.ATTACH_BOLETO_PAGAMENTO_ID]:  { type: String , default:'' ,
       required: function() {
@@ -193,6 +194,7 @@ const requestSchema = new Schema({
     // *********************************************************************************
     // IUGU payment & issuing
     iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu' },
+
 
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
