@@ -40,15 +40,10 @@ exports.getFolderId = async(folder_name) => {
   return new Promise( (resolve, reject) => {
     drive
       .files.list({
-        //q: "mimeType = 'application/vnd.google-apps.folder' and name = 'dummy'"
         q: "mimeType = 'application/vnd.google-apps.folder' and name = '"+folder_name+"'"
         , fields: 'files(id, name, parents, spaces, driveId, ownedByMe)'
-        // fields => https://developers.google.com/drive/api/v3/reference/files#resource
-        // fields =>
         , parents : [config.google.root_folder_id]
-        // , driveId : config.google.root_folder_id
         , spaces: 'drive'
-        // , corpora: 'drive'
         , includeItemsFromAllDrives:'true'
         , supportsAllDrives:'true'
       }, function (err, result) {
@@ -116,7 +111,7 @@ exports.createFolderSync = (folder_name) => new Promise((resolve, reject) => {
       resource: fileMetadata
       , fields: 'id'
       , parents : [config.google.root_folder_id]
-    }, function (err, result) {
+    }, async function (err, result) {
       console.error(' GoogleDriveHelper >> createFolder err: ', JSON.stringify(err));
       console.error(' GoogleDriveHelper >> createFolder result: ', JSON.stringify(result));
 
@@ -126,6 +121,16 @@ exports.createFolderSync = (folder_name) => new Promise((resolve, reject) => {
       } else {
         // res.send({ok : ' -- createFolder OK.', folder_id:result.id});
         console.log('-- createFolder OK: ', result.data.id);
+
+        const share_file=  await drive.permissions.create({
+          fileId: result.data.id,
+          resource: {
+            role:"reader",
+            type: "anyone",
+            allowFileDiscovery: true
+          }
+        });
+
         resolve(result.data.id);
 
       }
@@ -171,66 +176,119 @@ exports.createSheet = async (json, original_name, account_name, folder_id) => {
   console.log(' -- folder_id: ' , folder_id );
 
   return new Promise( async (resolve, reject) => { 
+          // 1.- Validate if customer's account  folder exists in drive.
           if(!folder_id)
           {
             let my_folder_id = undefined;
             try {
-                my_folder_id = await exports.getFolderId(account);
+                my_folder_id = await exports.getFolderId(account_name);
             } catch (e) {
-              reject({error:' unable to retrieve folder from Google Drive.', message:JSON.stringify(e)});
+              reject({error:' unable to retrieve folder from Google Drive #1.', original:e});
               return;
             }
             if(!my_folder_id){
               try {
+                // 1.1.- Create customer's account folder in drive.
                 my_folder_id = await exports.createFolder(account_name);
               } catch (e) {
-                reject({error:' unable to create folder at Google Drive.', message:JSON.stringify(e)});
+                reject({error:' unable to create folder at Google Drive #2.', original:e});
                 return;
               }
             }
 
-            if(!myfolder_id)
+            if(!my_folder_id)
             {
-              reject({error:' unable to retrieve nor create folder at Google Drive.', message: 'NA'});
+              reject({error:' unable to retrieve nor create folder at Google Drive #3.', message: 'NA'});
               return;
             }
-            folder_id = myfolder_id;
+            folder_id = my_folder_id;
           }
           
           console.log(' -- folder_id: ' , folder_id );
 
+          // 2.- Create sheet
           const sheets = google.sheets({ version: 'v4', auth });
            var request = {
             resource: {
               properties: {
-                  original_name,
-                },
-              values:json
+                  title: original_name,
+                }
             },
             fields: 'spreadsheetId'
           };
-
-          const res = await sheets.spreadsheets.create(request, function(err, result) {
-            if(err)
+          // const res = await sheets.spreadsheets.create(request, function(err, result) {
+          //   if(err)
+          //   {
+          //     console.log(' -- rej#1: ', err);
+          //     reject(err);
+          //     return;
+          //   }
+          //   if(result && ((result.data && result.data.spreadsheetId) || (result.spreadsheetId)) )
+          //   {
+          //     console.log(' -- OK#1: ', result);
+          //     if(result.spreadsheetId)
+          //       resolve(result.spreadsheetId)
+          //     else
+          //       resolve(result.data.id)
+          //     return;
+          //   };
+          //   console.log(' -- rej#2: UNKNOWN');
+          //   reject(new Error("Unable to get uploaded file id."))
+          // });
+          let spreadsheetId = null;
+          try{
+            const res = await sheets.spreadsheets.create(request);
+            if(res && res.data && res.data.spreadsheetId)
             {
-              console.log(' -- rej#1: ', err);
-              reject(err);
-              return;
+              console.log(' -- OK#1: ', res);
+              // resolve(res.data.spreadsheetId)
+              // return;
+              spreadsheetId = res.data.spreadsheetId;
+            };
+          }catch(e1){
+            reject(e1);
+            return;
+          }
+
+          // 3.- Add sharing permission to file (anyone with the link can view)
+          const share_file =  await drive.permissions.create({
+            fileId: spreadsheetId,
+            resource: {
+              role:"reader",
+              type: "anyone",
+              allowFileDiscovery: true
             }
+          });
+          
+          // 4.-  Move file to user's drive folder
+          const moved_file =  await drive.files.update({
+            fileId: spreadsheetId,
+            addParents: folder_id,
+            fields: 'id, parents'
+          });
 
-            if(result && ((result.data && result.data.spreadsheetId) || (result.spreadsheetId)) )
+          // 5.- Write json values
+          const resource = {
+            values:json,
+          };
+
+          try{
+            const res = await sheets.spreadsheets.values.update({
+                            spreadsheetId:      spreadsheetId
+                            , range:            "Sheet1!A1"
+                            , valueInputOption: "RAW"
+                            , resource
+                          });
+            if(res && res.spreadsheetId)
             {
-              console.log(' -- OK#1: ', result);
-              if(result.spreadsheetId)
-                resolve(result.spreadsheetId)
-              else
-                resolve(result.data.id)
+              console.log(' -- OK#1: ', res);
+              resolve(spreadsheetId)
               return;
             };
+          }catch(e1){
+            reject(e1);
+          }
 
-            console.log(' -- rej#2: UNKNOWN');
-            reject(new Error("Unable to get uploaded file id."))
-
-          });
+            
     });
 };
