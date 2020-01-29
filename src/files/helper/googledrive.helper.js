@@ -175,120 +175,127 @@ exports.createSheet = async (json, original_name, account_name, folder_id) => {
   console.log(' -- original_name: ' , original_name);
   console.log(' -- folder_id: ' , folder_id );
 
-  return new Promise( async (resolve, reject) => { 
-          // 1.- Validate if customer's account  folder exists in drive.
-          if(!folder_id)
-          {
-            let my_folder_id = undefined;
-            try {
-                my_folder_id = await exports.getFolderId(account_name);
-            } catch (e) {
-              reject({error:' unable to retrieve folder from Google Drive #1.', original:e});
-              return;
-            }
-            if(!my_folder_id){
-              try {
-                // 1.1.- Create customer's account folder in drive.
-                my_folder_id = await exports.createFolder(account_name);
-              } catch (e) {
-                reject({error:' unable to create folder at Google Drive #2.', original:e});
-                return;
-              }
-            }
+  // 1.- Validate if customer's account  folder exists in drive.
+  if(!folder_id)
+  {
+    let my_folder_id = undefined;
+    try {
+        my_folder_id = await exports.getFolderId(account_name);
+    } catch (e) {
+      // reject({error:' unable to retrieve folder from Google Drive #1.', original:e});
+      // return;
+      return {error:' unable to retrieve folder from Google Drive #1.', original:e};
+    }
+    if(!my_folder_id){
+      try {
+        // 1.1.- Create customer's account folder in drive.
+        my_folder_id = await exports.createFolder(account_name);
+      } catch (e) {
+        // reject({error:' unable to create folder at Google Drive #2.', original:e});
+        // return;
+        return {error:' unable to create folder at Google Drive #2.', original:e};
+      }
+    }
 
-            if(!my_folder_id)
-            {
-              reject({error:' unable to retrieve nor create folder at Google Drive #3.', message: 'NA'});
-              return;
-            }
-            folder_id = my_folder_id;
-          }
-          
-          console.log(' -- folder_id: ' , folder_id );
+    if(!my_folder_id)
+    {
+      // reject({error:' unable to retrieve nor create folder at Google Drive #3.', message: 'NA'});
+      // return;
+      return {error:' unable to retrieve nor create folder at Google Drive #3.', message: 'NA'};
+    }
+    folder_id = my_folder_id;
+  }
+  
+  console.log(' -- folder_id: ' , folder_id );
 
-          // 2.- Create sheet
-          const sheets = google.sheets({ version: 'v4', auth });
-           var request = {
-            resource: {
-              properties: {
-                  title: original_name,
-                }
-            },
-            fields: 'spreadsheetId'
-          };
-          // const res = await sheets.spreadsheets.create(request, function(err, result) {
-          //   if(err)
-          //   {
-          //     console.log(' -- rej#1: ', err);
-          //     reject(err);
-          //     return;
-          //   }
-          //   if(result && ((result.data && result.data.spreadsheetId) || (result.spreadsheetId)) )
-          //   {
-          //     console.log(' -- OK#1: ', result);
-          //     if(result.spreadsheetId)
-          //       resolve(result.spreadsheetId)
-          //     else
-          //       resolve(result.data.id)
-          //     return;
-          //   };
-          //   console.log(' -- rej#2: UNKNOWN');
-          //   reject(new Error("Unable to get uploaded file id."))
-          // });
-          let spreadsheetId = null;
-          try{
-            const res = await sheets.spreadsheets.create(request);
-            if(res && res.data && res.data.spreadsheetId)
-            {
-              console.log(' -- OK#1: ', res);
-              // resolve(res.data.spreadsheetId)
-              // return;
-              spreadsheetId = res.data.spreadsheetId;
-            };
-          }catch(e1){
-            reject(e1);
-            return;
-          }
+  // 2.- Create sheet
+  console.log('**************** 2.- Create sheet')
+  const sheets = await google.sheets({ version: 'v4', auth });
+   var request = {
+    resource: {
+      properties: {
+          title: original_name,
+        }
+    },
+    fields: 'spreadsheetId'
+  };
 
-          // 3.- Add sharing permission to file (anyone with the link can view)
-          const share_file =  await drive.permissions.create({
-            fileId: spreadsheetId,
-            resource: {
-              role:"reader",
-              type: "anyone",
-              allowFileDiscovery: true
-            }
-          });
-          
-          // 4.-  Move file to user's drive folder
-          const moved_file =  await drive.files.update({
-            fileId: spreadsheetId,
-            addParents: folder_id,
-            fields: 'id, parents'
-          });
+  let spreadsheetId = null;
+  
+  try{
+    const res = await sheets.spreadsheets.create(request);
+    if(res && res.data && res.data.spreadsheetId)
+    {
+      console.log(' -- OK#1: ', res);
+      spreadsheetId = res.data.spreadsheetId;
+    };
+  }catch(e1){
+    // reject(e1);
+    // return;
+    return {error:e1};
+  }
 
-          // 5.- Write json values
-          const resource = {
-            values:json,
-          };
+  // 3.- Add sharing permission to file (anyone with the link can view)
+  console.log('**************** 3.- Add sharing permission to file')
+  let share_file = null;
+  try{
+    share_file = await drive.permissions.create({
+      fileId: spreadsheetId,
+      resource: {
+        role:"reader",
+        type: "anyone",
+        allowFileDiscovery: true
+      }
+    });
+  }
+  catch(e){
+    return {error:e};
+  }
+  
+  
+  // 4.-  Move file to user's drive folder
+  console.log('**************** 4.-  Move file to users drive folder')
+  let moved_file = null;
+  try{
+    moved_file = await drive.files.update({
+      fileId: spreadsheetId,
+      addParents: folder_id,
+      fields: 'id, parents'
+    });
+  }
+  catch(e){
+    return {error:e};
+  }
+  
+  // 5.- Write json values
+  console.log('**************** 5.-  Write json values')
+  const resource = {
+    values:json,
+  };
 
-          try{
-            const res = await sheets.spreadsheets.values.update({
-                            spreadsheetId:      spreadsheetId
-                            , range:            "Sheet1!A1"
-                            , valueInputOption: "RAW"
-                            , resource
-                          });
-            if(res && res.spreadsheetId)
-            {
-              console.log(' -- OK#1: ', res);
-              resolve(spreadsheetId)
-              return;
-            };
-          }catch(e1){
-            reject(e1);
-          }
+  try{
+    const res = await sheets.spreadsheets.values.update({
+                    spreadsheetId:      spreadsheetId
+                    , range:            "Sheet1!A1"
+                    , valueInputOption: "RAW"
+                    , resource
+                  });
+    console.log(' -- retornoo.....: ', res);
+    if(res && res.status==200)
+    {
+      console.log(' -- OK#2: ');
+      // resolve(spreadsheetId)
+      // return;
+      return {spreadsheetId:spreadsheetId}
+    }
+    else{
+      console.log(' -- ERROR???#FINAL: ');
+      return {error:res.data.error||'NO SE QUE PASO'}
+    }
+  }catch(e2){
+    // reject(e2);
+    return {error:e2};
+  }
 
             
-    });
 };

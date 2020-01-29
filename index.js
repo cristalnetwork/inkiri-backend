@@ -50,7 +50,8 @@ app.use(`${config.api_version}/graphiql`, ExpressGraphQL({
     graphiql:   true
 }));
 
-const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }) => {
+const apollo_server = new ApolloServer({ typeDefs, resolvers , 
+  context: ({ req }) => {
     
     let jwt = null;
     try{
@@ -74,6 +75,23 @@ const apollo_server = new ApolloServer({ typeDefs, resolvers , context: ({ req }
       , is_admin:   is_admin
     }
   }
+  // ,
+
+  // formatResponse: (response, requestContext) => {
+  //   //return response
+
+  //   const userId = requestContext.context.user.id
+
+  //   response = Object.assign(response, {
+  //     extensions: {
+  //       meta: {
+  //         userId: userId
+  //       }
+  //     }
+  //   }
+
+  //   return response
+  // }
 });
 
 const path = `${config.api_version}/graphql`;
