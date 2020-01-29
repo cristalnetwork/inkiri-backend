@@ -7,9 +7,13 @@ const ServiceModel  = require('../services/models/services.model');
 const TeamModel     = require('../teams/models/teams.model');
 const ConfigModel   = require('../configuration/models/configuration.model');
 
+const GoogleDriveHelper     = require('../files/helper/googledrive.helper');
+
 const queryHelper   = require('./query-helper');
 // const { buildSchema }          = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools');
+
+const moment        = require('moment');
 
 /*
   type JobPosition{
@@ -257,8 +261,8 @@ exports.typeDefs = `
   
     maxRequestId:                                   Int
     request(id:String, requestCounterId:Int):    Request
-    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
-    extrato(page:String, limit:String, account_name: String, requested_type:String, from:String, to:String, provider_id:String, state:String, date_from:String, date_to:String) : [Request]
+    requests(export:Boolean, account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
+    extrato(export:Boolean, page:String, limit:String, account_name: String, requested_type:String, from:String, to:String, provider_id:String, state:String, date_from:String, date_to:String) : [Request]
     
     service(account_name:String, id:String, serviceCounterId:String):                                                 Service
     services(page:String, limit:String, account_name:String, id:String, serviceCounterId:String):                     [Service]
@@ -334,6 +338,8 @@ exports.resolvers = {
       // console.log(' ## graphql-server::requests-filter:', query.filter);
       const res = await RequestModel.list(query.limit, query.page, query.filter);
       // console.log(res);
+      if(args.export)
+        return returnSheet(res, context.account_name, 'requests') ;  
       return res;
     },
     
@@ -341,7 +347,8 @@ exports.resolvers = {
       const query = queryHelper.extratoQuery(context, args)
       console.log(' ## graphql-server::extrato-query:', query.filter);
       const res = await RequestModel.list(query.limit, query.page, query.filter);
-      // console.log(res);
+      if(args.export)
+        return returnSheet(res, context.account_name, 'extrato') ;
       return res;
     },
     
@@ -552,6 +559,18 @@ exports.resolvers = {
 
   },
 };
+
+const returnSheet = async (json, account_name, path) => {
+  const my_account_name = account_name || 'cristaltoken';
+  const file_name = `${moment().format('YYYY-MM-DD_HH-mm-ss')}.${path}.${my_account_name}`;
+  GoogleDriveHelper.createSheet(json, file_name, my_account_name)
+    .then((data) => {
+      return data;
+    }, (err)=>{
+      return err;
+    })
+  
+}
 
 // Define a schema
 exports.schema = makeExecutableSchema({

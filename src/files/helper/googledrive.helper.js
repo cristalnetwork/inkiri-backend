@@ -164,3 +164,73 @@ exports.uploadFile = async (bytes, original_name, folder_id) => {
         })
     });
 };
+
+exports.createSheet = async (json, original_name, account_name, folder_id) => {
+  console.log(' GoogleDriveHelper::createSheet: ' )
+  console.log(' -- original_name: ' , original_name);
+  console.log(' -- folder_id: ' , folder_id );
+
+  return new Promise( async (resolve, reject) => { 
+          if(!folder_id)
+          {
+            let my_folder_id = undefined;
+            try {
+                my_folder_id = await exports.getFolderId(account);
+            } catch (e) {
+              reject({error:' unable to retrieve folder from Google Drive.', message:JSON.stringify(e)});
+              return;
+            }
+            if(!my_folder_id){
+              try {
+                my_folder_id = await exports.createFolder(account_name);
+              } catch (e) {
+                reject({error:' unable to create folder at Google Drive.', message:JSON.stringify(e)});
+                return;
+              }
+            }
+
+            if(!myfolder_id)
+            {
+              reject({error:' unable to retrieve nor create folder at Google Drive.', message: 'NA'});
+              return;
+            }
+            folder_id = myfolder_id;
+          }
+          
+          console.log(' -- folder_id: ' , folder_id );
+
+          const sheets = google.sheets({ version: 'v4', auth });
+           var request = {
+            resource: {
+              properties: {
+                  original_name,
+                },
+              values:json
+            },
+            fields: 'spreadsheetId'
+          };
+
+          const res = await sheets.spreadsheets.create(request, function(err, result) {
+            if(err)
+            {
+              console.log(' -- rej#1: ', err);
+              reject(err);
+              return;
+            }
+
+            if(result && ((result.data && result.data.spreadsheetId) || (result.spreadsheetId)) )
+            {
+              console.log(' -- OK#1: ', result);
+              if(result.spreadsheetId)
+                resolve(result.spreadsheetId)
+              else
+                resolve(result.data.id)
+              return;
+            };
+
+            console.log(' -- rej#2: UNKNOWN');
+            reject(new Error("Unable to get uploaded file id."))
+
+          });
+    });
+};
