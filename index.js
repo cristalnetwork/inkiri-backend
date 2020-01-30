@@ -75,23 +75,6 @@ const apollo_server = new ApolloServer({ typeDefs, resolvers ,
       , is_admin:   is_admin
     }
   }
-  // ,
-
-  // formatResponse: (response, requestContext) => {
-  //   //return response
-
-  //   const userId = requestContext.context.user.id
-
-  //   response = Object.assign(response, {
-  //     extensions: {
-  //       meta: {
-  //         userId: userId
-  //       }
-  //     }
-  //   }
-
-  //   return response
-  // }
 });
 
 const path = `${config.api_version}/graphql`;
@@ -100,12 +83,3 @@ apollo_server.applyMiddleware({ app , path});
 app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);
 });
-
-// if(process.env.MONGODB_URI)
-    // app.listen(PORT, function () {
-    //     console.log('app listening at port %s', config.port);
-    // });
-// else
-//     app.listen(PORT, '0.0.0.0', function () {
-//         console.log('app listening at port %s', config.port);
-//     });

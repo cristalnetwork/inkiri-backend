@@ -580,7 +580,7 @@ const returnSheet = async (json, account_name, path) => {
   const file_name = `${moment().format('YYYY-MM-DD_HH-mm-ss')}.${path}.${my_account_name}`;
   
   if(!json || !Array.isArray(json) || json.length==0)
-    return 'NO RESULTS FOR QUERY';
+    return {file_id:'', error:'NO RESULTS FOR QUERY'};
 
   let content = [];
   let header  = [];
@@ -591,7 +591,7 @@ const returnSheet = async (json, account_name, path) => {
     Object.values(flatten(element)).map(val=> val?val.toString():'' )
   )
   content = [header, ...values]
-  console.log(content);
+  // console.log(content);
 
   const response = await GoogleDriveHelper.createSheet(content, file_name, my_account_name);
   if(response.error)
