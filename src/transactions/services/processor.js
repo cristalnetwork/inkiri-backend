@@ -57,6 +57,15 @@ exports.process = async () => {
 
   for(var i = 0; i<actions.length;i++)
   { 
+
+    if(!action)
+      continue;
+
+    const tx_to_processing_state = await TxsModel.model.findOneAndUpdate(
+      {_id: action.tx._id}
+      , {state: TxsModel.STATE_PROCESSING}
+    );
+
     const action     = actions[i];
 
     if(!action || !action.context)
