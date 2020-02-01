@@ -1,4 +1,4 @@
-const base64Helper      = require('base64-helper');
+const base64Helper      = require('./base64-helper');
 
 (async () => {
   
@@ -6,6 +6,10 @@ const base64Helper      = require('base64-helper');
     return;
 
   var args = process.argv.slice(2)
-  console.log(args)
+  
+  console.log (base64Helper.toBase64(args[0]));
+
+  return process.exit(0);
+
 })();
 

@@ -2,32 +2,55 @@ const fetch             = require('node-fetch');
 const IuguModel         = require('../models/iugu.model');
 const UserModel         = require('../../users/models/users.model');
 const config            = require('../../common/config/env.config.js');
-const base64Helper      = require('base64-helper');
+const base64Helper      = require('./base64-helper');
+var moment              = require('moment');
+
 var iugu_config         = null;
 try {
     iugu_config         = require('../../common/config/iugu.config.js');
-} catch (ex) {}
+} catch (ex) {
+    
+    iugu_config = {
+      IUGU_ACCOUNTS   : [
+        {
+          key     : "INSTITUTO"
+          , token : process.env.IUGU_INSTITUTO_TOKEN
+        },
+        {
+          key     : "EMPRESA"
+          , token : process.env.IUGU_EMPRESA_TOKEN
+        }
+      ]
+      , ISSUER_KEY      : process.env.IUGU_ISSUER_KEY
+    }
+    
+}
 
-const iugu_token       = process.env.IUGU_TOKEN || iugu_config.prod.token;
+// const iugu_token       = process.env.IUGU_TOKEN || iugu_config.prod.token;
+// const auth             = base64Helper.toBase64(iugu_token);
+
 const issuer           = require('./issuer');
-
-var moment             = require('moment');
-
-const auth             = base64Helper.toBase64(iugu_token);
 
 const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
 
-const LogModel         = require('../../iugu_log/models/iugu_log.model');
-const log = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs) => {
+const LogModel = require('../../iugu_log/models/iugu_log.model');
+const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs) => {
   LogModel.createEx(ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs);
 }
 
-exports.importAndSave = async () => {  
+/* *************************************************************** */
+/* *************************************************************** */
+/* MULTI ACCOUNT IMPORTER **************************************** */
+
+exports.importAll = async () => {  
   try{
-    const result = await importImpl();
-    if(!result || !result.items)
-      return {};
-    const result2 = await saveImpl(result.items);
+    const importPromises = iugu_config.map((account) => {
+      return importAccountImpl(account);  
+    });
+    const importResults = await Promise.all(importPromises);
+    
+    const savePromises  = await saveImpl(result.items);
+    
     return {...result2, qs:result.qs};
   }
   catch(e){
@@ -65,6 +88,8 @@ const importAccountImpl = async (account) => {
     //Um hash sendo a chave o nome do campo para ordenação e o valor sendo DESC ou ASC para descendente e ascendente, respectivamente. ex1: sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
     //  https://api.iugu.com/v1/invoices?limit=100&start=0&paid_at_from=2019-11-01T00:00:00-03:00&paid_at_to=2019-11-10T23:59:59-03:00&status_filter=paid
     const qs_string = '?' + Object.keys(qs).map(key => `${key}=${qs[key]}`).join('&')
+
+    // REMEMBER: auth = base64Helper.toBase64(iugu_token);
     const options   = { method: method, headers: { Authorization: auth }};
 
     const response     = await fetch(url+qs_string, options);
@@ -76,43 +101,59 @@ const importAccountImpl = async (account) => {
     return ({items:responseJSON.items, qs:qs});
 }
 
-exports.import = async () => importImpl();
 
-const importImpl = async () => {
+exports.saveAccountInvoices = async (account, invoices) => saveAccountInvoicesImpl(account, invoices);
 
-    let from = moment().subtract(1, 'days');
-    // let from = moment().subtract(8, 'days');
+const saveAccountInvoicesImpl = async (account, raw_invoices) => {
+  
+  const _filtered_raw_invoices = raw_invoices
+                    .filter(raw_invoice => raw_invoice.status=='paid');
 
-    const lastImported = await IuguModel.lastImportedOrNull();
+  console.log('iugu-importer::save IUGUs to insert:', JSON.stringify(_filtered_raw_invoices.map(raw_invoice=>raw_invoice.id)))
 
-    if(lastImported)
-      from = lastImported.paid_at;
-    
+  const _already_inserted_invoices    = await IuguModel.model.find({iugu_id: {$in : _filtered_raw_invoices.map(raw_invoice=>raw_invoice.id) }}).exec()
+  
+  // console.log('iugu-importer::saveImpl already inserted IUGUs:', JSON.stringify(_already_inserted_invoices.map(inserted_invoice=>inserted_invoice.iugu_id)))
 
-    const _from_query_param   = moment(from).format(iugu_date_format);
-    console.log('iugu-importer::importIml::_from_query_param => ', _from_query_param);
-    const _now_query_param    = moment().format(iugu_date_format)
-    const url     = config.iugu.api.endpoint + '/invoices';
-    const method  = 'GET';
-    const qs      = { limit :          100
-                      , start :        0
-                      , paid_at_from : _from_query_param
-                      , paid_at_to:    _now_query_param
-                      , status_filter: 'paid'
-                      , 'sortBy[paid_at]' : 'ASC'};
-    //Um hash sendo a chave o nome do campo para ordenação e o valor sendo DESC ou ASC para descendente e ascendente, respectivamente. ex1: sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
-    //  https://api.iugu.com/v1/invoices?limit=100&start=0&paid_at_from=2019-11-01T00:00:00-03:00&paid_at_to=2019-11-10T23:59:59-03:00&status_filter=paid
-    const qs_string = '?' + Object.keys(qs).map(key => `${key}=${qs[key]}`).join('&')
-    const options   = { method: method, headers: { Authorization: auth }};
+  const _already_inserted_invoices_id = _already_inserted_invoices.map(invoice => invoice.iugu_id)
 
-    const response     = await fetch(url+qs_string, options);
-    const responseJSON = await response.json();
+  console.log('iugu-importer::saveImpl already inserted IUGUs:', JSON.stringify(_already_inserted_invoices_id))
 
-    if(!responseJSON || responseJSON.error || responseJSON.errors)
-      return null;
-    
-    return ({items:responseJSON.items, qs:qs});
-}
+  const _built_invoices_p = _filtered_raw_invoices
+      .filter( invoice => !_already_inserted_invoices_id.includes(invoice.id) )
+      .map( (raw_invoice) => buildInvoiceImpl(account, raw_invoice) );
+
+  let _built_invoices = null;
+  try{
+    _built_invoices = await Promise.all(_built_invoices_p);
+  }
+  catch(ex){
+    console.log('iugu-importer::saveImpl ** await Promise.all EXCEPTION:', JSON.stringify(ex))
+  }
+
+  console.log('iugu-importer::saveImpl TO INSERT....  IUGUs:', JSON.stringify(_built_invoices.map(built_invoice=>built_invoice.iugu_id)))
+
+  if(!_built_invoices || _built_invoices.length==0)
+  {
+    // res({error:'NOTHING TO INSERT!'});
+    throw {error:'NOTHING TO INSERT!'}
+  }
+
+  console.log(`iugu-importer::saveImpl ABOUT to insert :: ${_built_invoices.length} invoices.`)
+  try{
+    const result = await IuguModel.model.create(_built_invoices);
+    return {items:result};
+  }
+  catch(e)
+  {
+    console.log('iugu-importer::saveImpl ERROR:: ',  e)
+    throw e;
+  }
+  
+};
+/* *************************************************************** */
+/* *************************************************************** */
+/* *************************************************************** */
 
 exports.getInvoiceAlias = async (alias) => getInvoiceAliasImpl(alias);
 
@@ -125,8 +166,8 @@ const getInvoiceAliasImpl = async (alias) => {
   return({alias:alias, user:user})
 }
 
-exports.buildInvoice = async (raw_invoice) => buildInvoiceImpl(raw_invoice);
-const buildInvoiceImpl = async (raw_invoice) => {
+exports.buildInvoice = async (account, raw_invoice) => buildInvoiceImpl(account, raw_invoice);
+const buildInvoiceImpl = async (account, raw_invoice) => {
 
     let alias_name          = null;
     let error               = null;
@@ -175,6 +216,7 @@ const buildInvoiceImpl = async (raw_invoice) => {
     // console.log('creating my_invoice');
     const my_invoice = {
       iugu_id:                raw_invoice.id
+      , iugu_account:         account
       , amount :              raw_invoice.total_paid_cents/100
       , paid_at:              moment(raw_invoice.paid_at)
       , receipt:              alias_object ? alias_object.user : null
@@ -187,56 +229,6 @@ const buildInvoiceImpl = async (raw_invoice) => {
     return my_invoice;
 
 }
-
-exports.save = async (invoices) => saveImpl(invoices);
-
-const saveImpl = async (raw_invoices) => {
-  
-  const _filtered_raw_invoices = raw_invoices
-                    .filter(raw_invoice => raw_invoice.status=='paid');
-
-  console.log('iugu-importer::saveImpl IUGUs to insert:', JSON.stringify(_filtered_raw_invoices.map(raw_invoice=>raw_invoice.id)))
-
-  const _already_inserted_invoices    = await IuguModel.model.find({iugu_id: {$in : _filtered_raw_invoices.map(raw_invoice=>raw_invoice.id) }}).exec()
-  
-  // console.log('iugu-importer::saveImpl already inserted IUGUs:', JSON.stringify(_already_inserted_invoices.map(inserted_invoice=>inserted_invoice.iugu_id)))
-
-  const _already_inserted_invoices_id = _already_inserted_invoices.map(invoice => invoice.iugu_id)
-
-  console.log('iugu-importer::saveImpl already inserted IUGUs:', JSON.stringify(_already_inserted_invoices_id))
-
-  const _built_invoices_p = _filtered_raw_invoices
-      .filter( invoice => !_already_inserted_invoices_id.includes(invoice.id) )
-      .map( (raw_invoice) => buildInvoiceImpl(raw_invoice) );
-
-  let _built_invoices = null;
-  try{
-    _built_invoices = await Promise.all(_built_invoices_p);
-  }
-  catch(ex){
-    console.log('iugu-importer::saveImpl ** await Promise.all EXCEPTION:', JSON.stringify(ex))
-  }
-
-  console.log('iugu-importer::saveImpl TO INSERT....  IUGUs:', JSON.stringify(_built_invoices.map(built_invoice=>built_invoice.iugu_id)))
-
-  if(!_built_invoices || _built_invoices.length==0)
-  {
-    // res({error:'NOTHING TO INSERT!'});
-    throw {error:'NOTHING TO INSERT!'}
-  }
-
-  console.log(`iugu-importer::saveImpl ABOUT to insert :: ${_built_invoices.length} invoices.`)
-  try{
-    const result = await IuguModel.model.create(_built_invoices);
-    return {items:result};
-  }
-  catch(e)
-  {
-    console.log('iugu-importer::saveImpl ERROR:: ',  e)
-    throw e;
-  }
-  
-};
 
 exports.reProcessInvoice = async (invoice_id) => reProcessInvoiceImpl(invoice_id);
 

@@ -94,6 +94,7 @@ exports.typeDefs = `
   type Iugu{
     _id:                        ID!
     amount:                     Float
+    iugu_account:               String
     iugu_id:                    String
     paid_at:                    String
     receipt:                    User
@@ -286,7 +287,7 @@ exports.typeDefs = `
     provider(id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ):                Provider
 
     iugu(id:String, iugu_id:String):   Iugu
-    iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String):  [Iugu]
+    iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String):  [Iugu]
     
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
