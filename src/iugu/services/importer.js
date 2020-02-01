@@ -2,6 +2,7 @@ const fetch             = require('node-fetch');
 const IuguModel         = require('../models/iugu.model');
 const UserModel         = require('../../users/models/users.model');
 const config            = require('../../common/config/env.config.js');
+const base64Helper      = require('base64-helper');
 var iugu_config         = null;
 try {
     iugu_config         = require('../../common/config/iugu.config.js');
@@ -12,8 +13,8 @@ const issuer           = require('./issuer');
 
 var moment             = require('moment');
 
-const b                = new Buffer.from(iugu_token + ':');
-const auth             = 'Basic ' + b.toString('base64');
+const auth             = base64Helper.toBase64(iugu_token);
+
 const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
 
 const LogModel         = require('../../iugu_log/models/iugu_log.model');
@@ -35,6 +36,44 @@ exports.importAndSave = async () => {
     // rej({error:err});
     return {error:err};
   }
+}
+
+exports.importAccount = async (account) => importAccountImpl(account);
+
+const importAccountImpl = async (account) => {
+
+    let from = moment().subtract(1, 'days');
+    // let from = moment().subtract(8, 'days');
+
+    const lastImported = await IuguModel.lastImportedOrNull();
+
+    if(lastImported)
+      from = lastImported.paid_at;
+    
+
+    const _from_query_param   = moment(from).format(iugu_date_format);
+    console.log('iugu-importer::importIml::_from_query_param => ', _from_query_param);
+    const _now_query_param    = moment().format(iugu_date_format)
+    const url     = config.iugu.api.endpoint + '/invoices';
+    const method  = 'GET';
+    const qs      = { limit :          100
+                      , start :        0
+                      , paid_at_from : _from_query_param
+                      , paid_at_to:    _now_query_param
+                      , status_filter: 'paid'
+                      , 'sortBy[paid_at]' : 'ASC'};
+    //Um hash sendo a chave o nome do campo para ordenação e o valor sendo DESC ou ASC para descendente e ascendente, respectivamente. ex1: sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
+    //  https://api.iugu.com/v1/invoices?limit=100&start=0&paid_at_from=2019-11-01T00:00:00-03:00&paid_at_to=2019-11-10T23:59:59-03:00&status_filter=paid
+    const qs_string = '?' + Object.keys(qs).map(key => `${key}=${qs[key]}`).join('&')
+    const options   = { method: method, headers: { Authorization: auth }};
+
+    const response     = await fetch(url+qs_string, options);
+    const responseJSON = await response.json();
+
+    if(!responseJSON || responseJSON.error || responseJSON.errors)
+      return null;
+    
+    return ({items:responseJSON.items, qs:qs});
 }
 
 exports.import = async () => importImpl();

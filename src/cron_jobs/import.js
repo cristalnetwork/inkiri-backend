@@ -2,8 +2,6 @@ const config       = require('../common/config/env.config.js');
 const importer     = require('../iugu/services/importer');
 const IuguLogModel = require('../iugu_log/models/iugu_log.model');
 
-
-
 (async () => {
 
   console.log('iugu-cron-jobs::import::BEGIN-CRON --------------------------------------------')

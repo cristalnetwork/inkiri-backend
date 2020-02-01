@@ -16,6 +16,7 @@ const Schema = mongoose.Schema;
 const iuguSchema = new Schema({
     amount:               { type: Number },
     iugu_id:              { type: String, unique: true },
+    iugu_account:         { type: String },
     paid_at:              { type: Date },
 
     receipt:              { type: Schema.Types.ObjectId
