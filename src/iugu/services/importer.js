@@ -46,19 +46,29 @@ exports.importAll = async () => {
       return importAccountImpl(iugu_account);  
     });
 
+    console.log('iugu-importer:: log#1 ');
+
     const importResults = await Promise.all(importPromises);
     
+    console.log('iugu-importer:: log#2 ', importResults);
+
     const savePromises  = importResults.map((result, idx) => {
-      if(!result || !result.items)
+      if(!result || !result.items || result.items.length==0)
         return null;
       return saveAccountInvoicesImpl(iugu_config.IUGU_ACCOUNTS[idx], result.items);  
     });
 
+    console.log('iugu-importer:: log#3 ');
+
     const saveResults   = await Promise.all(savePromises);
+
+    console.log('iugu-importer:: log#4 ');
 
     return saveResults.map((res, idx)=>{
       return {...res, qs:importResults[idx].qs};
     })
+
+    console.log('iugu-importer:: log#5 ');
   }
   catch(e){
     console.log('iugu-importer::importAndSave ERROR => ', e);
@@ -110,9 +120,9 @@ const importAccountImpl = async (iugu_account) => {
 }
 
 
-exports.saveAccountInvoices = async (account, invoices) => saveAccountInvoicesImpl(account, invoices);
+exports.saveAccountInvoices = async (iugu_account, invoices) => saveAccountInvoicesImpl(iugu_account, invoices);
 
-const saveAccountInvoicesImpl = async (account, raw_invoices) => {
+const saveAccountInvoicesImpl = async (iugu_account, raw_invoices) => {
   
   const _filtered_raw_invoices = raw_invoices
                     .filter(raw_invoice => raw_invoice.status=='paid');
@@ -129,7 +139,7 @@ const saveAccountInvoicesImpl = async (account, raw_invoices) => {
 
   const _built_invoices_p = _filtered_raw_invoices
       .filter( invoice => !_already_inserted_invoices_id.includes(invoice.id) )
-      .map( (raw_invoice) => buildInvoiceImpl(account, raw_invoice) );
+      .map( (raw_invoice) => buildInvoiceImpl(iugu_account.key, raw_invoice) );
 
   let _built_invoices = null;
   try{
@@ -174,8 +184,8 @@ const getInvoiceAliasImpl = async (alias) => {
   return({alias:alias, user:user})
 }
 
-exports.buildInvoice = async (account, raw_invoice) => buildInvoiceImpl(account, raw_invoice);
-const buildInvoiceImpl = async (account, raw_invoice) => {
+exports.buildInvoice = async (iugu_account, raw_invoice) => buildInvoiceImpl(iugu_account, raw_invoice);
+const buildInvoiceImpl = async (iugu_account, raw_invoice) => {
 
     let alias_name          = null;
     let error               = null;
@@ -224,7 +234,7 @@ const buildInvoiceImpl = async (account, raw_invoice) => {
     // console.log('creating my_invoice');
     const my_invoice = {
       iugu_id:                raw_invoice.id
-      , iugu_account:         account
+      , iugu_account:         iugu_account
       , amount :              raw_invoice.total_paid_cents/100
       , paid_at:              moment(raw_invoice.paid_at)
       , receipt:              alias_object ? alias_object.user : null
@@ -264,7 +274,7 @@ const reProcessInvoiceImpl = async (invoice_id) => {
   let new_invoice_obj = invoice_obj;
   if(!invoice_obj.receipt)
     try {
-      new_invoice_obj = await buildInvoiceImpl (invoice_obj.original);;
+      new_invoice_obj = await buildInvoiceImpl (undefined, invoice_obj.original);;
     } catch (e) {
       const err = `Error while parsing original IUGU invoice. ${JSON.stringify(e)}`;
       console.log('iugu-importer::saveImpl ERROR:: ',  e, err)
