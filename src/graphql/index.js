@@ -289,6 +289,8 @@ exports.typeDefs = `
     iugu(id:String, iugu_id:String):   Iugu
     iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String):  [Iugu]
     
+    export_iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String):  Export
+
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
     
@@ -501,6 +503,17 @@ exports.resolvers = {
         return item;
       });
     },
+
+    export_iugus: async (parent, args, context) => {
+      const query = queryHelper.iuguQuery(args)
+      const res = await IuguModel.list(query.limit, query.page, query.filter);
+      const the_res = res.map( item => {
+        item.original = JSON.stringify(item.original);
+        return item;
+      });
+      return returnSheet(the_res, context.account_name, 'iugus') ;  
+    },
+    
     iuguLog: async (parent, args, context) => {
       const query = queryHelper.iuguLogQuery(args)
       const res = await IuguLogModel.list(1, 0, query.filter);

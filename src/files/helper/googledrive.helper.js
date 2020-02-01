@@ -280,7 +280,7 @@ exports.createSheet = async (json, original_name, account_name, folder_id) => {
                     , valueInputOption: "RAW"
                     , resource
                   });
-    console.log(' -- retornoo.....: ', res);
+    // console.log(' -- retornoo.....: ', res);
     if(res && res.status==200)
     {
       console.log(' -- OK#2: ');
