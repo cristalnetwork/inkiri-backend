@@ -1,7 +1,8 @@
 var local_config         = null;
-try {
-    local_config         = require('./env.cristaltoken.config.js');
-} catch (ex) {}
+
+// try {
+//     local_config         = require('./env.cristaltoken.config.js');
+// } catch (ex) {}
 
 const the_config = {
     "api_version": '/api/v1',

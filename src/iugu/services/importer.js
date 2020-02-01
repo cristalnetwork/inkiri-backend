@@ -26,9 +26,6 @@ try {
     
 }
 
-// const iugu_token       = process.env.IUGU_TOKEN || iugu_config.prod.token;
-// const auth             = base64Helper.toBase64(iugu_token);
-
 const issuer           = require('./issuer');
 
 const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
@@ -44,14 +41,24 @@ const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs)
 
 exports.importAll = async () => {  
   try{
-    const importPromises = iugu_config.map((account) => {
-      return importAccountImpl(account);  
+    
+    const importPromises = iugu_config.IUGU_ACCOUNTS.map( (iugu_account) => {
+      return importAccountImpl(iugu_account);  
     });
+
     const importResults = await Promise.all(importPromises);
     
-    const savePromises  = await saveImpl(result.items);
-    
-    return {...result2, qs:result.qs};
+    const savePromises  = importResults.map((result, idx) => {
+      if(!result || !result.items)
+        return null;
+      return saveAccountInvoicesImpl(iugu_config.IUGU_ACCOUNTS[idx], result.items);  
+    });
+
+    const saveResults   = await Promise.all(savePromises);
+
+    return saveResults.map((res, idx)=>{
+      return {...res, qs:importResults[idx].qs};
+    })
   }
   catch(e){
     console.log('iugu-importer::importAndSave ERROR => ', e);
@@ -61,9 +68,9 @@ exports.importAll = async () => {
   }
 }
 
-exports.importAccount = async (account) => importAccountImpl(account);
+exports.importAccount = async (iugu_account) => importAccountImpl(iugu_account);
 
-const importAccountImpl = async (account) => {
+const importAccountImpl = async (iugu_account) => {
 
     let from = moment().subtract(1, 'days');
     // let from = moment().subtract(8, 'days');
@@ -85,11 +92,12 @@ const importAccountImpl = async (account) => {
                       , paid_at_to:    _now_query_param
                       , status_filter: 'paid'
                       , 'sortBy[paid_at]' : 'ASC'};
-    //Um hash sendo a chave o nome do campo para ordenação e o valor sendo DESC ou ASC para descendente e ascendente, respectivamente. ex1: sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
-    //  https://api.iugu.com/v1/invoices?limit=100&start=0&paid_at_from=2019-11-01T00:00:00-03:00&paid_at_to=2019-11-10T23:59:59-03:00&status_filter=paid
+    
+    // Um hash sendo a chave o nome do campo para ordenação e o valor sendo DESC ou ASC para descendente e ascendente, respectivamente. ex1: sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
+    // https://api.iugu.com/v1/invoices?limit=100&start=0&paid_at_from=2019-11-01T00:00:00-03:00&paid_at_to=2019-11-10T23:59:59-03:00&status_filter=paid
     const qs_string = '?' + Object.keys(qs).map(key => `${key}=${qs[key]}`).join('&')
 
-    // REMEMBER: auth = base64Helper.toBase64(iugu_token);
+    const auth = base64Helper.toBase64(iugu_account.token);
     const options   = { method: method, headers: { Authorization: auth }};
 
     const response     = await fetch(url+qs_string, options);
