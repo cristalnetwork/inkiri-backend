@@ -58,22 +58,17 @@ exports.process = async () => {
   for(var i = 0; i<actions.length;i++)
   { 
 
-    if(!action)
-      continue;
-
-    const tx_to_processing_state = await TxsModel.model.findOneAndUpdate(
-      {_id: action.tx._id}
-      , {state: TxsModel.STATE_PROCESSING}
-    );
-
-    const action     = actions[i];
-
     if(!action || !action.context)
     {
       console.log(` == Action ${i}/${actions.length} is not configured. Continuing...`);
       console.log(' ====================================================================') 
       continue;
     }
+
+    const tx_to_processing_state = await TxsModel.model.findOneAndUpdate(
+      {_id: action.tx._id}
+      , {state: TxsModel.STATE_PROCESSING}
+    );
 
     console.log(` == RUNNING action ${action.operation_data.tx_type} ${i}/${actions.length}...`);
     const context    = contexts[action.context];
