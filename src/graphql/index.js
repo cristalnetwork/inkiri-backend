@@ -269,7 +269,9 @@ exports.typeDefs = `
   type Query {
     users(page:String, limit:String, balance_status:Int, search_text:String, email:String, account_type:String, account_name:String, id:String, alias:String, last_name:String, business_name:String, bank_name:String, bank_agency:String, bank_cc:String ): [User]
     user(id:String, alias:String, email:String, account_name:String):                User
-  
+    
+    export_users(page:String, limit:String, balance_status:Int, search_text:String, email:String, account_type:String, account_name:String, id:String, alias:String, last_name:String, business_name:String, bank_name:String, bank_agency:String, bank_cc:String ): Export
+
     maxRequestId:                                   Int
     request(id:String, requestCounterId:Int):    Request
     requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
@@ -331,7 +333,11 @@ exports.resolvers = {
       return (Array.isArray(res))?res[0]:res;
     },
 
-
+    export_users: async (parent, args, context) => {
+      const query = queryHelper.usersQuery(args)
+      const res = await UserModel.list(query.limit, query.page, query.filter);
+      return returnSheet(res, context.account_name, 'users') ;  
+    },
     /* 
     *  REQUESTS 
     */
