@@ -211,11 +211,11 @@ exports.listBankBalances = async (account_names_array) => {
     const currency_token = config.eos.token.contract;
     const table          = config.eos.bank.table_balances;
     const scopes         = account_names_array.join('|');
-    
+    const server_key     = config.eos.dfuse.server_api_key || process.env.DFUSE_SERVER_API_KEY;
     let balances = null;
     try{
       balances = await stateTablesForScopes(
-          {api_key: config.eos.dfuse.server_api_key, network:config.eos.dfuse.network}
+          {api_key: server_key, network:config.eos.dfuse.network}
           , currency_token
           , account_names_array
           , table);

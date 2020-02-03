@@ -267,7 +267,7 @@ exports.typeDefs = `
   }
 
   type Query {
-    users(page:String!, limit:String!, email:String, account_type:String, account_name:String, id:String, alias:String, last_name:String, business_name:String, bank_name:String, bank_agency:String, bank_cc:String ): [User]
+    users(page:String, limit:String, balance_status:Int, search_text:String, email:String, account_type:String, account_name:String, id:String, alias:String, last_name:String, business_name:String, bank_name:String, bank_agency:String, bank_cc:String ): [User]
     user(id:String, alias:String, email:String, account_name:String):                User
   
     maxRequestId:                                   Int

@@ -62,23 +62,39 @@ const append = (filter, new_filter) => {
 exports.usersQuery  = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {email, account_type, account_name, id, alias, last_name, business_name, bank_name, bank_agency, bank_cc} = args;
+  const {balance_status, search_text, email, account_type, account_name, id, alias, last_name, business_name, bank_name, bank_agency, bank_cc} = args;
 
   let filter = {
     filter:     {},
     or_filter : []
   };
 
-  filter = append(filter, getLikeFilter('email', email) );
+  if(search_text && search_text.trim()!=''){
+    filter.or_filter = [getLikeFilter('account_name', search_text), getLikeFilter('email', search_text), getLikeFilter('business_name', search_text) ];
+  }
+  else{
+    filter = append(filter, getLikeFilter('email', email) );
+    filter = append(filter, getLikeFilter('account_name', account_name) );
+    filter = append(filter, getFilter('_id', id) );
+    filter = append(filter, getLikeFilter('alias', alias) );
+    filter = append(filter, getFilter('last_name', last_name) );
+    filter = append(filter, getLikeFilter('business_name', business_name) );
+    filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
+    filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
+    filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
+  
+  }
+  if(balance_status && balance_status!=0){
+    if(balance_status>0)
+      // filter = append(filter, {balance : {$gte: "$overdraft"}})
+      filter = append(filter, { $expr: { $gte: [ "$balance" , "$overdraft" ] } })
+      
+    else
+      // filter = append(filter, {overdraft : {$gt: "$balance"}})
+    filter = append(filter, { $expr: { $gt: [ "$overdraft" , "$balance" ] } })
+  }
+  
   filter = append(filter, getFilter('account_type', account_type) );
-  filter = append(filter, getLikeFilter('account_name', account_name) );
-  filter = append(filter, getFilter('_id', id) );
-  filter = append(filter, getLikeFilter('alias', alias) );
-  filter = append(filter, getFilter('last_name', last_name) );
-  filter = append(filter, getLikeFilter('business_name', business_name) );
-  filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
-  filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
-  filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
   
   return {
     limit:   limit,
