@@ -70,7 +70,8 @@ exports.usersQuery  = (args) => {
   };
 
   if(search_text && search_text.trim()!=''){
-    filter.or_filter = [getLikeFilter('account_name', search_text), getLikeFilter('email', search_text), getLikeFilter('business_name', search_text) ];
+    filter.or_filter = [getLikeFilter('account_name', search_text), getLikeFilter('email', search_text), getLikeFilter('business_name', search_text)
+      , getLikeFilter('first_name', search_text), getLikeFilter('last_name', search_text), getLikeFilter('legal_id', search_text), getLikeFilter('phone', search_text) ];
   }
   else{
     filter = append(filter, getLikeFilter('email', email) );
