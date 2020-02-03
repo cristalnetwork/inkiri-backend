@@ -36,7 +36,8 @@ exports.import = async () => {
   console.log(' =========== last_block:', last_block)
   // return;
 
-  const cfg   = {api_key: config.eos.dfuse.api_key, network: config.eos.dfuse.network};
+  const server_key     = config.eos.dfuse.server_api_key || process.env.DFUSE_SERVER_API_KEY;
+  const cfg   = {api_key: server_key, network: config.eos.dfuse.network};
   let raw_txs = [];
   
   

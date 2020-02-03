@@ -26,6 +26,7 @@ const the_config = {
             "contract":                "cristaltoken",
             "account":                 "cristaltoken",
             "issuer":                  "cristaltoken",
+            "table_balances":          "accounts",
             "table_customers":         "customer",
             "table_customers_action":  "upsertcust",
             "table_customers_delete":  "erasecust",

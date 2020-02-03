@@ -89,6 +89,9 @@ exports.typeDefs = `
     created_at:                 String
     updated_at:                 String
     userCounterId:              Int
+    balance:                    String
+    overdraft:                  String
+    fee:                        String
   }
   
   type Iugu{

@@ -1,8 +1,9 @@
-const config                     = require('../../common/config/env.config.js');
-const { JsonRpc, RpcError, Api } = require('eosjs');
-const { JsSignatureProvider }    = require('eosjs/dist/eosjs-jssig');
-const fetch = require('node-fetch');
-const { TextEncoder, TextDecoder } = require('util');
+const config                                   = require('../../common/config/env.config.js');
+const { JsonRpc, RpcError, Api }               = require('eosjs');
+const { JsSignatureProvider }                  = require('eosjs/dist/eosjs-jssig');
+const fetch                                    = require('node-fetch');
+const { TextEncoder, TextDecoder }             = require('util');
+const {stateTablesForScopes}                   = require('../../transactions/services/dfuse');
 
 var iugu_config         = null;
 try {
@@ -163,3 +164,78 @@ const pushTX = async (tx) => {
 const formatAmount = (amount) => {
   return Number(amount).toFixed(4) + ' ' + config.eos.token.code;
 }
+
+const parseAmount = (amount) => {
+  return parseFloat(amount.replace(config.eos.token.code, '').trim());
+}
+
+
+exports.listBankAccounts = async () => { 
+  const response = await rpc.get_table_rows({
+    json:           true                 
+    , code:         config.eos.bank.issuer
+    , scope:        config.eos.bank.issuer
+    , table:        config.eos.bank.table_customers
+    , limit:        1000
+    , reverse:      false
+    , show_payer :  false
+  });
+  //response.more
+  return response.rows.map( row => ({
+    account_name:   row.key
+    , fee:          parseAmount(row.fee)
+    , overdraft:    parseAmount(row.overdraft)
+    , account_type: row.account_type
+    , state:        row.state
+  }) );
+}
+
+// exports.listBankBalances = async () => { 
+//   // const response = await rpc.get_table_rows({
+//   //   json:           true                 
+//   //   , code:         config.eos.bank.issuer
+//   //   , scope:        config.eos.bank.issuer
+//   //   , table:        config.eos.bank.table_balances
+//   //   , limit:        1000
+//   //   , reverse:      false
+//   //   , show_payer :  false
+//   // });
+//   // return {balances:response.rows, more:response.more};
+// }
+
+exports.listBankBalances = async (account_names_array) => {
+  
+    // do_log && console.log( ' >>>>>> dfuse::getKeyAccounts >> token ->' , token)
+    const path           = config.eos.dfuse.base_url + '/v0/state/tables/scopes';
+    const method         = 'GET';
+    const currency_token = config.eos.token.contract;
+    const table          = config.eos.bank.table_balances;
+    const scopes         = account_names_array.join('|');
+    
+    let balances = null;
+    try{
+      balances = await stateTablesForScopes(
+          {api_key: config.eos.dfuse.server_api_key, network:config.eos.dfuse.network}
+          , currency_token
+          , account_names_array
+          , table);
+      // balances = await response.json();
+
+    }
+    catch(e){
+      // console.log('ERROR #1', e);
+      // console.log(JSON.stringify(e.details.errors.table));
+      return [];
+    }
+    
+    // console.log(balances)
+    return  (balances.tables.map(row=>{
+            return { account_name : row.scope, 
+                    balance :       ((row.rows&&row.rows.length>0)
+                                      ?parseAmount(row.rows[0].json.balance)
+                                      :0)
+              }
+          } ) );
+        
+}
+

@@ -1,9 +1,8 @@
 global.fetch     = require("node-fetch");
 global.WebSocket = require("ws");
 const {createDfuseClient} = require('@dfuse/client');
-// import { createDfuseClient, DfuseClient } from "@dfuse/client";
 
-const createClient = (api_key, network) => {
+exports.createClient = (api_key, network) => {
   let client = createDfuseClient({
     apiKey:   api_key,
     network:  network
@@ -37,7 +36,7 @@ exports.queryTransactionsBB = async (config, contract, cursor, last_block) => ne
     }
   }`;
 
-  const client = createClient(config.api_key, config.network);
+  const client = exports.createClient(config.api_key, config.network);
 
   try {
     const response = await client.graphql(searchTransactions, {
@@ -95,7 +94,7 @@ exports.queryTransactions = async (config, contract, cursor, last_block) => new 
     }
   }`;
 
-  const client = createClient(config.api_key, config.network);
+  const client = exports.createClient(config.api_key, config.network);
 
   try {
     const response = await client.graphql(searchTransactions, {
@@ -118,6 +117,12 @@ exports.queryTransactions = async (config, contract, cursor, last_block) => new 
 
 });
 
+exports.stateTablesForScopes = async(config, contract, scope, table) => {
+  const client = exports.createClient(config.api_key, config.network);
+  const response = await client.stateTablesForScopes(contract, scope, table);
+  client.release()
+  return response;
+}
 
 exports.quantityToNumber = (value) => {
     if(!value)

@@ -57,6 +57,11 @@ const userSchema = new Schema({
                 agency:           { type:  String, trim:true},
                 cc:               { type:  String, trim:true},
             }],
+
+    balance:          { type: Number},
+    overdraft:        { type: Number},
+    fee:              { type: Number},
+
   },
   { timestamps: { createdAt: 'created_at' } });
 
