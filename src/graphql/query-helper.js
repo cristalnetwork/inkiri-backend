@@ -96,10 +96,12 @@ exports.usersQuery  = (args) => {
   
   filter = append(filter, getFilter('account_type', account_type) );
   
+  const _query = getQuery(filter);
+  // console.log(_query)
   return {
     limit:   limit,
     page:    page,
-    filter:  getQuery(filter)
+    filter:  _query
   };    
 }
 
