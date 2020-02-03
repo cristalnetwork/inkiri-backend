@@ -58,6 +58,8 @@ exports.process = async () => {
   for(var i = 0; i<actions.length;i++)
   { 
 
+    const action     = actions[i];
+
     if(!action || !action.context)
     {
       console.log(` == Action ${i}/${actions.length} is not configured. Continuing...`);
