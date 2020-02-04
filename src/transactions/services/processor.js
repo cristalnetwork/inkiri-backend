@@ -16,15 +16,19 @@ const REQUEST_CONTEXT = 'request';
 const USER_CONTEXT    = 'user';
 const TX_CONTEXT      = 'tx';
 
-exports.process = async () => {  
+exports.process = async (reprocess) => {  
 
   console.log(' =============================================================================');
   console.log(' =====    START PROCESS    ===================================================');
   console.log(' =============================================================================');
 
   // 1.- Get unprocessed txs 
-  const txs = await TxsModel.listUnprocessed(100, 0);
-
+  let txs = []
+  if (!reprocess)
+    txs = await TxsModel.listUnprocessed(100, 0);
+  else
+    txs = await TxsModel.listProcessing(100, 0);
+  
   if(!txs || txs.length==0)
   {
     console.log('Nothing to process!');
@@ -283,15 +287,37 @@ const getAction = async (operation, operation_data, tx) => {
       // MEMO:   'pay|' + request_id + '|' + memo)
       // ACTION: UPDATE ref payment request
       // const pay_account = await UserModel.byAccountNameOrNull(operation.data.to);
-      return {
-        context:    REQUEST_CONTEXT
-        , action:   'findOneAndUpdate'
-        , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
-        , params: { 
-                    amount:         tx.amount
-                    // , state:        RequestModel.STATE_ACCEPTED
-                    , tx_id:        tx.tx_id
-                  }
+      if(helper._at(memo_parts, 1)!=undefined && helper._at(memo_parts, 1)!='undefined')
+        return {
+          context:    REQUEST_CONTEXT
+          , action:   'findOneAndUpdate'
+          , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
+          , params: { 
+                      amount:         tx.amount
+                      // , state:        RequestModel.STATE_ACCEPTED
+                      , tx_id:        tx.tx_id
+                    }
+        }
+      else
+      {
+        const pay_sender   = await UserModel.byAccountNameOrNull(operation.data.from);
+        const pay_receiver = await UserModel.byAccountNameOrNull(operation.data.to);
+        return {
+                context:    REQUEST_CONTEXT
+                , action:   'create'
+                , params:   [{ 
+                            created_by:       pay_sender
+                            , requested_by:   pay_sender
+                            , from:           operation.data.from
+                            , requested_to:   pay_receiver
+                            , to:             operation.data.to
+                            , requested_type: RequestModel.TYPE_PAYMENT
+                            , amount:         tx.amount
+                            , description:    helper._at(memo_parts, 2)
+                            , state:          RequestModel.STATE_ACCEPTED
+                            , tx_id:          tx.tx_id 
+                          }]
+              }
       }
       break;
     case helper.KEY_TRANSFER_SLR:

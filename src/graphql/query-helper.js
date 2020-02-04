@@ -111,7 +111,9 @@ exports.extratoQuery = (context, args) => {
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {requested_type, from, to, provider_id, state, date_from, date_to, wage_filter, account_name} = args;
   
-  const the_account_name = account_name || context.account_name;
+  const the_account_name = context.account_name && context.account_name!=''
+    ?context.account_name
+    :account_name;
 
   let filter = {
     filter:     {},
@@ -179,10 +181,8 @@ exports.extratoQuery = (context, args) => {
         { $and : [ { requested_type : RequestModel.TYPE_SEND },     { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_ACCEPTED] } } ] },
         { $and : [ { requested_type : RequestModel.TYPE_PAD },      { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
         { $and : [ { requested_type : RequestModel.TYPE_SALARY },   { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
-
         { $and : [ { requested_type : RequestModel.TYPE_SALARY },   { from : { $ne: the_account_name } } , { wages : { $elemMatch: {account_name: the_account_name} } } ] }, 
         { $and : [ { requested_type : RequestModel.TYPE_SALARY },   { from : the_account_name  }] }, 
-
         { $and : [ { state : { $in : [RequestModel.STATE_REFUNDED, RequestModel.STATE_REVERTED] } },  { refund_tx_id: {$in : [null, '' ]} }] },
     ];
 

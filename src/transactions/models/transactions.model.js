@@ -169,6 +169,19 @@ const listUnprocessedImpl = async (limit=100, skip=0) => {
   
 }
 
+exports.listProcessing = async (limit=100, skip=0) => listProcessingImpl(limit, skip);
+
+const listProcessingImpl = async (limit=100, skip=0) => {
+  const query = {state : exports.STATE_PROCESSING};
+  return Transaction.find(query)
+            .limit(limit)
+            .skip(skip)
+            .sort({block_num : 1, transactionCounterId: 1, block_timestamp: 1 })
+            .exec()
+  
+}
+
+
 exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
         Transaction.find(query)
