@@ -288,9 +288,11 @@ exports.typeDefs = `
     team(account_name:String, id:String, teamCounterId:String, created_by:String):                                    Team
     teams(page:String!, limit:String!, account_name:String, id:String, teamCounterId:String, created_by:String, member_position:String, member_wage:Float, member_account_name:String, member_name:String):      [Team]
   
-    providers(page:String!, limit:String, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): [Provider]
+    providers(page:String, limit:String, search_text:String, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): [Provider]
     provider(id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ):                Provider
-
+  
+    export_providers(page:String, limit:String, search_text:String, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): Export
+    
     iugu(id:String, iugu_id:String):   Iugu
     iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String):  [Iugu]
     
@@ -491,7 +493,12 @@ exports.resolvers = {
       const res = await ProviderModel.list(query.limit, query.page, query.filter);
       return res;
     },
-    
+    export_providers: async (parent, args, context) => {
+      const query = queryHelper.providerQuery(args)
+      console.log(' ## graphql-server::providers-filter:', query.filter);
+      const res = await ProviderModel.list(query.limit, query.page, query.filter);
+      return returnSheet(res, context.account_name, 'providers') ;  
+    },
     /* 
     *  IUGU 
     */

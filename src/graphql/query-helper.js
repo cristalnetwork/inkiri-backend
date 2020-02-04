@@ -42,7 +42,7 @@ const makeOrFilter = (name1, name2, value) => {
 const getLikeFilter = (name, value) => {
   if(!value || !name)
     return {};
-  return {[name]: {$regex: '.*' + value + '.*'}}
+  return {[name]: {$regex: '.*' + value + '.*',  $options : "i"}}
 }
 
 const getBetweenFilter = (name, from, to) => {
@@ -323,25 +323,31 @@ exports.teamQuery = (args) => {
 exports.providerQuery  = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {id, name, cnpj, email, category, products_services, state, providerCounterId, bank_name, bank_agency, bank_cc} = args;
+  const {search_text, id, name, cnpj, email, category, products_services, state, providerCounterId, bank_name, bank_agency, bank_cc} = args;
   
   let filter = {
     filter:     {},
     or_filter : []
   };
 
-  filter = append(filter, getFilter('_id', id) );
-  filter = append(filter, getLikeFilter('name', name) );
-  filter = append(filter, getLikeFilter('cnpj', cnpj) );
-  filter = append(filter, getLikeFilter('email', email) );
-  filter = append(filter, getLikeFilter('category', category) );
-  filter = append(filter, getLikeFilter('products_services', products_services) );
-  filter = append(filter, getFilter('state', state) );
-  filter = append(filter, getFilter('providerCounterId', providerCounterId) );
+  if(search_text && search_text.trim()!=''){
+    filter.or_filter = [getLikeFilter('email', search_text), getLikeFilter('name', search_text)
+      , getLikeFilter('cnpj', search_text), getLikeFilter('products', search_text), getLikeFilter('category', search_text)];
+  }
+  else{
+    filter = append(filter, getFilter('_id', id) );
+    filter = append(filter, getLikeFilter('name', name) );
+    filter = append(filter, getLikeFilter('cnpj', cnpj) );
+    filter = append(filter, getLikeFilter('email', email) );
+    filter = append(filter, getLikeFilter('category', category) );
+    filter = append(filter, getLikeFilter('products_services', products_services) );
+    filter = append(filter, getFilter('state', state) );
+    filter = append(filter, getFilter('providerCounterId', providerCounterId) );
 
-  filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
-  filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
-  filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
+    filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
+    filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
+    filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
+  }
   
   return {
     limit:   limit,
