@@ -122,32 +122,39 @@ exports.extratoQuery = (context, args) => {
   
   // If one of from/to filters is set, then the other one should be the account_name.
   let account_filter = null;
-  if (from!=''&&to!='') {
+  console.log('********** from:', from)
+  console.log('********** to:', to)
+  if ((from&&to) && from!=''&&to!='') {
     if (from!=the_account_name)
     {
+      console.log('********** EXTRATO#1')
       filter = append(filter, getFilter('from', from) );
       filter = append(filter, getFilter('to', the_account_name) );
     }
     else
       if (to!=the_account_name)
       {
+        console.log('********** EXTRATO#2')
         filter = append(filter, getFilter('from', the_account_name) );
         filter = append(filter, getFilter('to', to) );
       }
   }
   else
-    if (from!='')
+    if (from&&from!='')
     {
+      console.log('********** EXTRATO#3')
       filter = append(filter, getFilter('from', from) );
       filter = append(filter, getFilter('to', the_account_name) );
     }
     else
-      if (to!='')
+      if (to&&to!='')
       {
+        console.log('********** EXTRATO#4')
         filter = append(filter, getFilter('from', the_account_name) );
         filter = append(filter, getFilter('to', to) );
       }
       else{
+        console.log('********** EXTRATO#5')
         filter = append(filter, { $or : [{from: the_account_name}, {to: the_account_name}, {wages : { $elemMatch: {account_name: the_account_name} } }] } );
         // account_filter = { $or : [{from: from}, {to: to}, {wages : { $elemMatch: {account_name: wage_filter} } }] };
       }
