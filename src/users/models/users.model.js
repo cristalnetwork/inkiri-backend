@@ -62,6 +62,8 @@ const userSchema = new Schema({
     overdraft:        { type: Number},
     fee:              { type: Number},
 
+    exists_at_blockchain: { type: Boolean},
+
   },
   { timestamps: { createdAt: 'created_at' } });
 
