@@ -25,7 +25,7 @@ const auth = new google.auth.JWT(
     , GDRIVE_PRIVATE_KEY
     , SCOPES
   );
-
+exports.auth = auth;
 // console.log(' ** process.env.GDRIVE_CLIENT_EMAIL ** >> ', process.env.GDRIVE_CLIENT_EMAIL);
 
 const drive = google.drive({ version: 'v3', auth });
@@ -295,7 +295,10 @@ exports.createSheet = async (json, original_name, account_name, folder_id) => {
   }catch(e2){
     // reject(e2);
     return {error:e2};
-  }
-
-            
+  }            
 };
+
+exports.getSheetReader = async () => {
+  const sheets = await google.sheets({ version: 'v4', auth });
+  return sheets;
+}
