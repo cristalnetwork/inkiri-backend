@@ -33,7 +33,7 @@ module.exports = (rows) => {
         : '';
 
       const seed         = (account_type==UsersModel.ACCOUNT_TYPE_PERSONAL )
-        ?[row[cols_nomes], rows[cols_sobrenomes], email_prefix]
+        ?[row[cols_nomes], row[cols_sobrenomes], email_prefix]
         :[row[cols_nome_projeto]];
 
       const account_name = generateAccountName( seed, account_names_array);
