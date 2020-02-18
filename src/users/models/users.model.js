@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 // if(global.mongoose_connected!==undefined && global.mongoose_connected!=true)
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri, {useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
 
 exports.ACCOUNT_TYPE_NONE       = 'none';
 exports.ACCOUNT_TYPE_PERSONAL   = 'personal';
@@ -63,6 +63,7 @@ const userSchema = new Schema({
     fee:              { type: Number},
 
     exists_at_blockchain: { type: Boolean},
+    public_key:           { type: String},
 
   },
   { timestamps: { createdAt: 'created_at' } });

@@ -3,7 +3,7 @@ const GoogleDriveHelper  = require('../../files/helper/googledrive.helper');
 
 module.exports = async (spreadsheetId, range, values) => {
 
-  console.log('**************** 5.-  Write json values')
+  console.log('**************** Write spreadsheet values', spreadsheetId, range)
   const resource = {
     values:values,
   };
@@ -25,11 +25,12 @@ module.exports = async (spreadsheetId, range, values) => {
       return {spreadsheetId:spreadsheetId}
     }
     else{
-      console.log(' -- ERROR???#FINAL: ');
+      console.log(' -- write spreadsheet ERROR ');
       return {error:res.data.error||'NO SE QUE PASO'}
     }
   }
   catch(e){
+    console.log(' -- write spreadsheet ERROR: ', e);
     return {error:e||'NO SE QUE PASO'}
   }
   

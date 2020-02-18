@@ -238,4 +238,3 @@ exports.listBankBalances = async (account_names_array) => {
           } ) );
         
 }
-

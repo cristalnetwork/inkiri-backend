@@ -14,6 +14,9 @@ const the_config = {
     "environment": "dev",
     "email_domain": "inkiri.com",
     "mongodb_uri": "mongodb://localhost/cristal_dfuse?replicaSet=rs",
+    "mongo" : {
+      "useUnifiedTopology": false
+    },
     "eos" : {
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
