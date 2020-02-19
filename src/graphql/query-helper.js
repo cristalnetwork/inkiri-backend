@@ -178,7 +178,7 @@ exports.extratoQuery = (context, args) => {
   if(!state || state.trim()=='')
     filter = append(filter, { 'state' : { $in : accepted_states } } );
 
-  const accepted_request_types = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_SEND, RequestModel.TYPE_PAD, RequestModel.TYPE_SALARY];
+  const accepted_request_types = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_SEND, RequestModel.TYPE_PAD, RequestModel.TYPE_SALARY, RequestModel.TYPE_ISSUE];
   filter = append(filter, getFilter('requested_type', requested_type, accepted_request_types) );
   if(!requested_type || requested_type.trim()=='')
     filter = append(filter, { 'requested_type' : { $in : accepted_request_types } } );
