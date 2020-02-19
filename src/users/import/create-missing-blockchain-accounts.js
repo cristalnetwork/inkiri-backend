@@ -1,7 +1,7 @@
 const UsersModel    = require('../models/users.model');
-const accounts      = require('./accounts.js');
 const config        = require('../../common/config/env.config.js');
 const createAccount = require('./create-blockchain-accounts-lib');
+const accounts          = require('./accounts.js');
 
 const getNameFromTx = (tx) =>{
   try{
@@ -33,34 +33,34 @@ const arrayNullOrEmpty = (a, check_values) => {
   return false;
 };
 
+const cleanEmail = (email) => {
+  const the_email = email.split(',')[0].trim();
+  const prefix = the_email.split('_')[0];
+  const suffix = the_email.split('!')[1];
+  return prefix+suffix;
+}
 
 (async () => {
 
-  // const process_accounts  = accounts.slice(6, accounts.length);
-  // const process_accounts  = [accounts[5]]
-  const process_accounts  = accounts.filter( account => account.account_type!=UsersModel.ACCOUNT_TYPE_PERSONAL);
-  const promises          = process_accounts.map( (account, idx) => {
+  const missing_accounts = await UsersModel.list(100, 0, {exists_at_blockchain:false, account_name: { $ne: 'xasaflorestx' } } );
+  // const accounts         = await UsersModel.list(150, 0, {exists_at_blockchain:true);
+  
+  const promises          = missing_accounts.map( (account, idx) => {
     try{
       console.log(' -- about to build permissions for ', account.account_name);
       let permissions = null;
       if(account.account_type!=UsersModel.ACCOUNT_TYPE_PERSONAL)
       {
-        const owners = account.email.split(',').map( email => {
-          return accounts.find(
+        const the_email = cleanEmail(account.email);
+        const owners    = accounts.find(
             owner =>  {
-              if(owner.email==email.trim() && owner.account_type==UsersModel.ACCOUNT_TYPE_PERSONAL)
+              if(owner.email==the_email && owner.account_type==UsersModel.ACCOUNT_TYPE_PERSONAL)
                 return true;
               return false;
             }
-          )
-        });
+          );
         console.log(owners)
 
-        // const _owners = owners
-        //   ? ( (owners && Array.isArray(owners))
-        //       ? owners.map(account=>account.account_name)
-        //       : [owners.account_name])
-        //   : null; 
         if(!arrayNullOrEmpty(owners, true))
           permissions={owner:owners.map(account=>account.account_name)};
       }

@@ -9,6 +9,9 @@ const RequestModel  = require('../requests/models/requests.model');
 
 const getFilter = (name, value, allowed_values) => {
   
+  if(typeof value ==='boolean' && name)
+    return {[name]: value};
+
   if(!value || !name)
     return {};
   
@@ -16,7 +19,7 @@ const getFilter = (name, value, allowed_values) => {
     return {[name]: Number(value)};
 
   if (!value.includes(','))
-  return {[name]: value};
+    return {[name]: value};
   
   if (value.includes(',')) 
     // return value.split(',').map(req_item=> {return { [name]: req_item}})
@@ -62,7 +65,7 @@ const append = (filter, new_filter) => {
 exports.usersQuery  = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {balance_status, search_text, email, account_type, account_name, id, alias, last_name, business_name, bank_name, bank_agency, bank_cc} = args;
+  const {balance_status, search_text, email, account_type, account_name, id, alias, last_name, business_name, bank_name, bank_agency, bank_cc, exists_at_blockchain} = args;
 
   let filter = {
     filter:     {},
@@ -83,7 +86,8 @@ exports.usersQuery  = (args) => {
     filter = append(filter, getLikeFilter('bank_accounts.bank_name', bank_name) );
     filter = append(filter, getLikeFilter('bank_accounts.bank_agency', bank_agency) );
     filter = append(filter, getLikeFilter('bank_accounts.bank_cc', bank_cc) );
-  
+    // console.log('exists_at_blockchain ', exists_at_blockchain)
+    filter = append(filter, getFilter('exists_at_blockchain', exists_at_blockchain) );
   }
   if(balance_status && balance_status!=0){
     if(balance_status>0)
