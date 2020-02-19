@@ -184,6 +184,7 @@ exports.extratoQuery = (context, args) => {
     filter = append(filter, { 'requested_type' : { $in : accepted_request_types } } );
   
   const ors_filter = [
+        { $and : [ { requested_type : RequestModel.TYPE_ISSUE  },   { state : RequestModel.STATE_ACCEPTED} ] },
         { $and : [ { requested_type : RequestModel.TYPE_DEPOSIT  }, { state : RequestModel.STATE_ACCEPTED} ] },
         { $and : [ { requested_type : RequestModel.TYPE_EXCHANGE }, { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
         { $and : [ { requested_type : RequestModel.TYPE_PROVIDER }, { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
