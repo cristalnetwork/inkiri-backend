@@ -92,6 +92,8 @@ exports.typeDefs = `
     balance:                    String
     overdraft:                  String
     fee:                        String
+    exists_at_blockchain:       Boolean
+    public_key:                 String
   }
   
   type Iugu{

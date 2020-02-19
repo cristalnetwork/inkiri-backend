@@ -20,7 +20,7 @@ exports.generateAccountName = (seed_array, generated_names) => {
       the_account_name = account_name.slice(0, 12)
     }
     else{
-      the_account_name = (account_name+'000000000000').substring(0, 11) + '1';
+      the_account_name = (account_name+'111111111111').substring(0, 11) + '1';
       // (account_name+'000000000000').slice(0, 12)
     };
   // account_name = (account_name + end_with_map).slice(0, 12);
