@@ -4,7 +4,7 @@ const eosHelper     = require('../../eos/helper/helper.js');
 
 exports.getMissingAccounts = async () => {
   // 1) Get DDBB accounts
-    const accounts  = await UsersModel.list(200, 0, {});
+  const accounts  = await UsersModel.list(200, 0, {});
   
   // 2_ Iterate and verify blockchain existence
   const check_promises = accounts.map(

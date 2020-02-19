@@ -114,6 +114,27 @@ exports.getPermissionsForAccount = async (account_name, permissioner_account, pe
   });
 }
 
+exports.issueInitial = async (to, amount, memo) => {
+
+  const issueAction = {
+    account: config.eos.token.contract,
+    name: "issue",
+    authorization: [
+      {
+        actor:      config.eos.token.account,
+        permission: "active"
+      }
+    ],
+    data: {
+      to:       to,
+      quantity: formatAmount(amount),
+      memo:     ('oft|'+memo)
+    }
+  }
+
+  return pushTX(issueAction);
+
+}
 
 exports.issueIugu = async (to, amount, memo) => {
 

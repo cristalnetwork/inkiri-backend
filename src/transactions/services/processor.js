@@ -212,10 +212,25 @@ const getAction = async (operation, operation_data, tx) => {
         //           }]
       }
       break;
-    // case helper.KEY_ISSUE_OFT:
-    //   return { 
-    //         };
-    //   break;
+    case helper.KEY_ISSUE_OFT:
+      // MEMO: 'iug|'+Iugu.id
+      // ACTION: CREATE request de issue
+      // Nota: we use operation.data.to because the receiver is the user/customer that received the issue.
+      const issued_account = await UserModel.byAccountNameOrNull(operation.data.to);
+      return {
+        context:    REQUEST_CONTEXT
+        , action:   'create'
+        , params:   [{ 
+                    created_by:       issued_account
+                    , requested_by:   issued_account
+                    , from:           operation.data.to
+                    , requested_type: RequestModel.TYPE_ISSUE
+                    , amount:         tx.amount
+                    , state:          RequestModel.STATE_ACCEPTED
+                    , tx_id:          tx.tx_id 
+                  }]
+      }
+      break;
     case helper.KEY_TRANSFER_BCK:
       // MEMO: 'bck|' + request_counter_id + '|' + new_state      (bck|55|state_rejected)
       // ACTION: UPDATE request refundeada

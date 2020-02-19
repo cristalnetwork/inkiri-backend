@@ -15,6 +15,7 @@ exports.TYPE_SERVICE                  = 'type_service';
 exports.TYPE_PAD                      = 'type_pad';
 exports.TYPE_SALARY                   = 'type_salary';
 exports.TYPE_IUGU                     = 'type_iugu';
+exports.TYPE_ISSUE                    = 'type_issue';
 
 exports.STATE_REQUESTED               = 'state_requested';
 exports.STATE_RECEIVED                = 'state_received';
@@ -44,7 +45,7 @@ const requestSchema = new Schema({
     requested_type:       {
                             type: String
                             , enum: [exports.TYPE_DEPOSIT, exports.TYPE_EXCHANGE, exports.TYPE_PAYMENT, exports.TYPE_PROVIDER, exports.TYPE_SEND, exports.TYPE_WITHDRAW, exports.TYPE_SERVICE
-                                    , exports.TYPE_IUGU, exports.TYPE_SALARY, exports.TYPE_PAD]
+                                    , exports.TYPE_IUGU, exports.TYPE_SALARY, exports.TYPE_PAD, exports.TYPE_ISSUE]
                           },
 
     amount:               { type: String },
@@ -344,7 +345,8 @@ const req_types = {
     [exports.TYPE_PROVIDER]:  'PROVIDER PAYMENT',
     [exports.TYPE_SEND]:      'SEND',
     [exports.TYPE_WITHDRAW]:  'WITHDRAW',
-    [exports.TYPE_SERVICE]:   'SERVICE AGREEMENT'
+    [exports.TYPE_SERVICE]:   'SERVICE AGREEMENT',
+    [exports.TYPE_ISSUE]:     'ISSUE',
 }
 
 getHeader = (request) => {
