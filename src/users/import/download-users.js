@@ -28,14 +28,14 @@ const SPREADSHEET_USERS_RANGE  = 'full_users!2:133';
   }
   
   // parse data
-  const final_users           = (await parseUSERs(final_spreadsheet));
+  const final_users           = (await parseUSERs.download(final_spreadsheet));
   if(!final_users || final_users.error)
   {
     console.log('ERROR#2')
     console.log(final_users && final_users.error)
     return process.exit(0);
   }
-  console.log(JSON.stringify(final_users))
+  console.log(JSON.stringify(parseUSERs.sort(final_users)))
   return process.exit(0);
   console.log('Done!');
   return process.exit(0);

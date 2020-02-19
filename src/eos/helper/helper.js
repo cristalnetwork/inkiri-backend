@@ -137,6 +137,8 @@ exports.issueIugu = async (to, amount, memo) => {
 
 }
 
+exports.createAccount = async (tx) => pushTX(tx);
+
 // const pushTX = async (tx, privatekey) => {
 const pushTX = async (tx) => {
   // const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
@@ -151,11 +153,11 @@ const pushTX = async (tx) => {
 	      expireSeconds: 30
 	    }
 	  );
-	  console.log(' InkiriApi::pushTX (then#1) >> ', JSON.stringify(result));
+	  // console.log(' InkiriApi::pushTX (then#1) >> ', JSON.stringify(result));
     return result;
 
 	} catch (e) {
-	  console.log(' InkiriApi::pushTX (error#1) >>  ', JSON.stringify(e));
+	  // console.log(' InkiriApi::pushTX (error#1) >>  ', JSON.stringify(e));
     // throw e.json.error.details[0].message;
     throw e;
 	}

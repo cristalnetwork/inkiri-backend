@@ -18,7 +18,8 @@ const col_idx_overdraft     = 11;
 const col_idx_password      = 12;
 const col_idx_public_key    = 13;
 
-module.exports = (rows) => {
+// module.exports = (rows) => {
+exports.download = (rows) => {
   console.log('Parsing spreadsheet data ...');
   
   const account_types = {
@@ -58,11 +59,11 @@ module.exports = (rows) => {
 exports.sort = (users) => {
   return users.sort((a, b) => {
       if(a.account_type==UsersModel.ACCOUNT_TYPE_PERSONAL) 
-        return 1;
+        return -1;
       if(a.account_type==UsersModel.ACCOUNT_TYPE_BUSINESS &&
         b.account_type!=UsersModel.ACCOUNT_TYPE_PERSONAL) 
-        return 1;
-      return -1;
+        return -1;
+      return 1;
     })
 }
 const nullOrEmpty = (str) => {
