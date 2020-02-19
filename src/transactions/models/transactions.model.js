@@ -13,6 +13,7 @@ exports.STATE_NOT_PROCESSED = 'state_not_processed';
 exports.STATE_PROCESSING    = 'state_processing';
 exports.STATE_PROCESSED     = 'state_processed';
 exports.STATE_ERROR         = 'state_error';
+exports.STATE_UNKNOWN       = 'state_unknown';
 
 const transactionsSchema = new Schema({
     

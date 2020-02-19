@@ -35,18 +35,38 @@ exports.process = async (reprocess) => {
     return;
   }
 
+  const txs_to_freeze = [];
   // 2.- Process 
   const actions = await Promise.all ( txs.map(
       async (tx) => {
         const operation      = tx.trace.topLevelActions[0];
         const operation_data = helper.expand(operation)
+        // if(operation_data && operation_data.tx_type)
+        //   console.log('>>', operation_data.tx_type);
         let action = await getAction(operation, operation_data, tx);
+        if(!action || Object.keys(action).length === 0)
+        {
+          txs_to_freeze.push(tx)
+          return null;
+        }
         action.tx = tx;
         action.operation_data = operation_data;
         return action;
       }
     )
   );
+
+  // console.log(txs_to_freeze);
+  if(txs_to_freeze)
+  {
+    const proms_freeze = txs_to_freeze.map(tx => {
+      return TxsModel.model.findOneAndUpdate(
+            {tx_id: tx.tx_id}
+            , {state: TxsModel.STATE_UNKNOWN});
+    });
+    const res_freeze   = await Promise.all(proms_freeze);
+    // console.log('----------freezed:', res_freeze)
+  }
 
   if(!actions || !Array.isArray(actions) || actions.length==0)
     return null;
@@ -88,9 +108,7 @@ exports.process = async (reprocess) => {
       let update_tx = null;
       if(action.action)
       {
-        console.log(' == Trying to process: ', action.action);
-        console.log(' ==== with params: ', toLog(action.params));
-        console.log(' ==== query:', action.query);
+        console.log(' == Trying to process: ', action.action, ' ==== with params: ', toLog(action.params), ' ==== query:', action.query);
         // console.log(' ====== tx: ', action.tx.block_num);
         // console.log(' ====== ts: ', action.tx.block_timestamp);
 
@@ -119,7 +137,7 @@ exports.process = async (reprocess) => {
       // console.log(' ...........update_tx:', update_tx)
       // console.log(' ...........about to commit')
       const tx_res = await session.commitTransaction()
-      console.log(' commit tx')
+      // console.log(' commit tx')
       console.log(' ====================================================================') 
     } catch (err) {
       console.log(' +++ error:', err)

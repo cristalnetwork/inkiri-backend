@@ -114,7 +114,7 @@ exports.getPermissionsForAccount = async (account_name, permissioner_account, pe
   });
 }
 
-exports.issueInitial = async (to, amount, memo) => {
+exports.issueMoney = async (to, amount, memo) => {
 
   const issueAction = {
     account: config.eos.token.contract,
