@@ -115,10 +115,14 @@ exports.extratoQuery = (context, args) => {
   const limit = args.limit ? parseInt(args.limit) : 100;
   const {requested_type, from, to, provider_id, state, date_from, date_to, wage_filter, account_name} = args;
   
-  const the_account_name = context.account_name && context.account_name!=''
-    ?context.account_name
-    :account_name;
+  // const the_account_name = context.account_name && context.account_name!=''
+  //   ?context.account_name
+  //   :account_name;
 
+  const the_account_name = account_name && account_name!=''
+    ?account_name
+    :context.account_name;
+    
   let filter = {
     filter:     {},
     or_filter : []
