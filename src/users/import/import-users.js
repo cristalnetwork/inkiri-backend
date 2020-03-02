@@ -12,7 +12,7 @@ if (process.env.TEST_RUN === '1') {
 }
 
 const SPREADSHEET_ID           = '1NW0eav806Zx9RBr9MRrqvchL1aNs5opKLmuWJ67mVQU';
-const SPREADSHEET_RANGE        = '3:134';
+const SPREADSHEET_RANGE        = '3:123';
 const SPREADSHEET_UPDATE_RANGE = 'processed!I3';
 const SPREADSHEET_INSERT_RANGE = 'full_users!A2';
 const SPREADSHEET_USERS_RANGE  = 'full_users!2:133';
@@ -41,6 +41,7 @@ const SPREADSHEET_USERS_RANGE  = 'full_users!2:133';
 
   // load spreadsheet
   // const spreadsheet = await getSpreadSheetCSV(process.env.SPREADSHEET_ID, process.env.SPREADSHEET_RANGE);
+  
   const spreadsheet    = await getSpreadSheetCSV(SPREADSHEET_ID, SPREADSHEET_RANGE);
   if(!spreadsheet || spreadsheet.error)
   {
@@ -87,23 +88,24 @@ const SPREADSHEET_USERS_RANGE  = 'full_users!2:133';
     return process.exit(0);
   }
   
+  // PARA CREAR EN BLOCKCHAIN!  
+  // console.log(JSON.stringify(accounts));
 
-  // const accounts_count = accounts.length;
-  // const responses      = accounts.forEach( (account, idx) => {
-  //     const target = Object.assign({}, account); 
-  //     delete account.password;
-  //     if(idx==0)
-  //     {
-  //       return UsersModel.createUser(target) ;
-        
-  //     }
-
-  // });
-
-  // Promise.all(responses.map(response => {
-  //   console.log(response)
-  //   console.log('----------------------------------------')
-  // }))
+  const accounts_count = accounts.length;
+  const responses      = accounts.map( (account, idx) => {
+      const target = Object.assign({}, account); 
+      delete target.password;
+      const email_parts = target.email.split('@')
+      target.email = `${email_parts[0]}_${target.idx}@${email_parts[1]}`;
+      delete target.idx;
+      return UsersModel.createUser(target) ;
+      // if(idx==0)
+      // {
+      //   return UsersModel.createUser(target) ;
+      // }
+  });
+  const result = await Promise.all(responses);
+  console.log(result)
 
   console.log('Done!');
   return process.exit(0);

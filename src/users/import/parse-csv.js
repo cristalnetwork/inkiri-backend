@@ -30,7 +30,7 @@ module.exports = (rows) => {
       const is_personal = account_type==UsersModel.ACCOUNT_TYPE_PERSONAL;
       return{
         idx                   : idx,
-        account_name          : '',
+        account_name          : row[cols_ACCOUNT_NAME],
         alias                 : is_personal?'':row[cols_iugu_alias],
         first_name            : is_personal?row[cols_nomes]:'',
         last_name             : is_personal?row[cols_sobrenomes]:'',
@@ -39,7 +39,7 @@ module.exports = (rows) => {
         business_name         : is_personal?'':row[cols_nome_projeto],
         account_type          : account_type,
         exists_at_blockchain  : false,
-        balance               : 0,
+        balance               : row[cols_balance],
         overdraft             : 0,
         password              : row[cols_PASSWORD]
       }  

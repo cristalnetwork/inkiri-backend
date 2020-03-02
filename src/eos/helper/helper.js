@@ -44,10 +44,10 @@ exports.getCustomerInfo = async (account_name) => {
     , show_payer :  false
   });
   const _found = (response.rows&&response.rows.length>0);
-  if(_found)
-    console.log(' EOSHelper::getCustomerInfo >> ', JSON.stringify(response.rows[0]));
-  else
-    console.log(' EOSHelper::getCustomerInfo >> ', 'NOT FOUND');
+  // if(_found)
+  //   console.log(' EOSHelper::getCustomerInfo >> ', JSON.stringify(response.rows[0]));
+  // else
+  //   console.log(' EOSHelper::getCustomerInfo >> ', 'NOT FOUND');
   return _found?{...response.rows[0]}:undefined;
 }
 
@@ -160,7 +160,7 @@ exports.issueIugu = async (to, amount, memo) => {
 }
 
 exports.createAccount = async (tx) => pushTX(tx);
-
+exports.issue_oft = async (tx) => pushTX(tx);
 // const pushTX = async (tx, privatekey) => {
 const pushTX = async (tx) => {
   // const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });

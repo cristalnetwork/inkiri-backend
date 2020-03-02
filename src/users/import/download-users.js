@@ -12,7 +12,7 @@ if (process.env.TEST_RUN === '1') {
 }
 
 const SPREADSHEET_ID           = '1NW0eav806Zx9RBr9MRrqvchL1aNs5opKLmuWJ67mVQU';
-const SPREADSHEET_RANGE        = '3:134';
+const SPREADSHEET_RANGE        = '3:123';
 const SPREADSHEET_UPDATE_RANGE = 'processed!I3';
 const SPREADSHEET_INSERT_RANGE = 'full_users!A2';
 const SPREADSHEET_USERS_RANGE  = 'full_users!2:133';

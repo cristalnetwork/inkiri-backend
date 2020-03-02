@@ -4,6 +4,8 @@ const config        = require('../../common/config/env.config.js');
 const eosHelper     = require('../../eos/helper/helper.js');
 var   _             = require('lodash');
 
+const CURRENCY_SYMBOL = config.eos.blockchain_currency_symbol;
+
 const formatAmount = (amount) => {
   return Number(amount).toFixed(4) + ' ' + config.eos.token.code;
 }
@@ -14,7 +16,7 @@ const accountDescToId = (account_type_string) =>{
 };
 
 module.exports = async (new_account_name, new_account_public_key, account_type_string, fee, overdraft, permissions) => { 
-  
+    
   const account_type     = accountDescToId(account_type_string);
   const fee_string       = formatAmount(fee);
   const overdraft_string = formatAmount(overdraft);
@@ -123,8 +125,8 @@ module.exports = async (new_account_name, new_account_public_key, account_type_s
     data: {
       from: config.eos.bank.account,
       receiver: new_account_name,
-      stake_net_quantity: '0.2500 EOS',
-      stake_cpu_quantity: '0.2500 EOS',
+      stake_net_quantity: '0.2500 ' + CURRENCY_SYMBOL,
+      stake_cpu_quantity: '0.2500 ' + CURRENCY_SYMBOL,
       transfer: false,
     }
   }

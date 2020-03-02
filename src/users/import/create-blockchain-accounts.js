@@ -36,9 +36,13 @@ const arrayNullOrEmpty = (a, check_values) => {
 
 (async () => {
 
-  // const process_accounts  = accounts.slice(6, accounts.length);
-  // const process_accounts  = [accounts[5]]
-  const process_accounts  = accounts.filter( account => account.account_type!=UsersModel.ACCOUNT_TYPE_PERSONAL);
+  // const created = ['adrianainkir', 'adrianavoivo', 'alinebentobe', 'amandadearea', 'ameliacoelho', 'analucaldasi', 'anapatriciai', 'andrerochadr', 'angelinainki', 'anselmosilva', 'bancoinkirii', 'beatrizproen', 'betaoinkirib', 'brunobarcell', 'brunotambell', 'bryanangeloi', 'cafelotusink', 'casacoracaoi', 'casadapaula1', 'casagolfinho', 'catiaraquelf', 'celesteinkir', 'centroinkiri', 'comunicacaoi', 'construcaoin', 'cristaltoken', 'danielabruce', 'danielecrist', 'daviinkirida', 'diegoinkirii', 'ecologiainki', 'elbiomartini', 'eventosinkir', 'fabiolemosfr', 'fredbeinkiri', 'frutosdaterr', 'gabrielachav', 'gabrielaunib', 'gerardodiazi', 'giselebarbos', 'imersoesinki', 'inkirinetink', 'isabellainki', 'isadoraalves', 'isadoranigos', 'janainainkir', 'jorgeinkirij', 'julianainkir', 'karinainkiri', 'katherinalaw', 'leandroinkir', 'leticiacruni', 'lucianagmota', 'luishenrique', 'mairainkirim', 'marasousaluz', 'marciapeixot', 'mariafernand', 'marianadasne', 'marianascald', 'marinacervel', 'marinacetein', 'marinamonteb', 'matheusbosca', 'mauricioinki', 'melskywalker', 'musicainkiri', 'nataliacarne', 'nataligleice', 'nortontoribi', 'pabloinkirip', 'patriciatrod', 'pedroinkirip', 'peggyinkirip', 'planteinkiri', 'premadvayati', 'premjitendra', 'raelinkirira', 'raphaelorego', 'raquelbragac', 'raquelmirand', 'raqueltaffar', 'restaurantei', 'robertamarti', 'rosarioinkir', 'santiagoling', 'silvinainkir', 'sorayainkiri', 'suianecristi', 'transportesi', 'tutinopablo1', 'vanessainkir', 'viniciustele', 'viniciusvale', 'vitoriapreto', 'yuinkiriysta', 'zaidainkiriz', 'zeluisinkiri' ];
+  const created = [];
+  //1
+  const process_accounts  = accounts.filter( account => account.account_type==UsersModel.ACCOUNT_TYPE_PERSONAL).filter(account=>!created.includes(account.account_name) );
+  //2
+  // const process_accounts  = accounts.filter( account => account.account_type!=UsersModel.ACCOUNT_TYPE_PERSONAL).filter(account=>!created.includes(account.account_name) );
+  
   const promises          = process_accounts.map( (account, idx) => {
     try{
       console.log(' -- about to build permissions for ', account.account_name);

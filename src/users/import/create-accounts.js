@@ -15,8 +15,8 @@ if (process.env.TEST_RUN === '1') {
       const email_parts = target.email.split('@')
       target.email = `${email_parts[0]}_${target.idx}@${email_parts[1]}`;
 
-      delete account.password;
-      delete account.idx;
+      delete target.password;
+      delete target.idx;
       return UsersModel.createUser(target) ;
       
   });

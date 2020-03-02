@@ -25,8 +25,9 @@ module.exports = (users) => {
         : eosAccountName.generateAccountName( seed, account_names_array);
       account_names_array.push(account_name);
       
-      user.account_name = account_name;
-      user.public_key   = eosKeys.getDerivedKey(user.account_name, user.password, false)
+      user.exists_at_blockchain = false;
+      user.account_name         = account_name;
+      user.public_key           = eosKeys.getDerivedKey(user.account_name, user.password, false)
       
       return user;
 

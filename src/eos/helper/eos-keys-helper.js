@@ -9,7 +9,7 @@ const wif     = require('wif');
 // const sha256  = require('js-sha256').sha256;
 
 const derivation_path = "m/44'/194'/0'/0/0";
-const loop_count      = 1000;
+const loop_count      = 10;
 
 exports.getKey = (account_name, password, do_log=true) =>{
   const seed        = account_name + '.' + password;

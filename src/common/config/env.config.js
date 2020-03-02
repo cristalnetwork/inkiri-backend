@@ -19,6 +19,7 @@ const the_config = {
     },
     "eos" : {
         "history_provider": "hyperion",
+        "blockchain_currency_symbol" : "TLOS",
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         // "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
         "blockchain_endpoint": "https://testnet.telosusa.io",
