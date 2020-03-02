@@ -110,26 +110,29 @@ exports.queryTransactions = async (config, _contract, cursor, last_block_or_time
 
 });
 
-exports.getAccountsBalances = async() => {
-  // const client = exports.createClient(config.api_key, config.network);
-  // const response = await client.stateTablesForScopes(contract, scope, table);
-  // client.release()
-  // return response;
-  
-  const response = await rpc.get_table_rows({
-    json:           true
-    , code:         config.eos.bank.account
-    , scope:        config.eos.bank.account
-    , table:        config.eos.bank.table_customers
-    , lower_bound:  '11111111111a'
-    , upper_bound:  'zzzzzzzzzzzz'
-    , limit:        500
-    , reverse:      false
-    , show_payer :  false
-  });
-  return response.rows;
+// exports.getAccountBalance = async (account_name) => {
+//   const response = await rpc.get_currency_balance(config.eos.token.contract, account_name, config.eos.token.code)
+//   return response[0];
 
-}
+//   // const client = exports.createClient(config.api_key, config.network);
+//   // const response = await client.stateTablesForScopes(contract, scope, table);
+//   // client.release()
+//   // return response;
+  
+//   // const response = await rpc.get_table_rows({
+//   //   json:           true
+//   //   , code:         config.eos.bank.account
+//   //   , scope:        config.eos.bank.account
+//   //   , table:        config.eos.bank.table_balances
+//   //   , lower_bound:  '11111111111a'
+//   //   , upper_bound:  'zzzzzzzzzzzz'
+//   //   , limit:        500
+//   //   , reverse:      false
+//   //   , show_payer :  false
+//   // });
+//   // return response.rows;
+
+// }
 
 exports.quantityToNumber = (value) => {
     if(!value)

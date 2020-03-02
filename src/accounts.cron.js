@@ -1,9 +1,6 @@
 const eos_helper    = require('./eos/helper/helper');
 const UserModel     = require('./users/models/users.model');
 
-// POST
-// https://jungle.eos.dfuse.io/v0/state/tables/scopes?account=cristaltoken&scopes=aranadalmiro|biz112345abc|biz212345abc|businesstest|casadetuti12|casafloresta|casagirassol|centroinkiri|cristaltoken|fundo111111a|inkirinet123|isabpaganini|organicvegan|pablotutino2|personaltest|pessoalteste|projetodiego|projetoteste|silvinadayan|tutinopablo1|wawrzeniakdi&table=accounts&json=true
-
 (async () => {
 
   console.log('ABOUT TO FETCH ACCOUNTS')

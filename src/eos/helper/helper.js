@@ -227,43 +227,59 @@ exports.listBankAccounts = async () => {
 //   // return {balances:response.rows, more:response.more};
 // }
 
+exports.getAccountBalance = async (account_name) => {
+  const response = await rpc.get_currency_balance(config.eos.token.contract, account_name, config.eos.token.code)
+  return response[0];
+}
+
 exports.listBankBalances = async (account_names_array) => {
-  
-    // do_log && console.log( ' >>>>>> dfuse::getKeyAccounts >> token ->' , token)
-    const path           = config.eos.dfuse.base_url + '/v0/state/tables/scopes';
-    const method         = 'GET';
-    const currency_token = config.eos.token.contract;
-    const table          = config.eos.bank.table_balances;
-    const scopes         = account_names_array.join('|');
-    const server_key     = config.eos.dfuse.server_api_key || process.env.DFUSE_SERVER_API_KEY;
-    let balances = null;
+
+    // console.log(' ********* HISTORY PROVIDER: [' , config.eos.history_provider, ']')
     try{
-      if(config.eos.history_provider=='dfuse')
-        balances = await dfuse.stateTablesForScopes(
-            {api_key: server_key, network:config.eos.dfuse.network}
-            , currency_token
-            , account_names_array
-            , table);
-      else
-        if(config.eos.history_provider=='hyperion')
-          balances = await hyperion.getAccountsBalances();
-
-      // balances = await response.json();
-
-    }
-    catch(e){
-      // console.log('ERROR #1', e);
-      // console.log(JSON.stringify(e.details.errors.table));
-      return [];
-    }
-    
-    // console.log(balances)
-    return  (balances.tables.map(row=>{
+      if(config.eos.history_provider.trim()=='dfuse')
+      {
+        const path           = config.eos.dfuse.base_url + '/v0/state/tables/scopes';
+        const method         = 'GET';
+        const currency_token = config.eos.token.contract;
+        const table          = config.eos.bank.table_balances;
+        const scopes         = account_names_array.join('|');
+        const server_key     = config.eos.dfuse.server_api_key || process.env.DFUSE_SERVER_API_KEY;
+        
+        const balances = await dfuse.stateTablesForScopes(
+                    {api_key: server_key, network:config.eos.dfuse.network}
+                    , currency_token
+                    , account_names_array
+                    , table);
+        return  (balances.tables.map(row=>{
             return { account_name : row.scope, 
                     balance :       ((row.rows&&row.rows.length>0)
                                       ?parseAmount(row.rows[0].json.balance)
                                       :0)
               }
           } ) );
+      }
+      else
+        if(config.eos.history_provider.trim()=='hyperion')
+        {  
+          console.log('###1')
+          const promises  = account_names_array.map(account_name => exports.getAccountBalance(account_name))
+          console.log('###2')
+          const responses = await Promise.all(promises);
+          console.log('###2')
+          return  responses.map((balance, idx)=>{
+            return { account_name : account_names_array[idx], 
+                    balance       : parseAmount(balance)
+              }
+          } ) ;
+        }
+      // balances = await response.json();
+
+    }
+    catch(e){
+      console.log('ERROR #1', e);
+      // console.log(JSON.stringify(e.details.errors.table));
+      return [];
+    }
+    return [];
         
 }
