@@ -37,7 +37,7 @@ exports.import = async () => {
 
   let raw_txs = [];
   //HACK!!!!!!!!!!!!!!!!
-  last_timestamp = '2020-03-01T01:18:51.500Z';
+  // last_timestamp = '2020-03-01T01:18:51.500Z';
   // **********************************************************************
   // 2nd: Query hyperion historical data service for transactions for account since last timestamp.
   // **********************************************************************
