@@ -2,9 +2,16 @@ const UsersModel    = require('../models/users.model');
 const accounts      = require('./accounts.js');
 const config        = require('../../common/config/env.config.js');
 const issue_oft     = require('./update_overdraft-issue-lib');
-
+const eosHelper     = require('../../eos/helper/helper.js');
 (async () => {
 
+  
+  // const y = await eosHelper.getAccountBalance('auradoacoes1');
+  // const x = await eosHelper.getAccountBalance('cambioinkiri');
+
+  // console.log(x)
+  // console.log(y)
+  
   const process_accounts  = accounts;
   // const process_accounts  = [accounts[0], accounts[1]];
 
