@@ -1,9 +1,7 @@
-const TxsModel       = require('./transactions/models/transactions.model');
-const RequestModel   = require('./requests/models/requests.model');
-
-const importer = require('./transactions/services/importer');
-
-const processor = require('./transactions/services/processor');
+const TxsModel       = require('../../transactions/models/transactions.model');
+const RequestModel   = require('../../requests/models/requests.model');
+const importer       = require('../../transactions/services/importer');
+const processor      = require('../../transactions/services/processor');
 
 const _do = async () => {
   // Import transactions

@@ -91,6 +91,7 @@ const eos_helper    = require('./eos/helper/helper');
   // const balances = await eos_helper.listBankBalances();
   const account_names = accounts.map( account => account.account_name) 
   console.log(' *********** account_names:', account_names)
+  
   const balance_list  = await eos_helper.listBankBalances(account_names);
   console.log('balances:', balance_list)
 

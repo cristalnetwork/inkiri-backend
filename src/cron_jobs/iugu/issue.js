@@ -1,6 +1,6 @@
-const config       = require('../common/config/env.config.js');
-const issuer       = require('../iugu/services/issuer');
-const IuguLogModel = require('../iugu_log/models/iugu_log.model');
+const config       = require('../../common/config/env.config.js');
+const issuer       = require('../../iugu/services/issuer');
+const IuguLogModel = require('../../iugu_log/models/iugu_log.model');
 
 console.log(' -- BEGIN CRON --------------------------------------------')
 issuer.issuePending()
