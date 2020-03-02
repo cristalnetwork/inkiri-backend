@@ -11,7 +11,7 @@ const UserModel     = require('../../users/models/users.model');
   // const balances = await eos_helper.listBankBalances();
   const account_names = accounts.map( account => account.account_name) 
   const balance_list  = await eos_helper.listBankBalances(account_names);
-  console.log('balances:', balance_list)
+  // console.log('balances:', balance_list)
 
   // console.log('DONE!')
   const balances = balance_list.reduce((acc, obj) => { acc[obj.account_name] = obj.balance; return acc; } , {});

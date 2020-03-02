@@ -42,7 +42,8 @@ exports.process = async (reprocess) => {
         const operation      = tx.trace.topLevelActions[0];
         const operation_data = helper.expand(operation)
         // if(operation_data && operation_data.tx_type)
-        //   console.log('>>', operation_data.tx_type);
+        console.log('++ tx >>', JSON.stringify(tx) );
+        console.log('>>', operation_data);
         let action = await getAction(operation, operation_data, tx);
         if(!action || Object.keys(action).length === 0)
         {
@@ -489,6 +490,28 @@ const getAction = async (operation, operation_data, tx) => {
         // memo
       break;
     default:
+      if(operation_data.tx_type.startsWith('transfer_'))
+      {
+        const _sender   = await UserModel.byAccountNameOrNull(operation.data.from);
+        const _receiver = await UserModel.byAccountNameOrNull(operation.data.to);
+        return {
+          context:    REQUEST_CONTEXT
+          , action:   'create'
+          , params:   [{ 
+                      created_by:       _sender
+                      , requested_by:   _sender
+                      , from:           operation.data.from
+                      , requested_to:   _receiver
+                      , to:             operation.data.to
+                      , requested_type: RequestModel.TYPE_SEND
+                      , amount:         tx.amount
+                      , description:    helper._at(memo_parts, 0)
+                      , state:          RequestModel.STATE_ACCEPTED
+                      , tx_id:          tx.tx_id 
+                    }]
+        }
+        break;        
+      }
       return {};
   }
 }

@@ -1,6 +1,5 @@
 const TxsModel     = require('../models/transactions.model');
 const config       = require('../../common/config/env.config.js');
-// const processor    = require('./processor');
 const hyperion        = require('./hyperion');
 
 exports.import = async () => {  
@@ -38,7 +37,7 @@ exports.import = async () => {
 
   let raw_txs = [];
   //HACK!!!!!!!!!!!!!!!!
-  // last_timestamp = '2020-03-01T01:18:51.500Z';
+  last_timestamp = '2020-03-01T01:18:51.500Z';
   // **********************************************************************
   // 2nd: Query hyperion historical data service for transactions for account since last timestamp.
   // **********************************************************************
@@ -78,8 +77,8 @@ exports.import = async () => {
     return;
   }
   try{
-    // const res = await TxsModel.insertMany(my_txs);
-    console.log('............INSERTARIA', JSON.stringify(my_txs));
+    const res = await TxsModel.insertMany(my_txs);
+    // console.log('............INSERTARIA', JSON.stringify(my_txs));
   }
   catch(e){
     console.log(' ******************** Error saving txs :( ', e);

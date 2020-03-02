@@ -70,6 +70,7 @@ const  MEMO_KEY_SLR =  'slr';
 exports.KEY_ISSUE_DEP    =  'issue_'+MEMO_KEY_DEP;
 exports.KEY_ISSUE_IUG    =  'issue_'+MEMO_KEY_IUG;
 exports.KEY_ISSUE_OFT    =  'issue_'+MEMO_KEY_OFT;
+exports.KEY_TRANSFER_    =  'transfer_';
 exports.KEY_TRANSFER_BCK =  'transfer_'+MEMO_KEY_BCK;
 exports.KEY_TRANSFER_WTH =  'transfer_'+MEMO_KEY_WTH;
 exports.KEY_TRANSFER_XCH =  'transfer_'+MEMO_KEY_XCH;
@@ -103,6 +104,7 @@ const typesMap = {
   [exports.KEY_UPSERT_PAP]    : exports.TYPE_UPSERT_PAP,
   [exports.KEY_ERASE_PAP]     : exports.TYPE_ERASE_PAP,
   [exports.KEY_CHARGE_PAP]    : exports.TYPE_CHARGE_PAP,
+  [exports.KEY_TRANSFER_]     : exports.TYPE_SEND,
 }
 const keyCodeToRequestType = (key_code) => {
   const my_type = typesMap[key_code];

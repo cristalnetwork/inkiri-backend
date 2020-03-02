@@ -261,11 +261,8 @@ exports.listBankBalances = async (account_names_array) => {
       else
         if(config.eos.history_provider.trim()=='hyperion')
         {  
-          console.log('###1')
           const promises  = account_names_array.map(account_name => exports.getAccountBalance(account_name))
-          console.log('###2')
           const responses = await Promise.all(promises);
-          console.log('###2')
           return  responses.map((balance, idx)=>{
             return { account_name : account_names_array[idx], 
                     balance       : parseAmount(balance)

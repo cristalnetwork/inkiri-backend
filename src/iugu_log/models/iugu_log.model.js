@@ -120,3 +120,5 @@ exports.removeById = (iugu_logId) => {
         });
     });
 };
+
+exports.model = IuguLog;
