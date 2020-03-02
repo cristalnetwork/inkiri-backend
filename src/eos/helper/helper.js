@@ -3,7 +3,8 @@ const { JsonRpc, RpcError, Api }               = require('eosjs');
 const { JsSignatureProvider }                  = require('eosjs/dist/eosjs-jssig');
 const fetch                                    = require('node-fetch');
 const { TextEncoder, TextDecoder }             = require('util');
-const {stateTablesForScopes}                   = require('../../transactions/services/dfuse');
+const dfuse                                    = require('../../transactions/services/dfuse');
+const hyperion                                 = require('../../transactions/services/hyperion');
 
 var iugu_config         = null;
 try {
@@ -237,11 +238,16 @@ exports.listBankBalances = async (account_names_array) => {
     const server_key     = config.eos.dfuse.server_api_key || process.env.DFUSE_SERVER_API_KEY;
     let balances = null;
     try{
-      balances = await stateTablesForScopes(
-          {api_key: server_key, network:config.eos.dfuse.network}
-          , currency_token
-          , account_names_array
-          , table);
+      if(config.eos.history_provider=='dfuse')
+        balances = await dfuse.stateTablesForScopes(
+            {api_key: server_key, network:config.eos.dfuse.network}
+            , currency_token
+            , account_names_array
+            , table);
+      else
+        if(config.eos.history_provider=='hyperion')
+          balances = await hyperion.getAccountsBalances();
+
       // balances = await response.json();
 
     }

@@ -18,6 +18,7 @@ const the_config = {
       "useUnifiedTopology": false
     },
     "eos" : {
+        "history_provider": "hyperion",
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
         "token": {
@@ -38,7 +39,9 @@ const the_config = {
             "table_paps_delete":       "erasepap",
             "table_paps_charge":       "chargepap"
         },
-
+        "hyperion" :{
+          "history_endpoint" : "https://testnet.telosusa.io"
+        },
         "dfuse" : {
           "api_key"                   : 'web_8a50f2bc42c1df1a41830c359ba74240',
           "network"                   : 'jungle',
@@ -47,8 +50,8 @@ const the_config = {
           "chain_id"                  : 'e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473',
           "websocket_url"             : 'wss://jungle.eos.dfuse.io/v1/stream',
           "default_page_size"         : 25,
-          "tx_url"                    : 'https://jungle.bloks.io/transaction/'
-        }
+        },
+
     },
     "google":{
         "root_folder_id":"1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7"
