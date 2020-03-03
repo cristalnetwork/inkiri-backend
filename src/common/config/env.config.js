@@ -22,7 +22,8 @@ const the_config = {
         "blockchain_currency_symbol" : "TLOS",
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         // "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
-        "blockchain_endpoint": "https://testnet.telosusa.io",
+        // "blockchain_endpoint": "https://testnet.telosusa.io",
+        "blockchain_endpoint": "http://mainnet.telosusa.io",
         "token": {
             "contract":                "cristaltoken",
             "account":                 "cristaltoken",
@@ -42,7 +43,8 @@ const the_config = {
             "table_paps_charge":       "chargepap"
         },
         "hyperion" :{
-          "history_endpoint" : "https://testnet.telosusa.io"
+          //"history_endpoint" : "https://testnet.telosusa.io"
+          "history_endpoint" : "http://mainnet.telosusa.io"
         },
         "dfuse" : {
           "api_key"                   : 'web_8a50f2bc42c1df1a41830c359ba74240',
