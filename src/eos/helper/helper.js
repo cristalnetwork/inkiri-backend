@@ -13,9 +13,9 @@ try {
 
 const iugu_private_key  = process.env.IUGU_ISSUER_PRIVATE_KEY || iugu_config.prod.private_key;
 
-const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+const rpc =               new JsonRpc(config.eos.blockchain_endpoint, { fetch });
 const signatureProvider = new JsSignatureProvider([iugu_private_key]);
-const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
+const api =               new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
 
 const PERMISSION_VIEWER = 'viewer';
 const PERMISSION_PDA    = 'pda';
@@ -162,17 +162,18 @@ exports.issueIugu = async (to, amount, memo) => {
 exports.createAccount = async (tx) => pushTX(tx);
 exports.issue_oft = async (tx) => pushTX(tx);
 // const pushTX = async (tx, privatekey) => {
+
 const pushTX = async (tx) => {
   // const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
   // const signatureProvider = new JsSignatureProvider([iugu_private_key]);
   // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-
+  // console.log(' ---- config.eos.blockchain_endpoint:', config.eos.blockchain_endpoint);
   try {
 	  const result = await api.transact(
 	    { actions: Array.isArray(tx)?tx:[tx] },
 	    {
 	      blocksBehind: 3,
-	      expireSeconds: 30
+	      expireSeconds: 60
 	    }
 	  );
 	  // console.log(' InkiriApi::pushTX (then#1) >> ', JSON.stringify(result));

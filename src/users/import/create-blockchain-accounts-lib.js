@@ -15,48 +15,53 @@ const accountDescToId = (account_type_string) =>{
     return ACCOUNT_TYPES.indexOf(account_type_string);
 };
 
-module.exports = async (new_account_name, new_account_public_key, account_type_string, fee, overdraft, permissions) => { 
+module.exports = async (new_account_name, new_account_public_key, account_type_string, fee, overdraft, permissions, get_tx) => { 
     
   const account_type     = accountDescToId(account_type_string);
   const fee_string       = formatAmount(fee);
   const overdraft_string = formatAmount(overdraft);
   
+  const is_business = account_type_string=='business';
+  const ram         = 4096 ;
+  const net         = is_business? '0.5000' : '0.2500'; 
+  const cpu         = is_business? '1.0000' : '0.5000';
+
   let actions = [];
   
   let newAccountAction = 
     {
-    account:         'eosio',
-    name:            'newaccount',
+    account:             'eosio',
+    name:                'newaccount',
     authorization: [{
-      actor:         config.eos.bank.account,
-      permission:    'active',
+      actor:             config.eos.bank.account,
+      permission:        'active',
     }],
     data: {
-      creator: config.eos.bank.account,
-      name: new_account_name,
+      creator:           config.eos.bank.account,
+      name:              new_account_name,
       owner: {
-        threshold: 1,
+        threshold:       1,
         keys: [{
-          key: new_account_public_key,
-          weight: 1
+          key:           new_account_public_key,
+          weight:        1
         }],
         accounts: [{
           permission: {
-            actor: config.eos.bank.account,
-            permission: "active"
+            actor:       config.eos.bank.account,
+            permission:  "active"
           },
-          weight: 1
+          weight:        1
         }],
-        waits: []
+        waits:           []
       },
       active: {
-        threshold: 1,
+        threshold:       1,
         keys: [{
-          key: new_account_public_key,
-          weight: 1
+          key:           new_account_public_key,
+          weight:        1
         }],
-        accounts: [],
-        waits: []
+        accounts:        [],
+        waits:           []
       },
     },
   };
@@ -70,10 +75,10 @@ module.exports = async (new_account_name, new_account_public_key, account_type_s
       {
         // console.log(' ******* CREATED PERM: ', key)
         newAccountAction.data[key] = {
-          threshold: 1,
-          keys: [],
-          accounts: [],
-          waits: []
+          threshold:   1,
+          keys:        [],
+          accounts:    [],
+          waits:       []
         };
       }
       
@@ -82,10 +87,10 @@ module.exports = async (new_account_name, new_account_public_key, account_type_s
         newAccountAction.data[key].accounts.push(
             {
               permission: {
-                actor: auth_account,
-                permission: "active"
+                actor:       auth_account,
+                permission:  "active"
               },
-              weight: 1
+              weight:        1
             }
           );
       });
@@ -97,55 +102,54 @@ module.exports = async (new_account_name, new_account_public_key, account_type_s
     });
   }
 
-  console.log(JSON.stringify(newAccountAction));
+  // console.log(JSON.stringify(newAccountAction));
 
   const buyRamAction = {
-    account: 'eosio',
-    name: 'buyrambytes',
+    account:                'eosio',
+    name:                   'buyrambytes',
     authorization: [{
-      actor: config.eos.bank.account,
-      permission: 'active',
+      actor:                config.eos.bank.account,
+      permission:           'active',
     }],
     data: {
-      payer: config.eos.bank.account,
-      receiver: new_account_name,
-      // bytes: 8192,
-      bytes: 4096,
+      payer:                config.eos.bank.account,
+      receiver:             new_account_name,
+      bytes:                ram,
     },
   };
   // actions.push(buyRamAction)
 
   const delegateBWAction= {
-    account: 'eosio',
-    name: 'delegatebw',
+    account:                'eosio',
+    name:                   'delegatebw',
     authorization: [{
-      actor: config.eos.bank.account,
-      permission: 'active',
+      actor:                config.eos.bank.account,
+      permission:           'active',
     }],
     data: {
-      from: config.eos.bank.account,
-      receiver: new_account_name,
-      stake_net_quantity: '0.2500 ' + CURRENCY_SYMBOL,
-      stake_cpu_quantity: '0.2500 ' + CURRENCY_SYMBOL,
-      transfer: false,
+      from:                 config.eos.bank.account,
+      receiver:             new_account_name,
+      stake_net_quantity:   net + ' ' + CURRENCY_SYMBOL,
+      stake_cpu_quantity:   cpu + ' ' + CURRENCY_SYMBOL,
+      transfer:             false,
     }
   }
   // actions.push(delegateBWAction)
 
   const createBankAccountAction = {
-    account: config.eos.bank.account,
-    name: config.eos.bank.table_customers_action,
+    account:                config.eos.bank.account,
+    name:                   config.eos.bank.table_customers_action,
     authorization: [{
-      actor:       config.eos.bank.account,
-      permission:  'active',
+      actor:                config.eos.bank.account,
+      permission:           'active',
     }],
     data: {
-      to              : new_account_name
-      , fee           : fee_string
-      , overdraft     : overdraft_string
-      , account_type  : account_type
-      , state         : 1
-      , memo          : ''
+      to              :     new_account_name
+      , fee           :     fee_string
+      , overdraft     :     overdraft_string
+      , account_type  :     account_type
+      , state         :     1
+      , memo          :     ''
     },
   }
   
@@ -172,11 +176,19 @@ module.exports = async (new_account_name, new_account_public_key, account_type_s
 
   actions = [newAccountAction, buyRamAction, delegateBWAction, createBankAccountAction]
   
+  // console.log(' ---- ACTION:');
+  // console.log(JSON.stringify(actions));
+
+  if(get_tx)
+    return actions;
   return eosHelper.createAccount(actions);
   // return newAccountAction;
 }
 
 const getNameFromTx = (tx) =>{
+  console.log('*********** getNameFromTx');
+  console.log(tx);
+  
   try{
     const account_name = tx.processed.action_traces[0].act.data.name;
     console.log(' ---- get name from tx -> ', account_name)
