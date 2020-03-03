@@ -283,21 +283,21 @@ exports.init = async () => {
   exports.createConfiguration(newConfig (the_architect, father, `${father}_another`, 'Another...'));
    
   father = exports.CONFIG_KEY_BANKS ;
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_84` , 'Unicred Norte do Paraná'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_091-4` , 'Unicred Central do Rio Grande do Sul'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_230` , 'Unicard Banco Múltiplo S.A.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_409` , 'UNIBANCO - União de Bancos Brasileiros S.A.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_254` , 'Paraná Banco S.A.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_086-8` , 'OBOE Crédito Financiamento e Investimento S.A.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_753` , 'NBC Bank Brasil S.A. - Banco Múltiplo'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_14` , 'Natixis Brasil S.A. Banco Múltiplo'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_488` , 'JPMorgan Chase Bank'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_79` , 'JBS Banco S.A.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_84` , 'Unicred Norte do Paraná'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_091-4` , 'Unicred Central do Rio Grande do Sul'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_230` , 'Unicard Banco Múltiplo S.A.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_409` , 'UNIBANCO - União de Bancos Brasileiros S.A.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_254` , 'Paraná Banco S.A.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_086-8` , 'OBOE Crédito Financiamento e Investimento S.A.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_753` , 'NBC Bank Brasil S.A. - Banco Múltiplo'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_14` , 'Natixis Brasil S.A. Banco Múltiplo'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_488` , 'JPMorgan Chase Bank'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_79` , 'JBS Banco S.A.'));
   exports.createConfiguration(newConfig (the_architect, father, `${father}_341` , 'Itaú Unibanco S.A.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_652` , 'Itaú Unibanco Holding S.A.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_492` , 'ING Bank N.V.'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_168` , 'HSBC Finance (Brasil) S.A. - Banco Múltiplo'));
-  exports.createConfiguration(newConfig (the_architect, father, `${father}_399` , 'HSBC Bank Brasil S.A. - Banco Múltiplo'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_652` , 'Itaú Unibanco Holding S.A.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_492` , 'ING Bank N.V.'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_168` , 'HSBC Finance (Brasil) S.A. - Banco Múltiplo'));
+  // exports.createConfiguration(newConfig (the_architect, father, `${father}_399` , 'HSBC Bank Brasil S.A. - Banco Múltiplo'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_62` , 'Hipercard Banco Múltiplo S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_64` , 'Goldman Sachs do Brasil Banco Múltiplo S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_751` , 'Dresdner Bank Brasil S.A. - Banco Múltiplo'));
@@ -311,7 +311,7 @@ exports.init = async () => {
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_097-3` , 'Cooperativa Central de Crédito Noroeste Brasileiro Ltda.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_081-7` , 'Concórdia Banco S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_477` , 'Citibank N.A.'));
-  // exports.createConfiguration(newConfig (the_architect, father, `${father}_104` , 'Caixa Econômica Federal'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_104` , 'Caixa Econômica Federal'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_092-2` , 'Brickell S.A. Crédito, financiamento e Investimento'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_70` , 'BRB - Banco de Brasília S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_69` , 'BPN Brasil Banco Múltiplo S.A.'));
@@ -337,7 +337,7 @@ exports.init = async () => {
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_749` , 'Banco Simples S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_743` , 'Banco Semear S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_250` , 'Banco Schahin S.A.'));
-  // exports.createConfiguration(newConfig (the_architect, father, `${father}_33` , 'Banco Santander (Brasil) S.A.'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_33` , 'Banco Santander (Brasil) S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_422` , 'Banco Safra S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_453` , 'Banco Rural S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_72` , 'Banco Rural Mais S.A.'));
@@ -398,7 +398,7 @@ exports.init = async () => {
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_39` , 'Banco do Estado do Piauí S.A. - BEP'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_37` , 'Banco do Estado do Pará S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_47` , 'Banco do Estado de Sergipe S.A.'));
-  // exports.createConfiguration(newConfig (the_architect, father, `${father}_1` , 'Banco do Brasil S.A.'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_1` , 'Banco do Brasil S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_214` , 'Banco Dibens S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_456` , 'Banco de Tokyo-Mitsubishi UFJ Brasil S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_24` , 'Banco de Pernambuco S.A. - BANDEPE'));
@@ -431,7 +431,7 @@ exports.init = async () => {
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_208` , 'Banco BTG Pactual S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_M15` , 'Banco BRJ S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_225` , 'Banco Brascan S.A.'));
-  // exports.createConfiguration(newConfig (the_architect, father, `${father}_237` , 'Banco Bradesco S.A.'));
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_237` , 'Banco Bradesco S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_394` , 'Banco Bradesco Financiamentos S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_204` , 'Banco Bradesco Cartões S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_36` , 'Banco Bradesco BBI S.A.'));
@@ -453,7 +453,7 @@ exports.init = async () => {
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_25` , 'Banco Alfa S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_246` , 'Banco ABC Brasil S.A.'));
   // exports.createConfiguration(newConfig (the_architect, father, `${father}_654 ` , 'Banco A.J.Renner S.A.'));
-  
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_260` , 'Nu Pagamentos')); 
   console.log(' init: OK');
 
   return 'OK';

@@ -1,10 +1,10 @@
-//const credentials   = require('../../common/config/credentials.json');
+
 const {google}      = require('googleapis');
 const config        = require('../../common/config/env.config.js');
 var moment          = require('moment');
 var credentials     = null;
 try {
-    credentials   = require('../../common/config/credentials.json');
+    credentials   = require('../../common/config/drive.credentials.json');
 } catch (ex) {
 
 }

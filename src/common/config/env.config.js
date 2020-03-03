@@ -25,7 +25,8 @@ const the_config = {
         // https://tools.eosmetal.io/nodestatus/telos
         // "blockchain_endpoint": "https://testnet.telosusa.io",
         // "blockchain_endpoint": "http://mainnet.telosusa.io",
-        "blockchain_endpoint": "https://telos.caleos.io", 
+        // "blockchain_endpoint": "https://telos.eoscafeblock.com", 
+        "blockchain_endpoint": "https://telos.caleos.io",
         "token": {
             "contract":                "cristaltoken",
             "account":                 "cristaltoken",
@@ -61,7 +62,8 @@ const the_config = {
 
     },
     "google":{
-        "root_folder_id":"1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7"
+        // "root_folder_id":"1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7" // tuti
+        "root_folder_id":"1GErXOWh7WsTCRRG03qIhZRfKj34lPuTP" // inkiri
     },
     "iugu":
     {

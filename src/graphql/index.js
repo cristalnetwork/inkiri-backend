@@ -367,7 +367,7 @@ exports.resolvers = {
     
     extrato: async (parent, args, context) => {
       const query = queryHelper.extratoQuery(context, args)
-      console.log(' ## graphql-server::extrato-query:', query.filter);
+      // console.log(' ## graphql-server::extrato-query:', query.filter);
       const res = await RequestModel.list(query.limit, query.page, query.filter);
       return res;
     },
@@ -491,13 +491,13 @@ exports.resolvers = {
     },
     providers: async (parent, args, context) => {
       const query = queryHelper.providerQuery(args)
-      console.log(' ## graphql-server::providers-filter:', query.filter);
+      // console.log(' ## graphql-server::providers-filter:', query.filter);
       const res = await ProviderModel.list(query.limit, query.page, query.filter);
       return res;
     },
     export_providers: async (parent, args, context) => {
       const query = queryHelper.providerQuery(args)
-      console.log(' ## graphql-server::providers-filter:', query.filter);
+      // console.log(' ## graphql-server::providers-filter:', query.filter);
       const res = await ProviderModel.list(query.limit, query.page, query.filter);
       return returnSheet(res, context.account_name, 'providers') ;  
     },
@@ -628,10 +628,10 @@ const returnSheet = async (json, account_name, path) => {
   const response = await GoogleDriveHelper.createSheet(content, file_name, my_account_name);
   if(response.error)
   {
-    console.log('--------------ERROR:', response.error)
+    // console.log('--------------ERROR:', response.error)
     return {file_id:'', error: JSON.stringify(response.error)};
   }
-  console.log('----------------------spreadsheetId:', response.spreadsheetId)
+  // console.log('----------------------spreadsheetId:', response.spreadsheetId)
   return {file_id:response.spreadsheetId, error:''};
 }
 
