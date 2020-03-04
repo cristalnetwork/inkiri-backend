@@ -9,7 +9,8 @@ const ConfigModel   = require('../configuration/models/configuration.model');
 
 const GoogleDriveHelper     = require('../files/helper/googledrive.helper');
 
-var flatten = require('flat')
+var   _             = require('lodash');
+var flatten         = require('flat')
 
 const queryHelper   = require('./query-helper');
 // const { buildSchema }          = require('graphql');
@@ -338,8 +339,9 @@ exports.resolvers = {
     },
 
     export_users: async (parent, args, context) => {
-      const query = queryHelper.usersQuery(args)
-      const res = await UserModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.usersQuery(args)
+      const _limit  = query.limit + (query.limit*query.page)
+      const res     = await UserModel.list(_limit, 0, query.filter);
       return returnSheet(res, context.account_name, 'users') ;  
     },
     /* 
@@ -360,26 +362,29 @@ exports.resolvers = {
       return (Array.isArray(res))?res[0]:res;
     },
     requests: async (parent, args, context) => {
-      const query = queryHelper.requestQuery(args)
-      const res = await RequestModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.requestQuery(args)
+      const res     = await RequestModel.list(query.limit, query.page, query.filter);
       return res;
     },
     
     extrato: async (parent, args, context) => {
-      const query = queryHelper.extratoQuery(context, args)
-      // console.log(' ## graphql-server::extrato-query:', query.filter);
-      const res = await RequestModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.extratoQuery(context, args)
+      const res     = await RequestModel.list(query.limit, query.page, query.filter);
       return res;
     },
     
     export_requests: async (parent, args, context) => {
-      const query = queryHelper.requestQuery(args)
-      const res = await RequestModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.requestQuery(args)
+      const _limit  = query.limit + (query.limit*query.page)
+      const res     = await RequestModel.list(_limit, 0, query.filter);
+      // const res = await RequestModel.list(query.limit, query.page, query.filter);
       return returnSheet(res, context.account_name, 'requests') ;  
     },
     export_extrato: async (parent, args, context) => {
-      const query = queryHelper.extratoQuery(context, args)
-      const res = await RequestModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.extratoQuery(context, args)
+      const _limit  = query.limit + (query.limit*query.page)
+      const res     = await RequestModel.list(_limit, 0, query.filter);
+      // const res = await RequestModel.list(query.limit, query.page, query.filter);
       return returnSheet(res, context.account_name, 'extrato') ;
     },
 
@@ -468,13 +473,13 @@ exports.resolvers = {
     *  TEAMS
     */
     team: async (parent, args, context) => {
-      const query = queryHelper.teamQuery(args)
-      const res = await TeamModel.list(1, 0, query.filter, query.populate);
+      const query   = queryHelper.teamQuery(args)
+      const res     = await TeamModel.list(1, 0, query.filter, query.populate);
       return (Array.isArray(res))?res[0]:res;    
     },
     teams: async (parent, args, context) => {
-      const query = queryHelper.teamQuery(args)
-      const res = await TeamModel.list(query.limit, query.page, query.filter, query.populate);
+      const query   = queryHelper.teamQuery(args)
+      const res     = await TeamModel.list(query.limit, query.page, query.filter, query.populate);
       return res;
     },
     // jobPositions: async (parent, args, context) => {
@@ -485,37 +490,37 @@ exports.resolvers = {
     *  PROVIDER 
     */
     provider: async (parent, args, context) => {
-      const query = queryHelper.providerQuery(args)
-      const res = await ProviderModel.list(1, 0, query.filter);
+      const query   = queryHelper.providerQuery(args)
+      const res     = await ProviderModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
     providers: async (parent, args, context) => {
-      const query = queryHelper.providerQuery(args)
-      // console.log(' ## graphql-server::providers-filter:', query.filter);
-      const res = await ProviderModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.providerQuery(args)
+      const res     = await ProviderModel.list(query.limit, query.page, query.filter);
       return res;
     },
     export_providers: async (parent, args, context) => {
-      const query = queryHelper.providerQuery(args)
-      // console.log(' ## graphql-server::providers-filter:', query.filter);
-      const res = await ProviderModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.providerQuery(args)
+      const _limit  = query.limit + (query.limit*query.page)
+      const res     = await ProviderModel.list(_limit, 0, query.filter);
+      // const res     = await ProviderModel.list(query.limit, query.page, query.filter);
       return returnSheet(res, context.account_name, 'providers') ;  
     },
     /* 
     *  IUGU 
     */
     iugu: async (parent, args, context) => {
-      const query = queryHelper.iuguQuery(args)
-      const res = await IuguModel.list(1, 0, query.filter);
-      const __res = res.map( item => {
+      const query   = queryHelper.iuguQuery(args)
+      const res     = await IuguModel.list(1, 0, query.filter);
+      const __res   = res.map( item => {
         item.original = JSON.stringify(item.original);
         return item;
       })
       return (Array.isArray(__res))?__res[0]:__res;
     },
     iugus: async (parent, args, context) => {
-      const query = queryHelper.iuguQuery(args)
-      const res = await IuguModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.iuguQuery(args)
+      const res     = await IuguModel.list(query.limit, query.page, query.filter);
       return res.map( item => {
         item.original = JSON.stringify(item.original);
         return item;
@@ -523,8 +528,9 @@ exports.resolvers = {
     },
 
     export_iugus: async (parent, args, context) => {
-      const query = queryHelper.iuguQuery(args)
-      const res = await IuguModel.list(query.limit, query.page, query.filter);
+      const query   = queryHelper.iuguQuery(args)
+      const _limit  = query.limit + (query.limit*query.page)
+      const res     = await IuguModel.list(_limit, 0, query.filter);
       const the_res = res.map( item => {
         item.original = JSON.stringify(item.original);
         return item;
@@ -607,6 +613,33 @@ exports.resolvers = {
   },
 };
 
+
+const _flatten = function(data) {
+    var result = {};
+    const excluded_props = ['id', '_id']
+    function recurse (cur, prop) {
+      if(!excluded_props.includes(prop) && (prop.indexOf('.id')<0) && (prop.indexOf('._id')<0) && typeof cur !== 'function' && typeof prop !== 'function')
+        if (Object(cur) !== cur) {
+            result[prop] = cur;
+        } else if (Array.isArray(cur)) {
+             for(var i=0, l=cur.length; i<l; i++)
+                 recurse(cur[i], prop + "[" + i + "]");
+            if (l == 0)
+                result[prop] = [];
+        } else {
+            var isEmpty = true;
+            for (var p in cur) {
+                isEmpty = false;
+                recurse(cur[p], prop ? prop+"."+p : p);
+            }
+            if (isEmpty && prop)
+                result[prop] = {};
+        }
+    }
+    recurse(data, "");
+    return result;
+}
+
 const returnSheet = async (json, account_name, path) => {
   const my_account_name = account_name || 'cristaltoken';
   const file_name = `${moment().format('YYYY-MM-DD_HH-mm-ss')}.${path}.${my_account_name}`;
@@ -618,10 +651,38 @@ const returnSheet = async (json, account_name, path) => {
   let header  = [];
   let values  = [];
 
-  header  = Object.keys(flatten(json[0])) ;
-  values  = json.map(element => 
-    Object.values(flatten(element)).map(val=> val?val.toString():'' )
+  // header  = Object.keys(flatten(json[0])) ;
+  const flattened_elements  = json.map(element => 
+    {
+      let cloned = Object.assign({}, element);
+      
+      const _id  = cloned._id.toHexString();
+      delete cloned._id
+      delete cloned.id
+      delete cloned.created_by
+      cloned.idx = _id;
+
+      // console.log('******** _flatten(element) : ')
+      return _flatten(element);
+      // return Object.values(flatten(element)).map(val=> val?val.toString():'' )
+    }
   )
+
+  header = flattened_elements.map(element => Object.keys(element)).reduce((acc, fields) => _.union(acc, fields), []);
+
+  console.log(header);
+
+  const getValue = (element, value) => {
+    // if(element[value]!== null && element[value]!== undefined)
+    if(typeof element[value] === 'string' || typeof element[value] === 'number')
+    {
+      return element[value];
+    }
+    return ''
+  }
+  values = flattened_elements.map(element => {
+      return Object.values( header.reduce((acc, field) => {acc[field] = getValue(element, field); return acc}, {}) );
+  })
   content = [header, ...values]
   // console.log(content);
 
