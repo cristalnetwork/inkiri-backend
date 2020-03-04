@@ -670,7 +670,7 @@ const returnSheet = async (json, account_name, path) => {
 
   header = flattened_elements.map(element => Object.keys(element)).reduce((acc, fields) => _.union(acc, fields), []);
 
-  console.log(header);
+  // console.log(header);
 
   const getValue = (element, value) => {
     // if(element[value]!== null && element[value]!== undefined)
