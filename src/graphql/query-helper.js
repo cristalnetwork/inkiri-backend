@@ -421,3 +421,30 @@ exports.iuguLogQuery = (args) => {
     filter:  getQuery(filter)
   };    
 }
+
+exports.txsQuery = (args) => {
+  const page  = args.page ? parseInt(args.page) : 0;
+  const limit = args.limit ? parseInt(args.limit) : 100;
+  const { tx_id, from_account_name, to_account_name, amount, block_num_max, block_num_min} = args;
+
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
+
+  filter = append(filter, getFilter('tx_id', tx_id) );
+  filter = append(filter, getFilter('from_account_name', from_account_name) );
+  filter = append(filter, getFilter('to_account_name', to_account_name) );
+  filter = append(filter, getFilter('amount', amount) );
+
+  if(block_num_min&&block_num_min>0)
+    filter = append(filter, {'block_num': { $gte: block_num_min } })
+  if(block_num_max&&block_num_max>0)
+    filter = append(filter, {'block_num': { $lte: block_num_max } })
+  
+  return {
+    limit:   limit,
+    page:    page,
+    filter:  getQuery(filter)
+  };   
+}

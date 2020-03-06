@@ -1,22 +1,26 @@
-const UserModel     = require('../users/models/users.model');
-const RequestModel  = require('../requests/models/requests.model');
-const IuguModel     = require('../iugu/models/iugu.model');
-const IuguLogModel  = require('../iugu_log/models/iugu_log.model');
-const ProviderModel = require('../providers/models/providers.model');
-const ServiceModel  = require('../services/models/services.model');
-const TeamModel     = require('../teams/models/teams.model');
-const ConfigModel   = require('../configuration/models/configuration.model');
+const UserModel         = require('../users/models/users.model');
+const RequestModel      = require('../requests/models/requests.model');
+const IuguModel         = require('../iugu/models/iugu.model');
+const IuguLogModel      = require('../iugu_log/models/iugu_log.model');
+const ProviderModel     = require('../providers/models/providers.model');
+const ServiceModel      = require('../services/models/services.model');
+const TeamModel         = require('../teams/models/teams.model');
+const ConfigModel       = require('../configuration/models/configuration.model');
 
-const GoogleDriveHelper     = require('../files/helper/googledrive.helper');
+const TransactionModel  = require('../transactions/models/transactions.model');
 
-var   _             = require('lodash');
-var flatten         = require('flat')
+const config            = require('../common/config/env.config.js');
 
-const queryHelper   = require('./query-helper');
+const GoogleDriveHelper = require('../files/helper/googledrive.helper');
+
+var   _                 = require('lodash');
+var flatten             = require('flat')
+
+const queryHelper       = require('./query-helper');
 // const { buildSchema }          = require('graphql');
 const { makeExecutableSchema } = require('graphql-tools');
 
-const moment        = require('moment');
+const moment            = require('moment');
 
 /*
   type JobPosition{
@@ -32,6 +36,60 @@ exports.typeDefs = `
   type Export{
     file_id:             String
     error:               String
+  }
+  
+    
+  type TransactionTraceActionAuth{
+    actor:              String 
+    permission:         String
+  }
+
+  type TransactionTraceActionData{
+    memo:           String
+    quantity:       String
+    to:             String
+    from:           String
+    begins_at:      String
+    enabled:        String
+    last_charged:   String
+    periods:        String
+    price:          String
+    service_id:     String
+    fee:            String
+    overdraft:      String
+    account_type:   String
+    state:          String
+  }
+
+
+  type TransactionTraceAction{
+    account:          String
+    name:             String
+    authorization:    [TransactionTraceActionAuth]
+    data:             TransactionTraceActionData
+  }
+
+  type TransactionTrace{
+    id:                 String
+    topLevelActions:    [TransactionTraceAction]
+  }
+  
+  
+  type Transaction{
+    tx_id:                String
+    block_num:            Int
+    block_id:             String
+    block_timestamp:      String
+    trace:                TransactionTrace
+    from_account_name:    String
+    from:                 User
+    to_account_name:      String
+    to:                   User
+    request:              Request
+    amount:               Float
+    state:                String
+    created_at:           String
+    updatedAt:            String
   }
 
   type AccountConfig{
@@ -304,6 +362,9 @@ exports.typeDefs = `
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
     
+    transactions(page:String, limit:String, tx_id:String, from_account_name:String, to_account_name:String, amount:Float, block_num_max:Int, block_num_min:Int):  [Transaction]
+    
+
     configuration:                   [Configuration]
     configurationItem(id:String):    Configuration
     configurationsJobPositions:      [Configuration]
@@ -539,14 +600,20 @@ exports.resolvers = {
     },
     
     iuguLog: async (parent, args, context) => {
-      const query = queryHelper.iuguLogQuery(args)
-      const res = await IuguLogModel.list(1, 0, query.filter);
+      const query   = queryHelper.iuguLogQuery(args)
+      const res     = await IuguLogModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
     },
     iuguLogs: async (parent, args, context) => {
-      const query = queryHelper.iuguLogQuery(args)
-      const res = await IuguLogModel.list(1, 0, query.filter);
+      const query   = queryHelper.iuguLogQuery(args)
+      const res     = await IuguLogModel.list(1, 0, query.filter);
       return (Array.isArray(res))?res[0]:res;
+    },
+
+    transactions: async (parent, args, context) => {
+      const query  = queryHelper.txsQuery(args);
+      const res    = await TransactionModel.list(query.limit, query.page, query.filter);
+      return (Array.isArray(res))?res:[res];
     },
 
     /*
@@ -641,7 +708,7 @@ const _flatten = function(data) {
 }
 
 const returnSheet = async (json, account_name, path) => {
-  const my_account_name = account_name || 'cristaltoken';
+  const my_account_name = account_name || config.eos.bank.account;
   const file_name = `${moment().format('YYYY-MM-DD_HH-mm-ss')}.${path}.${my_account_name}`;
   
   if(!json || !Array.isArray(json) || json.length==0)

@@ -3,6 +3,8 @@ const RequestModel   = require('../../requests/models/requests.model');
 const importer       = require('../../transactions/services/importer');
 const processor      = require('../../transactions/services/processor');
 
+const config         = require('../../common/config/env.config.js');
+
 const _do = async () => {
   // Import transactions
   console.log (' ====== Import transactions')
@@ -19,8 +21,11 @@ const _do = async () => {
 } 
 
 const tick  = 30000;
-// const loops = 3600 * 1000 / 10000; 
-const loops = 2; 
+// const loops = 10 * 60 * 1000 / tick; 
+const loops = config.environment == 'prod'
+    ? 2
+    : 10 * 60 * 1000 / tick;
+     
 (async () => {
   
   let i = 0;

@@ -1,15 +1,15 @@
-const config = require('../../common/config/env.config.js');
-const { JsonRpc } = require('eosjs');
-const fetch = require('node-fetch');
-const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
-const UserModel = require('../../users/models/users.model');
-const ecc = require('eosjs-ecc')
-const helper = require('../helper/helper')
+const config            = require('../../common/config/env.config.js');
+const { JsonRpc }       = require('eosjs');
+const fetch             = require('node-fetch');
+const rpc               = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+const UserModel         = require('../../users/models/users.model');
+const ecc               = require('eosjs-ecc')
+const helper            = require('../helper/helper')
 
-const jwtSecret = require('../../common/config/env.config.js').jwt_secret,
-    jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+const jwt               = require('jsonwebtoken');
+const crypto            = require('crypto');
 
+const config_jwt_secret = process.env.JWT_SECRET || config.jwt_secret;
 
 exports.challenge = async(req, res) => {
 
@@ -54,14 +54,14 @@ exports.auth = async(req, res) => {
   }
   
   // Si, se ll
-  let refreshId       = req.body.account_name + jwtSecret;
+  let refreshId       = req.body.account_name + config_jwt_secret;
   let salt            = crypto.randomBytes(16).toString('base64');
   let hash            = crypto.createHmac('sha512', salt).update(refreshId).digest("base64");
 
   req.body.refreshKey = salt;
   req.body.expires_at = config.jwt_expiration_in_seconds + Math.floor((new Date()).getTime() / 1000);
 
-  let token           = jwt.sign(req.body, jwtSecret);
+  let token           = jwt.sign(req.body, config_jwt_secret);
   let b               = new Buffer.from(hash);
   let refresh_token   = b.toString('base64');
 
@@ -90,7 +90,7 @@ exports.getInkiriUsers = async(req, res) => {
       // console.log(resp.rows);
 
         // req.body = req.jwt;
-        // let token = jwt.sign(req.body, jwtSecret);
+        // let token = jwt.sign(req.body, config_jwt_secret);
         res.status(201).send(resp.rows);
     } catch (err) {
         res.status(500).send({errors: err});

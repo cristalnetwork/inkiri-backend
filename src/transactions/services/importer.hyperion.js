@@ -32,12 +32,14 @@ exports.import = async () => {
   catch(e){
     console.log(' ******************** Error getting last imported :( ', e);
   }
-  console.log(' =========== last_timestamp:', last_timestamp)
-  // return;
-
-  let raw_txs = [];
+  
   //HACK!!!!!!!!!!!!!!!!
   // last_timestamp = '2020-03-01T01:18:51.500Z';
+  // last_timestamp = '2020-03-06T00:35:24.500Z';
+  console.log(' =========== last_timestamp:', last_timestamp)
+  
+  let raw_txs = [];
+
   // **********************************************************************
   // 2nd: Query hyperion historical data service for transactions for account since last timestamp.
   // **********************************************************************

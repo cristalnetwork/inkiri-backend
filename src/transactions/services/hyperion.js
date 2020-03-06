@@ -30,11 +30,14 @@ const actionsToTx = (actions) => {
           ? exports.quantityToNumber(main_action.act.data.price) 
           : 0.0));
   
+  const _block_timestamp = (config.environment=='dev')
+                              ? moment.utc(main_action['@timestamp'])
+                              : main_action['@timestamp'];
   return{
       tx_id:                  main_action.trx_id,
       block_num:              main_action.block_num,
       block_id:               main_action.global_sequence,
-      block_timestamp:        main_action['@timestamp'],
+      block_timestamp:        _block_timestamp,
       trace: {
         id:                   main_action.trx_id,
         topLevelActions:      sorted_actions.map(action=>{
@@ -62,7 +65,7 @@ exports.queryTransactions = async (config, _contract, cursor, last_block_or_time
       sort: 'asc',
       after: last_block_or_timestamp 
         ? moment(last_block_or_timestamp).toISOString() 
-        : moment().subtract(1, 'hours').toISOString()
+        : moment().subtract(1, 'days').toISOString()
     };
     
     const response = await rpc.get_actions(contract, options);

@@ -1,9 +1,12 @@
 const config = require('../../common/config/env.config.js');
-const mongoose = require('mongoose');
-mongoose.set('useCreateIndex', true);
-mongoose.set('useFindAndModify', false);
-// if(global.mongoose_connected!==undefined && global.mongoose_connected!=true)
-mongoose.connect(process.env.MONGODB_URI || config.mongodb_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
+
+const mongoose = require('../../common/ddbb/mongo_connection.js');
+
+// const mongoose = require('mongoose');
+// mongoose.set('useCreateIndex', true);
+// mongoose.set('useFindAndModify', false);
+// mongoose.connect(process.env.MONGODB_URI || config.mongo.connection_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
+
 
 exports.ACCOUNT_TYPE_NONE       = 'none';
 exports.ACCOUNT_TYPE_PERSONAL   = 'personal';

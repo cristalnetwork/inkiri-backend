@@ -11,9 +11,10 @@ exports.verifyRefreshBodyField = (req, res, next) => {
 };
 
 exports.validRefreshNeeded = (req, res, next) => {
-    let b = new Buffer(req.body.refresh_token, 'base64');
-    let refresh_token = b.toString();
-    let hash = crypto.createHmac('sha512', req.jwt.refreshKey).update(req.jwt.userId + config.jwt_secret).digest("base64");
+    let b                   = new Buffer(req.body.refresh_token, 'base64');
+    let refresh_token       = b.toString();
+    const config_jwt_secret = process.env.JWT_SECRET || config.jwt_secret;
+    let hash = crypto.createHmac('sha512', req.jwt.refreshKey).update(req.jwt.userId + config_jwt_secret).digest("base64");
     if (hash === refresh_token) {
         req.body = req.jwt;
         return next();
@@ -64,8 +65,8 @@ exports.getLoggedUser = (req) => {
   if (authorization[0] !== 'Bearer') {
       throw new Error('No Bearer');
   } 
-
-  const _jwt = jwt.verify(authorization[1], config.jwt_secret);
+  const config_jwt_secret = process.env.JWT_SECRET || config.jwt_secret;
+  const _jwt              = jwt.verify(authorization[1], config_jwt_secret);
 
   if (_jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
       throw new Error('Expired session');
