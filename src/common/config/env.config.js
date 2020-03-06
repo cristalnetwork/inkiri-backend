@@ -96,6 +96,6 @@ const exports_config = (the_config.environment == 'prod' && local_prod_config)
                          : the_config;
 
 
-console.log(the_config.eos)
+// console.log(the_config.eos)
 
 module.exports = exports_config;
