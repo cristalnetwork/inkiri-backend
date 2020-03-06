@@ -164,10 +164,6 @@ exports.issue_oft = async (tx) => pushTX(tx);
 // const pushTX = async (tx, privatekey) => {
 
 const pushTX = async (tx) => {
-  // const rpc = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
-  // const signatureProvider = new JsSignatureProvider([iugu_private_key]);
-  // const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
-  // console.log(' ---- config.eos.blockchain_endpoint:', config.eos.blockchain_endpoint);
   try {
 	  const result = await api.transact(
 	    { actions: Array.isArray(tx)?tx:[tx] },

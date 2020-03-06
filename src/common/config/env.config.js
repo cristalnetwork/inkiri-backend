@@ -15,7 +15,7 @@ try {
   console.log(' ************* Loading env.test.config ERROR:', JSON.stringify(ex))
 }
 
-const the_config = {
+let the_config = {
     "api_version":                     "/api/v1",
     "port":                            3600,
     "jwt_secret":                      "myS33!!creeeT",
@@ -30,13 +30,16 @@ const the_config = {
         "history_provider":            "hyperion",
         "blockchain_currency_symbol":  "TLOS",
         
+        // https://tools.eosmetal.io/nodestatus/telos
         // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
         // "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
-        // https://tools.eosmetal.io/nodestatus/telos
         // "blockchain_endpoint": "https://testnet.telosusa.io",
         // "blockchain_endpoint": "http://mainnet.telosusa.io",
         // "blockchain_endpoint": "https://telos.eoscafeblock.com", 
-        "blockchain_endpoint":         "https://telos.caleos.io",
+        
+        "blockchain_endpoint_prod":    "https://telos.caleos.io",
+        "blockchain_endpoint_dev":     "https://testnet.telosusa.io",
+
         "token": {
             "contract":                "cristaltoken",
             "account":                 "cristaltoken",
@@ -56,9 +59,9 @@ const the_config = {
             "table_paps_charge":       "chargepap"
         },
         "hyperion" :{
-          //"history_endpoint" :     "https://testnet.telosusa.io"
-          // "history_endpoint" :    "http://mainnet.telosusa.io"
-          "history_endpoint"          : "https://telos.caleos.io", 
+          // "history_endpoint" :        "http://mainnet.telosusa.io"
+          "history_endpoint_prod":      "https://telos.caleos.io", 
+          "history_endpoint_dev" :      "https://testnet.telosusa.io"
         },
         "dfuse" : {
           "api_key"                   : 'web_8a50f2bc42c1df1a41830c359ba74240',
@@ -83,12 +86,16 @@ const the_config = {
     }
 };
 
+the_config.eos.blockchain_endpoint       = the_config.eos['blockchain_endpoint_'+the_config.environment];
+the_config.eos.hyperion.history_endpoint = the_config.eos.hyperion['history_endpoint_'+the_config.environment];
+
 const exports_config = (the_config.environment == 'prod' && local_prod_config)
                        ? local_prod_config 
                        : (the_config.environment == 'dev' && local_dev_config)
                          ? local_dev_config
                          : the_config;
 
-// console.log(exports_config.mongo.connection_uri)
+
+console.log(the_config.eos)
 
 module.exports = exports_config;

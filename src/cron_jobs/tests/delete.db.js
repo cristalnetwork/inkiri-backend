@@ -16,17 +16,17 @@ const TransactionsModel = require('../../transactions/models/transactions.model'
   // const g = await TeamModel.model.deleteMany({});
   // console.log( 'TeamModel ', g );
   
-  const h = await TransactionsModel.model.deleteMany({});
-  console.log( 'TransactionsModel ', h );
+  // const h = await TransactionsModel.model.deleteMany({});
+  // console.log( 'TransactionsModel ', h );
   
   // const a = await RequestModel.model.deleteMany({});
   // console.log( 'RequestModel ', a );
   
-  // const b = await IuguModel.model.deleteMany({});
-  // console.log( 'IuguModel ', b );
+  const b = await IuguModel.model.deleteMany({});
+  console.log( 'IuguModel ', b );
   
-  // const c = await IuguLogModel.model.deleteMany({});
-  // console.log( 'IuguLogModel ', c );
+  const c = await IuguLogModel.model.deleteMany({});
+  console.log( 'IuguLogModel ', c );
   
   console.log('END o_O');
 
