@@ -18,7 +18,7 @@ const DEV_ENV   = "dev";
 
 let the_config = {
     "environment":                     PROD_ENV,
-    // "environment":                     DEV_ENV,
+    
     "api_version":                     "/api/v1",
     "port":                            3600,
     "jwt_secret":                      "myS33!!creeeT",
@@ -83,7 +83,7 @@ let the_config = {
 the_config.eos.blockchain_endpoint       = the_config.eos['blockchain_endpoint_'+the_config.environment];
 the_config.eos.hyperion.history_endpoint = the_config.eos.hyperion['history_endpoint_'+the_config.environment];
 
-let exports_config = (the_config.environment == PROD_ENV && local_prod_config)
+const _local_config = (the_config.environment == PROD_ENV && local_prod_config)
                        ? local_prod_config 
                        : (the_config.environment == DEV_ENV && local_dev_config)
                          ? local_dev_config
@@ -91,5 +91,5 @@ let exports_config = (the_config.environment == PROD_ENV && local_prod_config)
 
 // exports_config.jwt_secret = "myS33!!creeeT";
 // console.log(exports_config.jwt_secret)
-
+const exports_config = {...the_config, ...(_local_config||{}) };
 module.exports = exports_config;
