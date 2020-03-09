@@ -1,6 +1,7 @@
-const config = require('../../common/config/env.config.js');
-const UserModel = require('../models/users.model');
-const crypto = require('crypto');
+const config         = require('../../common/config/env.config.js');
+const UserModel      = require('../models/users.model');
+const crypto         = require('crypto');
+var moment           = require('moment');
 
 const EMAIL_DOMAIN = process.env.EMAIL_DOMAIN || config.email_domain || 'inkiri.com';
 
@@ -91,6 +92,9 @@ exports.patchById = (req, res) => {
     //     req.body.password = salt + "$" + hash;
     // }
     delete req.body.account_name;
+    let user = req.body;
+    if(user.birthday)
+        user.birthday = moment(user.birthday);
     UserModel.patchUser(req.params.userId, req.body)
         .then((result) => {
             // res.status(204).send({});

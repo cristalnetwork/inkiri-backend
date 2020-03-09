@@ -25,32 +25,13 @@ exports.validRefreshNeeded = (req, res, next) => {
 
 
 exports.validJWTNeeded = (req, res, next) => {
-    // if (!req.headers['authorization']) 
-    //   return res.status(401).send({error:'Unauthorized.'});
-
-    // try {
-    //     const authorization = req.headers['authorization'].split(' ');
-    //     if (authorization[0] !== 'Bearer') {
-    //         return res.status(401).send({error:'no bearer'});
-    //     } 
-    //     req.jwt = jwt.verify(authorization[1], config.jwt_secret);
-
-    //     if (req.jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
-    //         return res.status(401).send({error:'expired token'});
-    //     }
-    //     return next();
-
-    // } catch (err) {
-    //     console.log('validJWTNeeded?? >> ', JSON.stringify(err));
-    //     return res.status(403).send(err);
-    // }
     try{
       req.jwt = exports.getLoggedUser(req);
       next();
     }
     catch (err) {
-      console.log('validJWTNeeded?? >> ', JSON.stringify(err));
-      return res.status(403).send({error:err.message});
+      console.log('validJWTNeeded()::getLoggedUser() -->> ', JSON.stringify(err));
+      return res.status(403).send({error: 'JWT Authentication error: ' + err.message});
     }
     
 };
@@ -71,13 +52,10 @@ exports.getLoggedUser = (req) => {
   if (_jwt.expires_at < Math.floor((new Date()).getTime() / 1000)){
       throw new Error('Expired session');
   }
-  // console.log('validJWTNeeded >> decoded >>', JSON.stringify(req.jwt));
+  
+  // console.log('getLoggedUser >> verification >>', JSON.stringify(_jwt));
   return _jwt;
       
-
-  // } catch (err) {
-  //     console.log('validJWTNeeded?? >> ', JSON.stringify(err));
-  //     throw err;
-  // }
+  // validJWTNeeded?? >>  {"name":"JsonWebTokenError","message":"invalid signature"}
 
 }

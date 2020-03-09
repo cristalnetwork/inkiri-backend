@@ -17,8 +17,8 @@ const PROD_ENV  = "prod";
 const DEV_ENV   = "dev";
 
 let the_config = {
-    // "environment":                     PROD_ENV,
-    "environment":                     DEV_ENV,
+    "environment":                     PROD_ENV,
+    // "environment":                     DEV_ENV,
     "api_version":                     "/api/v1",
     "port":                            3600,
     "jwt_secret":                      "myS33!!creeeT",
@@ -31,14 +31,6 @@ let the_config = {
     "eos" : {
         "history_provider":            "hyperion",
         "blockchain_currency_symbol":  "TLOS",
-        
-        // https://tools.eosmetal.io/nodestatus/telos
-        // "blockchain_endpoint": "https://jungle.eos.dfuse.io",
-        // "blockchain_endpoint": "https://jungle2.cryptolions.io:443",
-        // "blockchain_endpoint": "https://testnet.telosusa.io",
-        // "blockchain_endpoint": "http://mainnet.telosusa.io",
-        // "blockchain_endpoint": "https://telos.eoscafeblock.com", 
-        
         "blockchain_endpoint_prod":    "https://telos.caleos.io",
         "blockchain_endpoint_dev":     "https://testnet.telosusa.io",
 
@@ -91,13 +83,13 @@ let the_config = {
 the_config.eos.blockchain_endpoint       = the_config.eos['blockchain_endpoint_'+the_config.environment];
 the_config.eos.hyperion.history_endpoint = the_config.eos.hyperion['history_endpoint_'+the_config.environment];
 
-const exports_config = (the_config.environment == PROD_ENV && local_prod_config)
+let exports_config = (the_config.environment == PROD_ENV && local_prod_config)
                        ? local_prod_config 
                        : (the_config.environment == DEV_ENV && local_dev_config)
                          ? local_dev_config
                          : the_config;
 
-
-// console.log(the_config.eos)
+// exports_config.jwt_secret = "myS33!!creeeT";
+// console.log(exports_config.jwt_secret)
 
 module.exports = exports_config;
