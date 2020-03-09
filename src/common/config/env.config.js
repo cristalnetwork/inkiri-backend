@@ -2,25 +2,27 @@ var local_prod_config         = null;
 var local_dev_config          = null;
 
 try {
-  // console.log(' ************* Loading env.cristaltoken.config...')
   local_prod_config         = require('./env.cristaltoken.config.js');
 } catch (ex) {
   console.log(' ************* Loading env.cristaltoken.config ERROR:', JSON.stringify(ex))
 }
 
 try {
-  // console.log(' ************* Loading env.test.config...')
   local_dev_config          = require('./env.test.config.js');
 } catch (ex) {
   console.log(' ************* Loading env.test.config ERROR:', JSON.stringify(ex))
 }
 
+const PROD_ENV  = "prod";
+const DEV_ENV   = "dev";
+
 let the_config = {
+    // "environment":                     PROD_ENV,
+    "environment":                     DEV_ENV,
     "api_version":                     "/api/v1",
     "port":                            3600,
     "jwt_secret":                      "myS33!!creeeT",
     "jwt_expiration_in_seconds":       2592000,
-    "environment":                     "dev",
     "email_domain":                    "inkiri.com",
     "mongo" : {
       "useUnifiedTopology":            false,
@@ -89,9 +91,9 @@ let the_config = {
 the_config.eos.blockchain_endpoint       = the_config.eos['blockchain_endpoint_'+the_config.environment];
 the_config.eos.hyperion.history_endpoint = the_config.eos.hyperion['history_endpoint_'+the_config.environment];
 
-const exports_config = (the_config.environment == 'prod' && local_prod_config)
+const exports_config = (the_config.environment == PROD_ENV && local_prod_config)
                        ? local_prod_config 
-                       : (the_config.environment == 'dev' && local_dev_config)
+                       : (the_config.environment == DEV_ENV && local_dev_config)
                          ? local_dev_config
                          : the_config;
 

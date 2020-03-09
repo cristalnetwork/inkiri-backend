@@ -358,7 +358,9 @@ const criar_arquivo_remessa = (data_pagamento, conta_pagamento, lista_pagamentos
                             , parseFloat(pagamento['valor']))                
     })
 
-    remessa = remessa.concat(segmentos_ab)
+    const segmentos_ab_string = segmentos_ab.join('');
+    remessa = remessa.concat(segmentos_ab_string);
+    console.log(segmentos_ab_string);
     /*
       def nome_valido(caracter):
         return caracter.isalpha() or caracter == ' '        
