@@ -8,7 +8,8 @@ try {
 }
 
 try {
-  local_dev_config          = require('./env.test.config.js');
+  local_dev_config          = require('./env.cristaltoken.config.js');
+  // local_dev_config          = require('./env.test.config.js');
 } catch (ex) {
   console.log(' ************* Loading env.test.config ERROR:', JSON.stringify(ex))
 }

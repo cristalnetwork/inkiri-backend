@@ -33,10 +33,17 @@ exports.loggedHasAdminWritePermission = async (req, res, next) => {
 
   let logged_account = req.jwt.account_name;
   const is_new       = !req.body._id && !req.params.requestId;
+  
+  // If the request is a payment (request creator asks receiver to pay), then 'from' field is the requested account. 
+  // So we validate logged account with "to" account field.
+  const is_payment   = (req.body.requested_type == RequestModel.TYPE_PAYMENT);
+  
   let validate_with  = null;
   if(is_new)
   {
-    validate_with = req.body.from;
+    validate_with = is_payment
+      ? req.body.to
+      : req.body.from;
   }
   else{
     if(!req.params.requestId)
@@ -50,9 +57,15 @@ exports.loggedHasAdminWritePermission = async (req, res, next) => {
     if(Array.isArray(biz)) biz=biz[0];
     validate_with = biz.account_name;
   }
+
   if(!validate_with)
     return res.status(500).send({error:'Can not validate account permissions. Something went wrong!'});
 
+  console.log('******************* loggedHasAdminWritePermission')
+  console.log('validate_with:', validate_with)
+  console.log('to:', req.body.to)
+  console.log('from:', req.body.from)
+  console.log('request:', req.body.requested_type)
   let is_authorized   = logged_account==validate_with;
   let is_admin        = logged_account==config.eos.bank.account;
   if(!is_admin)

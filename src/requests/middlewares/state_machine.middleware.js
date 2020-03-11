@@ -52,12 +52,10 @@ const loadStatesForUser = (current_state) =>{
     transitions: [
       // { name: 'cancel',  from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_CANCELED },
       { name: toTransition(RequestsModel.STATE_REQUESTED, RequestsModel.STATE_CANCELED),  from: RequestsModel.STATE_REQUESTED,  to: RequestsModel.STATE_CANCELED },
-      { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_REFUNDED),  from: RequestsModel.STATE_RECEIVED,  to: RequestsModel.STATE_REFUNDED },
+      { name: toTransition(RequestsModel.STATE_RECEIVED, RequestsModel.STATE_REFUNDED),   from: RequestsModel.STATE_RECEIVED,  to: RequestsModel.STATE_REFUNDED },
     ]
   });
 }
-
-
 
 const loadStatesForRequestedC2CSender = (current_state) =>{
  return new StateMachine({
@@ -104,6 +102,11 @@ const toTransition = (old_state, new_state) => {
   return old_state +'_to_'+ new_state;
 }
 
+const getRequestOwner = (request) => {
+  if(request.requested_type==RequestsModel.TYPE_PAYMENT)
+    return request.to;
+  return request.from;
+}
 
 exports.validateTransitionForAdmin = async(req, res, next) => {
   const new_state = req.body.state;
@@ -176,7 +179,7 @@ exports.validateTransition = async(req, res, next) => {
     return res.status(404).send({error:'Request NOT FOUND'});
   }
 
-  const request_owner = request.from;
+  const request_owner = getRequestOwner(request);
 
   let is_authorized   = account_name==request_owner;
 
@@ -279,9 +282,15 @@ exports.validateTransitionC2C = async(req, res, next) => {
     return next();
   }
 
+  // const fsm = (is_admin)
+  //   ?loadStatesForRequestedC2CAdmin(request.state)
+  //   : (is_sender)
+  //       ?loadStatesForRequestedC2CSender(request.state)
+  //       :loadStatesForRequestedC2CReceiver(request.state);
+
   const fsm = (is_admin)
     ?loadStatesForRequestedC2CAdmin(request.state)
-    : (is_sender)
+    : (is_sender && request.requested_type!=RequestsModel.TYPE_PAYMENT) // << SPECIAL CASE: TYPE_PAYMENT requests are treated in the inverse.
         ?loadStatesForRequestedC2CSender(request.state)
         :loadStatesForRequestedC2CReceiver(request.state);
 
@@ -323,10 +332,16 @@ exports.validateC2CTransitionFor = (_type_) => {
           switch(_type_){
             case exports.REQUEST_USER_SENDER:
 
-              is_authorized   = account_name==request.from;
+              // is_authorized   = account_name==request.from;
+              // SPECIAL CASE: TYPE_PAYMENT requests are treated in the inverse.
+              const check_sender = (request.requested_type!=RequestsModel.TYPE_PAYMENT)
+                ? request.from
+                : request.to;
+              is_authorized   = account_name==check_sender;
+
               if(!is_authorized)
                 try {
-                  let perm = await eos_helper.accountHasWritePermission(account_name, request.from);
+                  let perm = await eos_helper.accountHasWritePermission(account_name, check_sender);
                   if(perm)
                   {
                     is_authorized = true;
@@ -337,10 +352,15 @@ exports.validateC2CTransitionFor = (_type_) => {
 
             break;
             case exports.REQUEST_USER_RECEIVER:
-              is_authorized   = account_name==request.to;
+              // is_authorized   = account_name==request.to;
+              const check_receiver = (request.requested_type!=RequestsModel.TYPE_PAYMENT)
+                ? request.to
+                : request.from;
+              is_authorized   = account_name==check_receiver;
+
               if(!is_authorized)
                 try {
-                  let perm = await eos_helper.accountHasWritePermission(account_name, request.to);
+                  let perm = await eos_helper.accountHasWritePermission(account_name, check_receiver);
                   if(perm)
                   {
                     is_authorized = true;
