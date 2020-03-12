@@ -32,7 +32,8 @@ let the_config = {
     "eos" : {
         "history_provider":            "hyperion",
         "blockchain_currency_symbol":  "TLOS",
-        "blockchain_endpoint_prod":    "https://telos.caleos.io",
+        // "blockchain_endpoint_prod":    "https://telos.caleos.io",
+        "blockchain_endpoint_prod":    "https://mainnet.telosusa.io",
         "blockchain_endpoint_dev":     "https://testnet.telosusa.io",
 
         "token": {
@@ -55,7 +56,8 @@ let the_config = {
         },
         "hyperion" :{
           // "history_endpoint" :        "http://mainnet.telosusa.io"
-          "history_endpoint_prod":      "https://telos.caleos.io", 
+          // "history_endpoint_prod":      "https://telos.caleos.io", 
+          "history_endpoint_prod":      "https://telos.eoscafeblock.com", 
           "history_endpoint_dev" :      "https://testnet.telosusa.io"
         },
         "dfuse" : {
@@ -93,4 +95,4 @@ const _local_config = (the_config.environment == PROD_ENV && local_prod_config)
 // exports_config.jwt_secret = "myS33!!creeeT";
 // console.log(exports_config.jwt_secret)
 const exports_config = {...the_config, ...(_local_config||{}) };
-module.exports = exports_config;
+module.exports       = exports_config;

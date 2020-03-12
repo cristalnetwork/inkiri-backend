@@ -36,7 +36,7 @@ exports.auth = async(req, res) => {
   try {
       accountInfo = await helper.getAccountInfo(req.body.account_name);
   } catch (e) {
-    console.log('============= eos::auth::error#1')
+    console.log('============= eos::auth::error#1', e)
     res.status(400).send({error: 'Account not found on blockchain!'});
     return;
   }
@@ -48,7 +48,7 @@ exports.auth = async(req, res) => {
   // 4.- Did we find a valid pub key? Shoul we give the token?
   if(!valid_perm || valid_perm.length==0)
   {
-    console.log('============= eos::auth::error#2')
+    console.log('============= eos::auth::error#2', e)
     res.status(400).send({errors: ['Something went wrong my dear friend!']});
     return;
   }
