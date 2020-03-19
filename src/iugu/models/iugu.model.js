@@ -107,11 +107,11 @@ exports.createIugu = (iuguData) => {
     return _iugu.save();
 };
 
-exports.lastImported = async () => lastImportedImpl();
+exports.lastImported = async (iugu_account) => lastImportedImpl(iugu_account);
 
-const lastImportedImpl = async () => {
+const lastImportedImpl = async (iugu_account) => {
   return new Promise((res, rej) => {
-      Iugu.findOne()
+      Iugu.findOne({iugu_account:iugu_account})
           .populate('receipt')
           .limit(1)
           .skip(0)
@@ -128,8 +128,9 @@ const lastImportedImpl = async () => {
   });
 }
 
-exports.lastImportedOrNull = async () => {
-  const iugu = await Iugu.findOne()
+exports.lastImportedOrNull = async (iugu_account) => {
+
+  const iugu = await Iugu.findOne({iugu_account:iugu_account})
           .populate('receipt')
           .limit(1)
           .skip(0)
@@ -240,6 +241,22 @@ exports.removeById = (iuguId) => {
     });
 };
 
+exports.byAccountNameOrNull = async (account_name) => {
+    if(!account_name)
+        return null;
+    // console.log(' == >> UsersModel::byAccountNameOrNull:', account_name)
+    const  _account_name = account_name?account_name.trim():'';
+    const  user = await User.findOne({account_name: _account_name}).exec();
+    return user;
+};
+
+
+exports.byIuguIdOrNull = async (iugu_id) => {
+  if(!iugu_id)
+    return null;
+  const iugu = await Iugu.findOne({iugu_id: iugu_id}).exec();
+  return iugu;
+};
 
 exports.findByIuguId = (iugu_id, null_if_not_found) => {
   return new Promise((resolve, reject) => {

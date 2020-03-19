@@ -55,8 +55,8 @@ let the_config = {
             "table_paps_charge":       "chargepap"
         },
         "hyperion" :{
-          "history_endpoint_prod" :        "http://mainnet.telosusa.io",
-          // "history_endpoint_prod":      "https://telos.caleos.io", 
+          // "history_endpoint_prod" :        "http://mainnet.telosusa.io",
+          "history_endpoint_prod":      "https://telos.caleos.io", 
           // "history_endpoint_prod":      "https://telos.eoscafeblock.com", 
           // "history_endpoint_prod":      "https://node1.us-east.telosglobal.io:8899", 
           "history_endpoint_dev" :      "https://testnet.telosusa.io"
@@ -80,7 +80,8 @@ let the_config = {
     {
       "api":{
           "endpoint":               "https://api.iugu.com/v1"
-      }
+      },
+      "date_format" : 'YYYY-MM-DDTHH:mm:ss-03:00'
     }
 };
 

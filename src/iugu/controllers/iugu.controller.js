@@ -10,61 +10,61 @@ const TASK_ISSUE             = 'issue';
 const TASK_IMPORT_AND_ISSUE  = 'import_and_issue';
 const TASK_GET_LAST_IMPORTED = 'get_last_imported';
 
-exports.import = async(req, res) => {
+// exports.import = async(req, res) => {
 
-  if(req.params.task==TASK_GET_LAST_IMPORTED)
-  {
-    const lastImported = await IuguModel.lastImported();
-    // from = lastImported.paid_at;
-    res.status(200).send({paid_at: lastImported.paid_at, result: lastImported});
-    return;
-  }
+//   if(req.params.task==TASK_GET_LAST_IMPORTED)
+//   {
+//     const lastImported = await IuguModel.lastImported();
+//     // from = lastImported.paid_at;
+//     res.status(200).send({paid_at: lastImported.paid_at, result: lastImported});
+//     return;
+//   }
 
-  if(req.params.task==TASK_IMPORT)
-  {
-    importer.importAndSave()
-      .then( (result) => {
-          res.status(200).send({message: 'OK', result: result});
+//   if(req.params.task==TASK_IMPORT)
+//   {
+//     importer.importAndSave()
+//       .then( (result) => {
+//           res.status(200).send({message: 'OK', result: result});
 
-          if(!result.error)
-            IuguLogModel.logImport('', result.items.length, result.items.map(obj => obj.id), null, 0, null, null, result.qs)
-          else
-            IuguLogModel.logImport(result.error, 0, null, null, 0, null, null, result.qs)
+//           if(!result.error)
+//             IuguLogModel.logImport('', result.items.length, result.items.map(obj => obj.id), null, 0, null, null, result.qs)
+//           else
+//             IuguLogModel.logImport(result.error, 0, null, null, 0, null, null, result.qs)
 
-          console.log('importController::importAndSave()::result-> ', JSON.stringify(result))
-          return;
-      }, (err)=>{
-          console.log('importController::importAndSave()::ERROR-> ', JSON.stringify(err))
-          res.status(500).send({error:err});
-          IuguLogModel.logImport(err.error, 0, null, null, 0, null, null, err.qs )
-          return;
-      });
-    return;
-  }
+//           console.log('importController::importAndSave()::result-> ', JSON.stringify(result))
+//           return;
+//       }, (err)=>{
+//           console.log('importController::importAndSave()::ERROR-> ', JSON.stringify(err))
+//           res.status(500).send({error:err});
+//           IuguLogModel.logImport(err.error, 0, null, null, 0, null, null, err.qs )
+//           return;
+//       });
+//     return;
+//   }
 
-  if(req.params.task==TASK_ISSUE)
-  {
-    issuer.issuePending()
-      .then( (result) => {
-          console.log('importController::issue()::result-> ', JSON.stringify(result))
-          res.status(200).send({message: 'OK', result: result});
-          return;
-      }, (err)=>{
-          console.log('importController::issue()::ERROR-> ', JSON.stringify(err))
-          res.status(500).send({error:err});
-          IuguLogModel.logImport(err.error, 0, null, null, 0, null, null, err.qs )
-          return;
-      });
-    return;
-  }
+//   if(req.params.task==TASK_ISSUE)
+//   {
+//     issuer.issuePending()
+//       .then( (result) => {
+//           console.log('importController::issue()::result-> ', JSON.stringify(result))
+//           res.status(200).send({message: 'OK', result: result});
+//           return;
+//       }, (err)=>{
+//           console.log('importController::issue()::ERROR-> ', JSON.stringify(err))
+//           res.status(500).send({error:err});
+//           IuguLogModel.logImport(err.error, 0, null, null, 0, null, null, err.qs )
+//           return;
+//       });
+//     return;
+//   }
 
-  if(req.params.task==TASK_IMPORT_AND_ISSUE)
-  {
-    console.log('#issue::ERROR -> TASK_IMPORT_AND_ISSUE NOT ALLOWED')
-    res.status(405).send({error:'TASK_IMPORT_AND_ISSUE NOT ALLOWED!'});
-    return;
-  }
-};
+//   if(req.params.task==TASK_IMPORT_AND_ISSUE)
+//   {
+//     console.log('#issue::ERROR -> TASK_IMPORT_AND_ISSUE NOT ALLOWED')
+//     res.status(405).send({error:'TASK_IMPORT_AND_ISSUE NOT ALLOWED!'});
+//     return;
+//   }
+// };
 
 exports.reprocess = async (req, res) => {
   

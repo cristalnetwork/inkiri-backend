@@ -41,9 +41,11 @@ exports.auth = async(req, res) => {
     return;
   }
 
+  const user = await UserModel.byAccountNameOrNull(req.body.account_name);
+
   const active_perm = accountInfo.permissions.filter( perm => perm.perm_name == 'active' )[0];
-  const valid_perm =active_perm.required_auth.keys.filter(
-    (key) => ecc.verify(req.body.signature, req.body.challenge, key.key))
+  // const valid_perm =active_perm.required_auth.keys.filter((key) => ecc.verify(req.body.signature, req.body.challenge, key.key))
+  const valid_perm =active_perm.required_auth.keys.filter((key) => ecc.verify(req.body.signature, user.to_sign, key.key))
 
   // 4.- Did we find a valid pub key? Shoul we give the token?
   if(!valid_perm || valid_perm.length==0)

@@ -6,11 +6,11 @@ const PermissionMiddleware      = require('../common/middlewares/auth.permission
 
 exports.routesConfig = function (app) {
 
-    app.get(config.api_version+'/iugu_importer/:task', [
-        ValidationMiddleware.validJWTNeeded,
-        PermissionMiddleware.loggedHasAdminWritePermission,
-        IuguController.import
-    ]);
+    // app.get(config.api_version+'/iugu_importer/:task', [
+    //     ValidationMiddleware.validJWTNeeded,
+    //     PermissionMiddleware.loggedHasAdminWritePermission,
+    //     IuguController.import
+    // ]);
 
     app.post(config.api_version+'/iugu', [
       ValidationMiddleware.validJWTNeeded,

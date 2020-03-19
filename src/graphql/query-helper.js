@@ -375,7 +375,7 @@ exports.providerQuery  = (args) => {
 exports.iuguQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const { iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state, iugu_account} = args;
+  const { iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state, iugu_account, amount} = args;
 
   let filter = {
     filter:     {},
@@ -390,6 +390,8 @@ exports.iuguQuery = (args) => {
   filter = append(filter, getFilter('iuguCounterId', iuguCounterId) );
   filter = append(filter, getFilter('state', state) );
   filter = append(filter, getFilter('iugu_account', iugu_account) );
+
+  filter = append(filter, getFilter('amount', amount) );
 
   filter = append(filter, getBetweenFilter('paid_at', paid_at_from, paid_at_to) );
   filter = append(filter, getBetweenFilter('issued_at', issued_at_from, issued_at_to) );

@@ -85,11 +85,12 @@ const importAccountImpl = async (iugu_account) => {
     let from = moment().subtract(1, 'days');
     // let from = moment().subtract(8, 'days');
 
-    const lastImported = await IuguModel.lastImportedOrNull();
+    const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
 
     if(lastImported)
       from = lastImported.paid_at;
     
+    // https://dev.iugu.com/reference#listar-faturas
 
     const _from_query_param   = moment(from).format(iugu_date_format);
     console.log('iugu-importer::importIml::_from_query_param => ', _from_query_param);
@@ -183,6 +184,14 @@ const getInvoiceAliasImpl = async (alias) => {
   
   return({alias:alias, user:user})
 }
+
+// const findAlias = (raw_invoice) => {
+
+//   const projeto = raw_invoice.custom_variables.find(_custom_var => _custom_var.name=='projeto')
+//   if(!projeto)
+//     return null;
+//   return projeto.value;
+// }
 
 exports.buildInvoice = async (iugu_account, raw_invoice) => buildInvoiceImpl(iugu_account, raw_invoice);
 const buildInvoiceImpl = async (iugu_account, raw_invoice) => {
