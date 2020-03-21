@@ -135,6 +135,23 @@ exports.byAliasOrNull = async (alias) => {
     return user;
 };
 
+exports.byAliasOrBizNameOrNull = async (alias_or_name) => {
+    if(!alias_or_name)
+        return null;
+    // console.log(' == >> UsersModel::byAliasOrBizNameOrNull:', alias_or_name)
+    const  _alias_or_name = alias_or_name?alias_or_name.trim():'';
+    if(_alias_or_name=='')
+        return null;
+    try{
+        const  user = await User.findOne({$or : [{alias: alias_or_name}, {business_name: alias_or_name}]}).exec();
+        return user;    
+    }catch(ex){
+        console.log('UserModel::byAliasOrBizNameOrNull::', alias_or_name, ' | ERROR:', ex);
+        return null;
+    }
+    
+};
+
 exports.findByAccountName = (account_name) => {
     const _account_name = account_name?account_name.trim():'';
     return User.find({account_name: _account_name});

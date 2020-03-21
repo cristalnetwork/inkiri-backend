@@ -375,7 +375,7 @@ exports.providerQuery  = (args) => {
 exports.iuguQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const { iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state, iugu_account, amount} = args;
+  const { iugu_ids, iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state, iugu_account, amount} = args;
 
   let filter = {
     filter:     {},
@@ -383,7 +383,10 @@ exports.iuguQuery = (args) => {
   };
 
   filter = append(filter, getFilter('_id', id) );
-  filter = append(filter, getFilter('iugu_id', iugu_id) );
+  if(iugu_ids)
+    filter = append(filter, getFilter('iugu_id', iugu_ids) );
+  else
+    filter = append(filter, getFilter('iugu_id', iugu_id) );
   filter = append(filter, getFilter('receipt.business_name', business_name) );
   filter = append(filter, getFilter('receipt_accountname', account_name) );
   filter = append(filter, getFilter('receipt_alias', alias) );

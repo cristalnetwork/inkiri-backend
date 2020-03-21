@@ -73,7 +73,7 @@ const issueOneImpl = async (invoice) => new Promise(async(res, rej) => {
   }
 
   console.log(' ISSUED!! invoice.id->', invoice.id);
-  console.log(JSON.stringify(tx));
+  // console.log(JSON.stringify(tx));
   invoice.issued_at     = moment();
   invoice.issued_tx_id  = tx.transaction_id;;
   invoice.state         = IuguModel.STATE_ISSUED;
