@@ -375,31 +375,38 @@ exports.providerQuery  = (args) => {
 exports.iuguQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const { iugu_ids, iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state, iugu_account, amount} = args;
+  const { iugu_ids, iugu_id, id, paid_at_from, paid_at_to, business_name, alias, account_name, iuguCounterId, issued_at_from, issued_at_to, issued_tx_id, state, iugu_account, amount, search_text} = args;
 
   let filter = {
     filter:     {},
     or_filter : []
   };
 
-  filter = append(filter, getFilter('_id', id) );
-  if(iugu_ids)
-    filter = append(filter, getFilter('iugu_id', iugu_ids) );
+  if(search_text && search_text.trim()!=''){
+    const _search_text = search_text.trim();
+    filter.or_filter = [getLikeFilter('iugu_id', _search_text), getLikeFilter('business_name', _search_text), getLikeFilter('receipt_accountname', _search_text), getLikeFilter('receipt_alias', _search_text) ];
+  }
   else
-    filter = append(filter, getFilter('iugu_id', iugu_id) );
-  filter = append(filter, getFilter('receipt.business_name', business_name) );
-  filter = append(filter, getFilter('receipt_accountname', account_name) );
-  filter = append(filter, getFilter('receipt_alias', alias) );
-  filter = append(filter, getFilter('iuguCounterId', iuguCounterId) );
-  filter = append(filter, getFilter('state', state) );
-  filter = append(filter, getFilter('iugu_account', iugu_account) );
-
-  filter = append(filter, getFilter('amount', amount) );
-
-  filter = append(filter, getBetweenFilter('paid_at', paid_at_from, paid_at_to) );
-  filter = append(filter, getBetweenFilter('issued_at', issued_at_from, issued_at_to) );
-
-  filter = append(filter, getFilter('issued_tx_id', issued_tx_id) );
+  {
+    filter = append(filter, getFilter('_id', id) );
+    if(iugu_ids)
+      filter = append(filter, getFilter('iugu_id', iugu_ids) );
+    else
+      filter = append(filter, getFilter('iugu_id', iugu_id) );
+    filter = append(filter, getFilter('receipt.business_name', business_name) );
+    filter = append(filter, getFilter('receipt_accountname', account_name) );
+    filter = append(filter, getFilter('receipt_alias', alias) );
+    filter = append(filter, getFilter('iuguCounterId', iuguCounterId) );
+    filter = append(filter, getFilter('state', state) );
+    filter = append(filter, getFilter('iugu_account', iugu_account) );
+  
+    filter = append(filter, getFilter('amount', amount) );
+  
+    filter = append(filter, getBetweenFilter('paid_at', paid_at_from, paid_at_to) );
+    filter = append(filter, getBetweenFilter('issued_at', issued_at_from, issued_at_to) );
+  
+    filter = append(filter, getFilter('issued_tx_id', issued_tx_id) );
+  }
 
   return {
     limit:   limit,

@@ -356,9 +356,9 @@ exports.typeDefs = `
     export_providers(page:String, limit:String, search_text:String, id:String, name:String, cnpj:String, email:String, category:String, products_services:String, state:String, providerCounterId:String, bank_name:String, bank_agency:String, bank_cc:String ): Export
     
     iugu(id:String, iugu_id:String):   Iugu
-    iugus(page:String, limit:String, id:String, iugu_id:String, iugu_ids:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String, amount:Float):  [Iugu]
+    iugus(page:String, limit:String, id:String, iugu_id:String, iugu_ids:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String, amount:Float, search_text:String):  [Iugu]
     
-    export_iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String):  Export
+    export_iugus(page:String, limit:String, id:String, iugu_id:String, paid_at_from:String, paid_at_to:String, business_name:String, alias:String, account_name:String, iuguCounterId:String, issued_at_from:String, issued_at_to:String, issued_tx_id:String, state:String, iugu_account:String, search_text:String):  Export
 
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
