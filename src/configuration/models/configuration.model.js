@@ -460,7 +460,8 @@ exports.init = async () => {
   
   exports.createConfiguration(newConfig (the_architect, father, `${father}_077` , 'Banco Intermedium S.A.'));
   exports.createConfiguration(newConfig (the_architect, father, `${father}_269` , 'Banco HSBC Brasil S.A.'));
-  
+  exports.createConfiguration(newConfig (the_architect, father, `${father}_707` , 'Banco Daycoval S.A.'));
+
   console.log(' init: OK');
 
   return 'OK';

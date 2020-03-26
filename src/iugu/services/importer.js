@@ -124,33 +124,33 @@ const findAlias = (raw_invoice_param) => {
 exports.importAll = async () => {  
   try{
     
-    // console.log('iugu.import.all.log#1')
+    console.log('iugu.import.all.log#1')
     const invoicesPromises = iugu_config.IUGU_ACCOUNTS.map( (iugu_account) => {
       return importAccountImpl(iugu_account);  
     });
-    // console.log('iugu.import.all.log#2')
+    console.log('iugu.import.all.log#2')
     const invoicesByAccount = await Promise.all(invoicesPromises);
 
-    // console.log('iugu.import.all.log#3')
+    console.log('iugu.import.all.log#3')
     const invoices = [...invoicesByAccount[0], ...invoicesByAccount[1]]
     
     console.log(iugu_config.IUGU_ACCOUNTS[0].key, invoicesByAccount[0].length)
     console.log(iugu_config.IUGU_ACCOUNTS[1].key, invoicesByAccount[1].length)
 
-    // console.log('iugu.import.all.log#4')
+    console.log('iugu.import.all.log#4')
     const importedInvoicesPromises = invoices.map(invoice => IuguModel.byIuguIdOrNull(invoice.id) )
 
-    // console.log('iugu.import.all.log#5')
+    console.log('iugu.import.all.log#5')
     const importedInvoices = await Promise.all(importedInvoicesPromises);
 
-    // console.log('iugu.import.all.log#6')
+    console.log('iugu.import.all.log#6')
     const newInvoices =  invoices.filter((invoice, idx)=>importedInvoices[idx]==null);
     
     // const oldInvoices =  invoices.filter((invoice, idx)=>importedInvoices[idx]!=null);
     // console.log(' ++++ ids to insert :', newInvoices.map(x=>x.id))
     // console.log(' ---- ids already inserted :', oldInvoices.map(x=>x.id))
 
-    // console.log('iugu.import.all.log#7')
+    console.log('iugu.import.all.log#7')
     const invoicesUserPromises = newInvoices.map(invoice=>{
           // 1 get receiver by alias or project
           const alias = findAlias(invoice);
@@ -159,10 +159,10 @@ exports.importAll = async () => {
           return UserModel.byAliasOrBizNameOrNull(alias);      
         });
 
-    // console.log('iugu.import.all.log#7.HALF')
+    console.log('iugu.import.all.log#8')
     const invoicesUser = await Promise.all(invoicesUserPromises);
 
-    // console.log('iugu.import.all.log#8')
+    console.log('iugu.import.all.log#9')
     
     const toInsert = invoicesUser.map((user, idx)=>{
       // console.log('*****************************', user?user.account_name:'user', idx)
@@ -188,11 +188,11 @@ exports.importAll = async () => {
         
     });
 
-    // console.log('iugu.import.all.log#9');
+    console.log('iugu.import.all.log#10');
     console.log('toInsert:', toInsert);
-    return toInsert
-    // const result = await IuguModel.model.create(toInsert);
-    // return result;
+    // return toInsert
+    const result = await IuguModel.model.create(toInsert);
+    return result;
   }
   catch(e){
     console.log('iugu-importer::importAndSave ERROR => ', e);
