@@ -182,12 +182,13 @@ exports.extratoQuery = (context, args) => {
   if(!state || state.trim()=='')
     filter = append(filter, { 'state' : { $in : accepted_states } } );
 
-  const accepted_request_types = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_SEND, RequestModel.TYPE_PAD, RequestModel.TYPE_SALARY, RequestModel.TYPE_ISSUE];
+  const accepted_request_types = [RequestModel.TYPE_DEPOSIT, RequestModel.TYPE_EXCHANGE, RequestModel.TYPE_PROVIDER, RequestModel.TYPE_WITHDRAW, RequestModel.TYPE_PAYMENT, RequestModel.TYPE_SEND, RequestModel.TYPE_PAD, RequestModel.TYPE_SALARY, RequestModel.TYPE_ISSUE, RequestModel.TYPE_IUGU];
   filter = append(filter, getFilter('requested_type', requested_type, accepted_request_types) );
   if(!requested_type || requested_type.trim()=='')
     filter = append(filter, { 'requested_type' : { $in : accepted_request_types } } );
   
   const ors_filter = [
+        { $and : [ { requested_type : RequestModel.TYPE_IUGU  },    { state : RequestModel.STATE_ACCEPTED} ] },
         { $and : [ { requested_type : RequestModel.TYPE_ISSUE  },   { state : RequestModel.STATE_ACCEPTED} ] },
         { $and : [ { requested_type : RequestModel.TYPE_DEPOSIT  }, { state : RequestModel.STATE_ACCEPTED} ] },
         { $and : [ { requested_type : RequestModel.TYPE_EXCHANGE }, { state : { $in : [RequestModel.STATE_RECEIVED, RequestModel.STATE_PROCESSING, RequestModel.STATE_ACCEPTED] } } ] },
@@ -212,6 +213,7 @@ exports.extratoQuery = (context, args) => {
 
 
   const query = getQuery(filter, ors_filter);
+  
   // console.log(' ## graphql-server::extrato-query-builder::query:', JSON.stringify(query)  );
   return {
     limit:   limit

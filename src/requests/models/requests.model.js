@@ -1,11 +1,6 @@
-const config = require('../../common/config/env.config.js');
-
+const config   = require('../../common/config/env.config.js');
 const mongoose = require('../../common/ddbb/mongo_connection.js');
-
-// const mongoose = require('mongoose');
-// mongoose.set('useCreateIndex', true);
-// mongoose.set('useFindAndModify', false);
-// mongoose.connect(process.env.MONGODB_URI || config.mongo.connection_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
+var moment     = require('moment');
 
 exports.TYPE_DEPOSIT                  = 'type_deposit';
 exports.TYPE_EXCHANGE                 = 'type_exchange';
@@ -215,6 +210,7 @@ requestSchema.set('toJSON', {
         // delete ret._id;
         // ret.__typename = ret.requested_type;
         delete ret.__v;
+        ret.created_at_desc = moment.unix(Math.floor(ret.created_at/1000)).format('YYYY-MM-DD HH:mm:ss');
         return ret;
     }
 });

@@ -275,6 +275,7 @@ exports.typeDefs = `
     wages:                      [Wage]
     iugu:                       Iugu
     created_at:                 String
+    created_at_desc:            String
     updated_at:                 String
     
     header:                     String
