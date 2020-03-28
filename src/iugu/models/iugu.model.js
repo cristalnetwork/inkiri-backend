@@ -68,6 +68,7 @@ iuguSchema.set('toJSON', {
         ret.id = ret._id;
         // delete ret._id;
         delete ret.__v;
+        ret.original = JSON.stringify(ret.original);
         return ret;
     }
 });

@@ -336,7 +336,7 @@ exports.typeDefs = `
 
     maxRequestId:                                   Int
     request(id:String, requestCounterId:Int):    Request
-    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : [Request]
+    requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String, iugu_id:String) : [Request]
     extrato(page:String, limit:String, account_name: String, requested_type:String, from:String, to:String, provider_id:String, state:String, date_from:String, date_to:String) : [Request]
     
     export_requests(account_name:String, page:String, limit:String, requested_type:String, from:String, to:String, provider_id:String, state:String, id:String, requestCounterId:Int, tx_id:String, refund_tx_id:String, attach_nota_fiscal_id:String, attach_boleto_pagamento_id:String, attach_comprobante_id:String, deposit_currency:String, date_from:String, date_to:String, service_id:String, wage_filter:String) : Export

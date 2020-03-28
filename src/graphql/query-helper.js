@@ -223,7 +223,7 @@ exports.extratoQuery = (context, args) => {
 exports.requestQuery = (args) => {
   const page  = args.page ? parseInt(args.page) : 0;
   const limit = args.limit ? parseInt(args.limit) : 100;
-  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency, date_from, date_to, service_id, wage_filter} = args;
+  const {requested_type, from, to, provider_id, state, id, requestCounterId, tx_id, refund_tx_id, attach_nota_fiscal_id, attach_boleto_pagamento_id, attach_comprobante_id, deposit_currency, date_from, date_to, service_id, wage_filter, iugu_id} = args;
 
   let filter = {
     filter:     {},
@@ -252,6 +252,8 @@ exports.requestQuery = (args) => {
     filter = append(filter,  {updated_at: { $gte: my_date_from, $lte: my_date_to }});
     // filter = append(filter,  {updated_at: { $gte: my_date_to, $lte: my_date_from }}, {created_at: { $gte: my_date_from, $lte: my_date_to}});
   }
+  
+  filter = append(filter, getFilter('iugu', iugu_id) );
   filter = append(filter, getFilter('requestCounterId', requestCounterId) );
   filter = append(filter, getFilter('_id', id) );
   filter = append(filter, getFilter('provider', provider_id) );

@@ -190,7 +190,6 @@ exports.importAll = async () => {
 
     console.log('iugu.import.all.log#10');
     console.log('toInsert:', toInsert);
-    // return toInsert
     const result = await IuguModel.model.create(toInsert);
     return result;
   }
