@@ -574,30 +574,34 @@ exports.resolvers = {
     iugu: async (parent, args, context) => {
       const query   = queryHelper.iuguQuery(args)
       const res     = await IuguModel.list(1, 0, query.filter);
-      const __res   = res.map( item => {
-        item.original = JSON.stringify(item.original);
-        return item;
-      })
-      return (Array.isArray(__res))?__res[0]:__res;
+      // const __res   = res.map( item => {
+      //   item.original = JSON.stringify(item.original);
+      //   return item;
+      // })
+      // return (Array.isArray(__res))?__res[0]:__res;
+      return (Array.isArray(res))?res[0]:res;
     },
     iugus: async (parent, args, context) => {
       const query   = queryHelper.iuguQuery(args)
       const res     = await IuguModel.list(query.limit, query.page, query.filter);
-      return res.map( item => {
-        item.original = JSON.stringify(item.original);
-        return item;
-      });
+      return res
+      // return res.map( item => {
+      //   item.original = JSON.stringify(item.original);
+      //   return item;
+      // });
     },
 
     export_iugus: async (parent, args, context) => {
       const query   = queryHelper.iuguQuery(args)
       const _limit  = query.limit + (query.limit*query.page)
       const res     = await IuguModel.list(_limit, 0, query.filter);
-      const the_res = res.map( item => {
-        item.original = JSON.stringify(item.original);
-        return item;
-      });
-      return returnSheet(the_res, context.account_name, 'iugus') ;  
+      
+      // const the_res = res.map( item => {
+      //   item.original = JSON.stringify(item.original);
+      //   return item;
+      // });
+      // return returnSheet(the_res, context.account_name, 'iugus') ;  
+      return returnSheet(res, context.account_name, 'iugus') ;  
     },
     
     iuguLog: async (parent, args, context) => {
