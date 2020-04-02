@@ -79,7 +79,7 @@
 
 
 
-const eos_helper    = require('./eos/helper/helper');
+const eos_helper    = require('../../eos/helper/helper');
 
 (async () => {
 
