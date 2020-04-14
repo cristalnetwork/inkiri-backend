@@ -1,4 +1,5 @@
 
+
 # CristalNetwork REST & GraphQL API
 This is a step by step guide to launch an instance of CristalNetwork Backend API. 
 This doc will try to guide you through:
@@ -113,4 +114,5 @@ To run the project, please use a command line the following:
 ```bash
 IUGU_ISSUER_PRIVATE_KEY=<YOUR_ADMIN_ACCOUNT_PRIVATE_KEY> npm start
 ```
+> Please note the private key is the one generated [at this link](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment).
 - It will run the server at port 3600.
