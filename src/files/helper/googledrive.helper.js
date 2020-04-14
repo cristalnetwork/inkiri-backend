@@ -16,15 +16,21 @@ try {
 // const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
-const GDRIVE_CLIENT_EMAIL = process.env.GDRIVE_CLIENT_EMAIL || credentials.client_email
-const GDRIVE_PRIVATE_KEY  = process.env.GDRIVE_PRIVATE_KEY || credentials.private_key
+const GDRIVE_CLIENT_EMAIL = process.env.GDRIVE_CLIENT_EMAIL || (credentials && credentials.client_email) || null;
+const GDRIVE_PRIVATE_KEY  = process.env.GDRIVE_PRIVATE_KEY || (credentials && credentials.private_key) || null;
 
-const auth = new google.auth.JWT(
-    GDRIVE_CLIENT_EMAIL
-    , null
-    , GDRIVE_PRIVATE_KEY
-    , SCOPES
-  );
+const auth = (GDRIVE_CLIENT_EMAIL && GDRIVE_PRIVATE_KEY)
+  ?new google.auth.JWT(
+      GDRIVE_CLIENT_EMAIL
+      , null
+      , GDRIVE_PRIVATE_KEY
+      , SCOPES
+    )
+  :{};
+
+// console.log('GDRIVE_CLIENT_EMAIL:', GDRIVE_CLIENT_EMAIL);
+// console.log('GDRIVE_PRIVATE_KEY:', GDRIVE_PRIVATE_KEY);
+(!GDRIVE_CLIENT_EMAIL && !GDRIVE_PRIVATE_KEY) && console.log('GOOGLE DRIVE API ALERT! App might not work correctly if Google Drive Credentials are misconfigured.')
 exports.auth = auth;
 // console.log(' ** process.env.GDRIVE_CLIENT_EMAIL ** >> ', process.env.GDRIVE_CLIENT_EMAIL);
 
