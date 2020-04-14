@@ -74,13 +74,16 @@ Please make sure that you have:
 - Node.js installed (https://nodejs.org/) 
 Min version required is 10.16.0, please refer to this[installation guide].(https://github.com/nodesource/distributions/blob/master/README.md#debinstall)
 - Have [MongoDB](https://www.mongodb.com/) installed and running locally in `replica set` mode.
-  - Here is a simplified commands guide. Please refer to [this link](https://thecodebarbarian.com/introducing-run-rs-zero-config-mongodb-runner.html#your-first-transaction-with-run-rs-and-mongodb-40) for detailed installation instructions.
+  - Option 1: Local MongoDB Instance
+    - Here is a simplified guide. Please refer to [this link](https://thecodebarbarian.com/introducing-run-rs-zero-config-mongodb-runner.html#your-first-transaction-with-run-rs-and-mongodb-40) for detailed installation instructions.
   ```bash
   npm install run-rs -g
   run-rs --keep --mongod --dbpath /path_to_cristalnetwork/mongodata -v 4.0.0 --shell
   ```
-  - If you are used to **docker**, please refer to [this link](https://gist.github.com/harveyconnor/518e088bad23a273cae6ba7fc4643549).
-  - You may also take a look at [Atlas Mongo Cloud Service](https://www.mongodb.com/cloud/atlas), they have an amazing free tier.
+    - Option 2: Docker MongoDB Instance
+      - If you are used to **docker**, please refer to [this link](https://gist.github.com/harveyconnor/518e088bad23a273cae6ba7fc4643549).
+  - Option 3: Third party MongoDB Services
+    - You may also take a look at [Atlas Mongo Cloud Service](https://www.mongodb.com/cloud/atlas), they have an amazing free tier.
 - Finally, run `npm install` in your root project folder
 
 ## Configuration
