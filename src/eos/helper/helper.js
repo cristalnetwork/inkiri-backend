@@ -13,9 +13,9 @@ try {
 
 const iugu_private_key  = process.env.IUGU_ISSUER_PRIVATE_KEY || iugu_config.prod.private_key;
 
-const rpc =               new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+const rpc               = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
 const signatureProvider = new JsSignatureProvider([iugu_private_key]);
-const api =               new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
+const api               = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
 
 const PERMISSION_VIEWER = 'viewer';
 const PERMISSION_PDA    = 'pda';

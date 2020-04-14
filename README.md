@@ -110,5 +110,7 @@ _missing text_
 
 ## Usage
 To run the project, please use a command line the following:
-`npm start`
+```bash
+IUGU_ISSUER_PRIVATE_KEY=<YOUR_ADMIN_ACCOUNT_PRIVATE_KEY> npm start
+```
 - It will run the server at port 3600.
