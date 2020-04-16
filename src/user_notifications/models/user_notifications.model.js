@@ -4,19 +4,9 @@ const mongoose = require('../../common/ddbb/mongo_connection.js');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const Schema = mongoose.Schema;
 
-exports.STATE_NOT_PROCESSED = 'state_not_processed';
-exports.STATE_PROCESSING    = 'state_processing';
-exports.STATE_SENT          = 'state_sent';
-exports.STATE_ERROR         = 'state_error';
 
-
-const notificationSchema = new Schema({
+const UserNotificationSchema = new Schema({
     account_name:   { type: String },
-    notification:   { title:                 String
-                      , message:             String
-                      , request_counter_id:  Number
-                      , amount:              Number
-                    },
     state:          {
                       type: String
                       , enum: [ exports.STATE_NOT_PROCESSED,
@@ -35,12 +25,12 @@ const notificationSchema = new Schema({
  );
 
 
-notificationSchema.virtual('id').get(function () {
+UserNotificationSchema.virtual('id').get(function () {
     return this._id.toHexString();
 });
 
 // Ensure virtual fields are serialised.
-notificationSchema.set('toJSON', {
+UserNotificationSchema.set('toJSON', {
     virtuals: true,
     transform: function(doc, ret, options) {
         ret.id = ret._id;
@@ -51,9 +41,9 @@ notificationSchema.set('toJSON', {
     }
 });
 
-notificationSchema.plugin(AutoIncrement, {inc_field: 'notificationCounterId'});
+UserNotificationSchema.plugin(AutoIncrement, {inc_field: 'userNotificationCounterId'});
 
-const Notification = mongoose.model('Notification', notificationSchema);
+const Notification = mongoose.model('Notification', UserNotificationSchema);
 
 exports.findById = (id) => {
   return new Promise((resolve, reject) => {
@@ -93,12 +83,12 @@ exports.list = (perPage, page, query) => {
             .populate('receipt')
             .limit(perPage)
             .skip(perPage * page)
-            .sort({notificationCounterId: -1 })
+            .sort({, userNotificationCounterId: -1 })
             .exec(function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
-                  const x = result.map(notif => notif.toJSON())
+                  const x = result.map(user_notif => user_notif.toJSON())
                   resolve(x);
                 }
             })

@@ -1,51 +1,20 @@
-const fetch             = require('node-fetch');
-const IuguModel         = require('../models/iugu.model');
-const UserModel         = require('../../users/models/users.model');
-const config            = require('../../common/config/env.config.js');
-const base64Helper      = require('./base64-helper');
-var moment              = require('moment');
-
-var iugu_config         = null;
-try {
-    iugu_config         = require('../../common/config/iugu.config.js');
-} catch (ex) {
-    
-    iugu_config = {
-      IUGU_ACCOUNTS   : [
-        {
-          key     : "INSTITUTO"
-          , token : process.env.IUGU_INSTITUTO_TOKEN
-        },
-        {
-          key     : "EMPRESA"
-          , token : process.env.IUGU_EMPRESA_TOKEN
-        }
-      ]
-      , ISSUER_KEY      : process.env.IUGU_ISSUER_KEY
-    }
-    
-}
-
-const issuer           = require('./issuer');
+const config         = require('../../common/config/env.config.js');
+const iugu_config    = require('../../common/config/iugu.config.js');
+const IuguModel      = require('../../iugu/models/iugu.model');
+const UserModel      = require('../../users/models/users.model');
+const base64Helper   = require('../../iugu/services/base64-helper');
+const moment         = require('moment');
+const fetch          = require('node-fetch');
 
 const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
 
-const LogModel = require('../../iugu_log/models/iugu_log.model');
-const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs) => {
-  LogModel.createEx(ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs);
-}
-
-/* *************************************************************** */
-/* *************************************************************** */
-/* MULTI ACCOUNT IMPORTER **************************************** */
-
 const importAccountImpl = async (iugu_account) => {
 
-    let from = moment().subtract(5, 'days');
+    let from = moment().subtract(20, 'days');
 
-    const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
-    if(lastImported)
-      from = lastImported.paid_at;
+    // const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
+    // if(lastImported)
+    //   from = lastImported.paid_at;
     
     // console.log(' ** import_account.log#2')
     const _from_query_param   = moment(from).format(iugu_date_format);
@@ -121,7 +90,7 @@ const findAlias = (raw_invoice_param) => {
   return null;
 }
 
-exports.importAll = async () => {  
+const importAll = async () => {  
   try{
     
     console.log('iugu.import.all.log#1')
@@ -191,9 +160,8 @@ exports.importAll = async () => {
     console.log('iugu.import.all.log#10');
     console.log('toInsert:', toInsert);
     
-    // const result = await IuguModel.model.create(toInsert);
-    // return result;
-    return  {};
+    const result = await IuguModel.model.create(toInsert);
+    return result;
   }
   catch(e){
     console.log('iugu-importer::importAndSave ERROR => ', e);
@@ -203,85 +171,20 @@ exports.importAll = async () => {
   }
 }
 
-// exports.importAccount 
 
-// exports.saveAccountInvoices
+(async () => {
 
-// exports.getInvoiceAlias 
+  console.log('iugu.import.all::BEGIN --------------------------------------------')
 
-// exports.buildInvoice
-
-
-exports.reProcessInvoice = async (invoice_id) => reProcessInvoiceImpl(invoice_id);
-
-const reProcessInvoiceImpl = async (invoice_id) => {
-  console.log( ' importer::reProcessInvoiceImpl -> ', invoice_id )
   
-  let invoice_obj = null;
-  try {
-    invoice_obj = await IuguModel.model.findById(invoice_id).populate('receipt').exec()
-  } catch (e) {
-    throw ({error:'Invoice ID not exists. '+invoice_id+'|'+JSON.stringify(e)})
-    return;
-  }
+  // const test_invoice = await IuguModel.byIuguIdOrNull('1BA4DC1943EC4D4CB1477BEABA91108A');
+  // console.log(typeof test_invoice.original)
+  // return process.exit(0);
+  // return;
+  const x = await importAll();
 
-  // 1.- Veo que el estado no sea ISSUED
-  if(!IuguModel.canReprocess(invoice_obj))
-  {
-    const err = `Invoice state/status is ${invoice_obj.state}. Can NOT reprocess invoice.`;
-    console.log('iugu-importer::reProcessInvoiceImpl ERROR:: ', err)
-    throw({error:err})
-    return;
-  }
+        
+  console.log('iugu.import.all::END --------------------------------------------')
+  return process.exit(0);
 
-  // 2.- Obtengo el alias
-  let new_invoice_obj = invoice_obj;
-  if(!invoice_obj.receipt)
-    try {
-      const alias = findAlias(invoice_obj.original);
-      if(!alias || alias==null || alias=='')
-      {
-        console.log('iugu-importer::reProcessInvoiceImpl ERROR:: ', error_alias_not_found)
-        throw({error:error_alias_not_found});
-        return;
-      }
-      new_invoice_obj.receipt = await UserModel.byAliasOrBizNameOrNull(alias);      
-    } catch (e) {
-      const err = `Error while parsing original IUGU invoice. ${JSON.stringify(e)}`;
-      console.log('iugu-importer::reProcessInvoiceImpl ERROR:: ',  e, err)
-      throw({error:err})
-      return;
-    }
-
-  // 3.- Verifico el user a partir del alias
-  if(!new_invoice_obj || !new_invoice_obj.receipt)
-  {
-    const err = `Error while finding account by IUGU alias. Can NOT issue if no account is related to alias. ${new_invoice_obj.error}`;
-    console.log('iugu-importer::reProcessInvoiceImpl ERROR:: ',  e, err)
-    throw({error:err})
-    return;
-  }
-
-  // 4.- "Clone" invoice
-  invoice_obj.iugu_id             = new_invoice_obj.iugu_id;
-  invoice_obj.amount              = new_invoice_obj.amount;
-  invoice_obj.paid_at             = new_invoice_obj.paid_at;
-  invoice_obj.receipt             = new_invoice_obj.receipt;
-  invoice_obj.receipt_alias       = new_invoice_obj.receipt.receipt_alias;
-  invoice_obj.receipt_accountname = new_invoice_obj.receipt.account_name;
-  invoice_obj.original            = new_invoice_obj.original;
-  invoice_obj.error               = null;
-  invoice_obj.state               = IuguModel.STATE_NOT_PROCESSED;
-
-  // 5.- Issue paid amount
-  let issue = null;
-  try {
-    issue = await issuer.issueOne(invoice_obj);
-    return issue;
-  } catch (e) {
-    const err = `Error Issuing invoice:${{new_invoice_obj}}. Error: ${JSON.stringify(e)}`;
-    console.log('iugu-importer::saveImpl ERROR:: ',  err)
-    throw ({invoice:new_invoice_obj, error:e });
-  }
-
-};
+})();
