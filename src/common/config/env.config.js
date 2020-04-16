@@ -77,6 +77,11 @@ let the_config = {
         // "root_folder_id":        "1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7" // tuti
         "root_folder_id":             "1GErXOWh7WsTCRRG03qIhZRfKj34lPuTP" // inkiri
     },
+    "firebase":
+    {
+      "sender_id"  : "",
+      "server_key" : ""
+    },
     "iugu":
     {
       "api":{
