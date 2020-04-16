@@ -6,9 +6,9 @@ const ProviderModel     = require('../providers/models/providers.model');
 const ServiceModel      = require('../services/models/services.model');
 const TeamModel         = require('../teams/models/teams.model');
 const ConfigModel       = require('../configuration/models/configuration.model');
-
 const TransactionModel  = require('../transactions/models/transactions.model');
-
+const NotificationModel = require('../notifications/models/notifications.model');
+const UserNotificationModel = require('../notifications/models/user_notifications.model');
 const config            = require('../common/config/env.config.js');
 
 const GoogleDriveHelper = require('../files/helper/googledrive.helper');
@@ -97,6 +97,31 @@ exports.typeDefs = `
     account_type:             String
     fee:                      Float
     overdraft:                Float
+  }
+
+  type UserNotification{
+    _id:                      ID!
+    account_name:             String
+    tokens:                   [String]
+    updated_at:               String
+    created_at:               String
+  }
+
+  type NotificationMessage{
+    title:                    String
+    message:                  String
+    request_counter_id:       Int
+    amount:                   Float
+  }
+
+  type Notification{
+    _id:                      ID!
+    account_name:             String
+    notification:             [NotificationMessage]
+    state:                    String
+    error:                    String
+    updated_at:               String
+    created_at:               String
   }
 
   type Configuration{
@@ -366,6 +391,9 @@ exports.typeDefs = `
     
     transactions(page:String, limit:String, tx_id:String, from_account_name:String, to_account_name:String, amount:Float, block_num_max:Int, block_num_min:Int):  [Transaction]
     
+    notifications(_id:String, account_name:String): [Notification]
+
+    user_notifications(_id:String, account_name:String, token:String): [UserNotification]
 
     configuration:                   [Configuration]
     configurationItem(id:String):    Configuration
@@ -619,6 +647,17 @@ exports.resolvers = {
     transactions: async (parent, args, context) => {
       const query  = queryHelper.txsQuery(args);
       const res    = await TransactionModel.list(query.limit, query.page, query.filter);
+      return (Array.isArray(res))?res:[res];
+    },
+
+    notifications:async (parent, args, context) => {
+      const query  = queryHelper.notificationsQuery(args);
+      const res    = await NotificationModel.list(query.limit, query.page, query.filter);
+      return (Array.isArray(res))?res:[res];
+    },
+    user_notifications:async (parent, args, context) => {
+      const query  = queryHelper.userNotificationsQuery(args);
+      const res    = await UserNotificationModel.list(query.limit, query.page, query.filter);
       return (Array.isArray(res))?res:[res];
     },
 

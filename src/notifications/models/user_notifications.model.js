@@ -59,7 +59,7 @@ exports.list = (perPage, page, query) => {
         UserNotification.find(query)
             .limit(perPage)
             .skip(perPage * page)
-            .sort({, userNotificationCounterId: -1 })
+            .sort({userNotificationCounterId: -1 })
             .exec(function (err, result) {
                 if (err) {
                     reject(err);

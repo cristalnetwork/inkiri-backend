@@ -464,3 +464,43 @@ exports.txsQuery = (args) => {
     filter:  getQuery(filter)
   };   
 }
+
+exports.userNotificationsQuery= (args) => {
+  const page  = args.page ? parseInt(args.page) : 0;
+  const limit = args.limit ? parseInt(args.limit) : 100;
+  const { _id, account_name , token} = args;
+
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
+
+  filter = append(filter, getFilter('_id', _id) );
+  filter = append(filter, getFilter('account_name', account_name) );
+  filter = append(filter, getFilter('token', token) );
+  return {
+    limit:   limit,
+    page:    page,
+    filter:  getQuery(filter)
+  };    
+}
+
+exports.notificationsQuery = (args) => {
+  const page  = args.page ? parseInt(args.page) : 0;
+  const limit = args.limit ? parseInt(args.limit) : 100;
+  const { _id, account_name } = args;
+
+  let filter = {
+    filter:     {},
+    or_filter : []
+  };
+
+  filter = append(filter, getFilter('_id', _id) );
+  filter = append(filter, getFilter('account_name', account_name) );
+
+  return {
+    limit:   limit,
+    page:    page,
+    filter:  getQuery(filter)
+  };    
+}

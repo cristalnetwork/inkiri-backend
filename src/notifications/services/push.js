@@ -1,3 +1,7 @@
+/*
+  https://firebase.google.com/docs/cloud-messaging/send-message
+*/
+
 const fetch                 = require('node-fetch');
 const NotificationModel     = require('../models/notifications.model');
 const UserNotificationModel = require('../models/user_notifications.model');
