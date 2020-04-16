@@ -9,12 +9,17 @@ const UserModel             = require('../../users/models/users.model');
 const config                = require('../../common/config/env.config.js');
 var moment                  = require('moment');
 var admin                   = require("firebase-admin");
-var serviceAccount          = require("../../common/config/firebase.credentials.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://cristalnetwork-a4720.firebaseio.com"
-});
+let serviceAccount          = null;
+try{
+  serviceAccount            = require("../../common/config/firebase.credentials.json");
+}catch(ex){}
+
+if(serviceAccount)
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://cristalnetwork-a4720.firebaseio.com"
+  });
 
 const getAccessToken = ()  => {
   return new Promise(function(resolve, reject) {
@@ -55,7 +60,10 @@ const getAccessToken = ()  => {
 // }
 
 const pushNotifications = async (notification, userNotification) => new Promise((resolve, reject) => {
-  // This registration token comes from the client FCM SDKs.
+  
+  if(!serviceAccount)
+    return reject({error:'No firebase credentials!'});
+
   if(!userNotification || !userNotification.tokens || userNotification.tokens.length==0)
   {
     resolve({error:'No tokens'});
@@ -86,6 +94,8 @@ const pushNotifications = async (notification, userNotification) => new Promise(
 
 exports.pushAll = async () => {  
   
+  if(!serviceAccount)
+    return;
   const notifications = await NotificationModel.listUnProcessed();
 
   const x  = await NotificationModel.updateMany(
