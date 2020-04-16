@@ -11,6 +11,7 @@ const IuguRouter          = require('./src/iugu/routes.config');
 const TeamsRouter         = require('./src/teams/routes.config');
 const ServicesRouter      = require('./src/services/routes.config');
 const ConfigurationRouter = require('./src/configuration/routes.config');
+const NotificationsRouter = require('./src/notifications/routes.config');
 
 const ExpressGraphQL      = require("express-graphql");
 const { ApolloServer }    = require('apollo-server-express');
@@ -42,6 +43,7 @@ ConfigurationRouter.routesConfig(app);
 IuguRouter.routesConfig(app);
 TeamsRouter.routesConfig(app);
 ServicesRouter.routesConfig(app);
+NotificationsRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
 

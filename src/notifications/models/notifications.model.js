@@ -83,14 +83,13 @@ exports.byIdOrNull = async (id) => {
 
 exports.createNotification = (notificationData) => {
     const _notification = new Notification(notificationData);
-    return Notification.save();
+    return _notification.save();
 };
 
 
 exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
         Notification.find(query)
-            .populate('receipt')
             .limit(perPage)
             .skip(perPage * page)
             .sort({notificationCounterId: -1 })
@@ -104,6 +103,8 @@ exports.list = (perPage, page, query) => {
             })
     });
 };
+
+exports.listUnProcessed = () => exports.list(100, 0, {state:exports.STATE_NOT_PROCESSED});
 
 exports.updateMany = async(filter, update, options, callback) => {
   return Notification.updateMany(filter, update, options, callback);
@@ -120,6 +121,12 @@ exports.insertMany = (notifications) => {
       resolve(docs);
     });
   });
+};
+
+exports.patchById = (_id, notificationData) => {
+    return Notification.findOneAndUpdate({
+        _id: _id
+        }, notificationData);
 };
 
 exports.removeById = (notificationId) => {

@@ -6,17 +6,8 @@ const Schema = mongoose.Schema;
 
 
 const UserNotificationSchema = new Schema({
-    account_name:   { type: String },
-    state:          {
-                      type: String
-                      , enum: [ exports.STATE_NOT_PROCESSED,
-                                exports.STATE_PROCESSING,
-                                exports.STATE_SENT,
-                                exports.STATE_ERROR
-                              ]
-
-                    },
-    error:          { type: String }, 
+    account_name:   { type: String, required : true, unique : true, index: true },
+    tokens:         [{ type: String , index: true,}],
    },
    { timestamps:
       { createdAt: 'created_at'
@@ -34,53 +25,38 @@ UserNotificationSchema.set('toJSON', {
     virtuals: true,
     transform: function(doc, ret, options) {
         ret.id = ret._id;
-        // delete ret._id;
         delete ret.__v;
-        ret.original = JSON.stringify(ret.original);
         return ret;
     }
 });
 
 UserNotificationSchema.plugin(AutoIncrement, {inc_field: 'userNotificationCounterId'});
 
-const Notification = mongoose.model('Notification', UserNotificationSchema);
-
-exports.findById = (id) => {
-  return new Promise((resolve, reject) => {
-      Notification.findById(id)
-          .populate('receipt')
-          .exec(function (err, result) {
-              if (err) {
-                  reject(err);
-              } else {
-                  if(!result)
-                  {
-                    reject('NOT FOUND!!!!!!!!!');
-                    return;
-                  }
-                  resolve (result.toJSON());
-              }
-          })
-  });
-};
+const UserNotification = mongoose.model('UserNotification', UserNotificationSchema);
 
 exports.byIdOrNull = async (id) => {
     if(!id)
         return null;
-    const  notification = await Notification.findOne({_id: id}).exec();
-    return notification;
+    const  user_notification = await UserNotification.findOne({_id: id}).exec();
+    return user_notification;
 };
 
-exports.createNotification = (notificationData) => {
-    const _notification = new Notification(notificationData);
-    return Notification.save();
+exports.byAccountNameOrNull = async (account_name) => {
+    if(!account_name)
+        return null;
+    const  user_notification = await UserNotification.findOne({account_name: account_name.trim()}).exec();
+    return user_notification;
+};
+
+exports.createUserNotification = (userNotificationData) => {
+    const _user_notification = new UserNotification(userNotificationData);
+    return _user_notification.save();
 };
 
 
 exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
-        Notification.find(query)
-            .populate('receipt')
+        UserNotification.find(query)
             .limit(perPage)
             .skip(perPage * page)
             .sort({, userNotificationCounterId: -1 })
@@ -96,12 +72,12 @@ exports.list = (perPage, page, query) => {
 };
 
 exports.updateMany = async(filter, update, options, callback) => {
-  return Notification.updateMany(filter, update, options, callback);
+  return UserNotification.updateMany(filter, update, options, callback);
 }
 
-exports.insertMany = (notifications) => {
+exports.insertMany = (user_notifications) => {
   return new Promise((resolve, reject) => {
-    Notification.create(notifications, (error, docs) => {
+    UserNotification.create(user_notifications, (error, docs) => {
       if(error)
       {
         reject(error);
@@ -112,9 +88,9 @@ exports.insertMany = (notifications) => {
   });
 };
 
-exports.removeById = (notificationId) => {
+exports.removeById = (user_notification_id) => {
     return new Promise((resolve, reject) => {
-        Notification.remove({_id: notificationId}, (err) => {
+        UserNotification.remove({_id: user_notification_id}, (err) => {
             if (err) {
                 reject(err);
             } else {
@@ -122,6 +98,12 @@ exports.removeById = (notificationId) => {
             }
         });
     });
+};
+
+exports.update = (account_name, user_notification) => {
+    return UserNotification.findOneAndUpdate({
+        account_name: account_name
+        }, user_notification);
 };
 
 // exports.byNotificationIdOrNull = async (notification_id) => {
@@ -132,4 +114,4 @@ exports.removeById = (notificationId) => {
 // };
 
 
-exports.model = Notification;
+exports.model = UserNotification;

@@ -10,26 +10,17 @@ const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03
 
 const importAccountImpl = async (iugu_account) => {
 
-    let from = moment().subtract(20, 'days');
+    let from = moment().subtract(1, 'days');
 
-    // const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
-    // if(lastImported)
-    //   from = lastImported.paid_at;
-    
-    // console.log(' ** import_account.log#2')
     const _from_query_param   = moment(from).format(iugu_date_format);
-    console.log(' ** iugu-importer::importAccountImpl::', iugu_account.key, _from_query_param);
-    const _now_query_param    = moment().format(iugu_date_format);
-    // console.log(' ** import_account.log#3')
     const url     = config.iugu.api.endpoint + '/invoices';
     const method  = 'GET';
     const qs      = { limit :          100
                       , start :        0
-                      , paid_at_from : _from_query_param
-                      , paid_at_to:    _now_query_param
+                      , updated_since : _from_query_param
                       , status_filter: 'paid'
                       , 'sortBy[paid_at]' : 'ASC'};
-    
+
     const qs_string = '?' + Object.keys(qs).map(key => `${key}=${qs[key]}`).join('&')
     // console.log(' ** import_account.log#4')
     const auth = base64Helper.toBase64(iugu_account.token);
@@ -160,8 +151,9 @@ const importAll = async () => {
     console.log('iugu.import.all.log#10');
     console.log('toInsert:', toInsert);
     
-    const result = await IuguModel.model.create(toInsert);
-    return result;
+    // const result = await IuguModel.model.create(toInsert);
+    // return result;
+    return {};
   }
   catch(e){
     console.log('iugu-importer::importAndSave ERROR => ', e);
