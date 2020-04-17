@@ -1,16 +1,19 @@
-const config         = require('../../common/config/env.config.js');
-const RequestModel   = require('../models/requests.model');
-const crypto         = require('crypto');
-const rem_generator  = require('../../rem/rem_generator');
-var moment           = require('moment');
+const config               = require('../../common/config/env.config.js');
+const RequestModel         = require('../models/requests.model');
+const crypto               = require('crypto');
+const rem_generator        = require('../../rem/rem_generator');
+var moment                 = require('moment');
+const NotificationHelper   = require('../../notifications/helper/helper');
 
-exports.insert = (req, res) => {
+
+exports.insert = async (req, res) => {
 
   req.body.state = RequestModel.STATE_REQUESTED;
-  // res.status(201).send({'res':'exports.insert', received: req.body});
-//   console.log(' request.Controller::ABOUT TO SAVE')
   RequestModel.createRequest(req.body)
-  .then((result) => {
+  .then(async (result) => {
+
+      try{ const push_notif = await NotificationHelper.onNewRequest(result, req.jwt.account_name); }catch(e){}
+
       res.status(201).send({id: result._id, requestCounterId: result.requestCounterId});
   }, (err)=>{
       console.log(' request.Controller::ERROR', JSON.stringify(err));
@@ -18,7 +21,7 @@ exports.insert = (req, res) => {
   });
 };
 
-exports.insert_files = (req, res) => {
+exports.insert_files = async (req, res) => {
 
   // req.body.state = RequestModel.STATE_REQUESTED;
   // const request = req.body.request;
@@ -30,7 +33,10 @@ exports.insert_files = (req, res) => {
   // };
 
   RequestModel.createRequest(req.body)
-  .then((result) => {
+  .then(async (result) => {
+
+      try{ const push_notif = await NotificationHelper.onNewRequest(result, req.jwt.account_name); }catch(e){}
+
       res.status(201).send({id: result._id, requestCounterId: result.requestCounterId});
   }, (err)=>{
       console.log(' request.Controller::ERROR', JSON.stringify(err));
@@ -97,38 +103,38 @@ exports.list = (req, res) => {
     };
 
 exports.getById = async (req, res) => {
-      console.log(' >> getById:', req.params.requestId);
-      RequestModel.findById(req.params.requestId)
-          .then((result) => {
-              if(!result)
-              {
-                res.status(404).send({error:'Request NOT FOUND #1'});
-                return;
-              }
-              res.status(200).send(result);
-          },
-          (err)=>{
-            res.status(404).send({error:JSON.stringify(err)});
-          });
+    console.log(' >> getById:', req.params.requestId);
+    RequestModel.findById(req.params.requestId)
+      .then((result) => {
+          if(!result)
+          {
+            res.status(404).send({error:'Request NOT FOUND #1'});
+            return;
+          }
+          res.status(200).send(result);
+      },
+      (err)=>{
+        res.status(404).send({error:JSON.stringify(err)});
+      });
   };
 
 
 exports.getByCounter = async (req, res) => {
-    console.log(' >> getById:', req.params.counterId);
-    let filter = { requestCounterId : req.params.counterId};
-    RequestModel.list(1, 0, filter)
-      .then((result) => {
-        if(!result || !result[0])
-          return res.status(404).send({error:'Request NOT FOUND #2'});
-        return res.status(200).send(result[0]);
-      },
-       (err)=> {
-        return res.status(404).send({error:JSON.stringify(err)});
-      });
+  console.log(' >> getById:', req.params.counterId);
+  let filter = { requestCounterId : req.params.counterId};
+  RequestModel.list(1, 0, filter)
+    .then((result) => {
+      if(!result || !result[0])
+        return res.status(404).send({error:'Request NOT FOUND #2'});
+      return res.status(200).send(result[0]);
+    },
+     (err)=> {
+      return res.status(404).send({error:JSON.stringify(err)});
+    });
 
-    };
+  };
 
-exports.patchById = (req, res) => {
+exports.patchById = async (req, res) => {
     // if (req.body.password) {
     //     let salt = crypto.randomBytes(16).toString('base64');
     //     let hash = crypto.createHmac('sha512', salt).update(req.body.password).digest("base64");
@@ -138,13 +144,16 @@ exports.patchById = (req, res) => {
     console.log(JSON.stringify(req.body));
 
     RequestModel.patchRequest(req.params.requestId, req.body)
-        .then((result) => {
+        .then(async (result) => {
+            
+            try{ const push_notif = await NotificationHelper.onUpdateRequest(result, req.jwt.account_name); }catch(e){}
+            
             res.status(200).send({});
         });
 
 };
 
-exports.update_files = (req, res) => {
+exports.update_files = async (req, res) => {
 
   // const request = req.body.request;
   // delete req.body.request;
@@ -158,7 +167,10 @@ exports.update_files = (req, res) => {
 
 
   RequestModel.patchRequest(req.params.requestId, req.body)
-      .then((result) => {
+      .then(async(result) => {
+
+          try{ const push_notif = await NotificationHelper.onUpdateRequest(result, req.jwt.account_name); }catch(e){}
+
           res.status(200).send({});
       });
 };

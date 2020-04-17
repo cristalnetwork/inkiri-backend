@@ -61,11 +61,11 @@ exports.loggedHasAdminWritePermission = async (req, res, next) => {
   if(!validate_with)
     return res.status(500).send({error:'Can not validate account permissions. Something went wrong!'});
 
-  console.log('******************* loggedHasAdminWritePermission')
-  console.log('validate_with:', validate_with)
-  console.log('to:', req.body.to)
-  console.log('from:', req.body.from)
-  console.log('request:', req.body.requested_type)
+  // console.log('******************* loggedHasAdminWritePermission')
+  // console.log('validate_with:', validate_with)
+  // console.log('to:', req.body.to)
+  // console.log('from:', req.body.from)
+  // console.log('request:', req.body.requested_type)
   let is_authorized   = logged_account==validate_with;
   let is_admin        = logged_account==config.eos.bank.account;
   if(!is_admin)

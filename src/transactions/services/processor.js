@@ -1,12 +1,5 @@
 const config         = require('../../common/config/env.config.js');
-
 const mongoose = require('../../common/ddbb/mongo_connection.js');
-
-// const mongoose = require('mongoose');
-// mongoose.set('useCreateIndex', true);
-// mongoose.set('useFindAndModify', false);
-// mongoose.connect(process.env.MONGODB_URI || config.mongo.connection_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
-
 
 const dfuse          = require('./dfuse');
 const TxsModel       = require('../models/transactions.model');
@@ -16,6 +9,8 @@ const IuguModel      = require('../../iugu/models/iugu.model');
 const RequestModel   = require('../../requests/models/requests.model');
 const ServiceModel   = require('../../services/models/services.model');
 const helper         = require('./txs-helper.js');
+
+const NotificationHelper   = require('../../notifications/helper/helper');
 
 const REQUEST_CONTEXT = 'request';
 const USER_CONTEXT    = 'user';
@@ -115,9 +110,7 @@ exports.process = async (reprocess) => {
       if(action.action)
       {
         console.log(' == Trying to process: ', action.action, ' ==== with params: ', toLog(action.params), ' ==== query:', action.query);
-        // console.log(' ====== tx: ', action.tx.block_num);
-        // console.log(' ====== ts: ', action.tx.block_timestamp);
-
+        
         if(action.query)
         {
           res = await RequestModel.model[action.action](action.query, action.params, opts)
@@ -139,6 +132,8 @@ exports.process = async (reprocess) => {
             , {state: TxsModel.STATE_PROCESSED, request: action.tx.request||res._id}
             , { session: session });
       }
+      const push_notif = await NotificationHelper.onBlockchainTx(res, null, session);
+
       // console.log(' ...........res:', res)
       // console.log(' ...........update_tx:', update_tx)
       // console.log(' ...........about to commit')

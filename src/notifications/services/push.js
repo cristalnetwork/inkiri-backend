@@ -110,9 +110,9 @@ exports.pushAll = async () => {
                     });
 
   const notificationsAndTokensProms  = notifications.map(pn => UserNotificationModel.byAccountNameOrNull(pn.account_name));
-  const notificationsAndTokens       = await Promises.all(notificationsAndTokensProms);
+  const notificationsAndTokens       = await Promise.all(notificationsAndTokensProms);
   const notificationsProms           = notifications.map((pn, index) => pushNotifications(pn, notificationsAndTokens[index]))
-  const notificationsResponses       = await Promises.all(notificationsProms);
+  const notificationsResponses       = await Promise.all(notificationsProms);
   const updateDDBBProms              = notificationsResponses.map((resp, index) => 
       {
         let state = NotificationModel.STATE_SENT;
@@ -124,7 +124,7 @@ exports.pushAll = async () => {
         }
         return NotificationModel.patchById(notifications._id, {state:state, error:error});
       });
-  const updateDDBBResponses          = await Promises.all(updateDDBBProms);
+  const updateDDBBResponses          = await Promise.all(updateDDBBProms);
   console.log('Done', )
 }
 
