@@ -4,14 +4,14 @@ const TRANSITION_BLOCKCHAIN     = 'TRANSITION_BLOCKCHAIN';
 const TRANSITION_NEW_REQUEST    = 'TRANSITION_NEW_REQUEST';
 const TRANSITION_UPDATE_REQUEST = 'TRANSITION_UPDATE_REQUEST';
 
-exports.onBlockchainTx     = async (request, logged_account, session) => createNotification(request, TRANSITION_BLOCKCHAIN, logged_account, session);
-exports.onNewRequest       = async (request, logged_account, session) => createNotification(request, TRANSITION_NEW_REQUEST, logged_account, session);
-exports.onUpdateRequest    = async (request, logged_account, session) => createNotification(request, TRANSITION_UPDATE_REQUEST, logged_account, session);
+exports.onBlockchainTx          = async (request, logged_account, session) => exports.createNotification(request, TRANSITION_BLOCKCHAIN, logged_account, session);
+exports.onNewRequest            = async (request, logged_account, session) => exports.createNotification(request, TRANSITION_NEW_REQUEST, logged_account, session);
+exports.onUpdateRequest         = async (request, logged_account, session) => exports.createNotification(request, TRANSITION_UPDATE_REQUEST, logged_account, session);
 
-exports.createNotification = async (request, transition, logged_account, session) => {
+exports.createNotification      = async (request, transition, logged_account, session) => {
   console.log('NOTIFICATIONS-HELPER::transition:', transition)   
   console.log('NOTIFICATIONS-HELPER::logged_account:', logged_account)   
-  console.log('NOTIFICATIONS-HELPER::request:', request)   
+  // console.log('NOTIFICATIONS-HELPER::request:', request)   
 
   const account_name = request.to;
   if(logged_account && logged_account == request.to) 
@@ -23,14 +23,12 @@ exports.createNotification = async (request, transition, logged_account, session
     , notification:  { 
                       title                  : mega_title                 
                       , message              : mega_text
-                      , body                 : mega_text
-                      , image                : 'https://cristalnetwork.org/images/favicon-32x32.png'
                       , request_counter_id   : request.requestCounterId
-                      , from                 : request.from
-                      , requested_type       : request.requested_type
+                      // , from                 : request.from
+                      // , requested_type       : request.requested_type
                       , amount               : request.amount
-                      , to                   : request.to
-                      , state                : request.state
+                      // , to                   : request.to
+                      // , state                : request.state
                       
 
                      }

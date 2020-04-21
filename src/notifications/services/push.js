@@ -62,29 +62,43 @@ const getAccessToken = ()  => {
 const pushNotifications = async (notification, userNotification) => new Promise((resolve, reject) => {
   
   if(!serviceAccount)
-    return reject({error:'No firebase credentials!'});
+  {
+    // return reject({error:'No firebase credentials!'});
+    resolve({error:'No firebase credentials!'});
+    return;
+  }
 
   if(!userNotification || !userNotification.tokens || userNotification.tokens.length==0)
   {
     resolve({error:'No tokens'});
     return;
   }
-  
-  var message = {
-    data:   notification.notification,
+  const notif = {
+      account_name :         notification.account_name
+      , title :              notification.notification.title
+      , message :            notification.notification.message
+      , body :               notification.notification.message
+      , request_counter_id : notification.notification.request_counter_id.toString()
+      , amount :             notification.notification.amount?notification.notification.amount.toString():''
+      , image:               'https://cristalnetwork.org/images/favicon-32x32.png'
+                      
+    };
+  const message = {
+    data:   notif,
     tokens: userNotification.tokens
   };
 
+  console.log(' ************ SENDING PUSH NOTIF TO:', notification.account_name, message);
   // Send a message to the device corresponding to the provided
   // registration token.
   admin.messaging().sendMulticast(message)
     .then((response) => {
-      console.log(notification.account_name, response.successCount + ' messages were sent successfully');
+      console.log(' ************ SENDING PUSH NOTIF OK! ==>', notification.account_name, response.successCount + ' messages were sent successfully');
       resolve(true)
       return;
     })
     .catch((error) => {
-      console.log('Error sending message:', error, notification.account_name);
+      console.log(' ************ SENDING PUSH NOTIF ERROR ==>:', error, notification.account_name);
       resolve({error:error});
       return;
     });
@@ -106,7 +120,6 @@ exports.pushAll = async () => {
                     , {"state": NotificationModel.STATE_PROCESSING}
                     , null
                     , (err, writeResult) => {
-
                     });
 
   const notificationsAndTokensProms  = notifications.map(pn => UserNotificationModel.byAccountNameOrNull(pn.account_name));
@@ -122,7 +135,7 @@ exports.pushAll = async () => {
           state = NotificationModel.STATE_ERROR;
           error = JSON.stringify(resp.error);
         }
-        return NotificationModel.patchById(notifications._id, {state:state, error:error});
+        return NotificationModel.patchById(notifications[index]._id, {state:state, error:error});
       });
   const updateDDBBResponses          = await Promise.all(updateDDBBProms);
   console.log('Done', )

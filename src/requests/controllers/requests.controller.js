@@ -9,16 +9,20 @@ const NotificationHelper   = require('../../notifications/helper/helper');
 exports.insert = async (req, res) => {
 
   req.body.state = RequestModel.STATE_REQUESTED;
+  
   RequestModel.createRequest(req.body)
-  .then(async (result) => {
+    .then(async (result) => {
 
-      try{ const push_notif = await NotificationHelper.onNewRequest(result, req.jwt.account_name); }catch(e){}
+        try{ 
+          const push_notif = await NotificationHelper.onNewRequest(result, req.jwt.account_name); 
+        }catch(e){
+        }
 
-      res.status(201).send({id: result._id, requestCounterId: result.requestCounterId});
-  }, (err)=>{
-      console.log(' request.Controller::ERROR', JSON.stringify(err));
-      res.status(400).send({error:err.errmsg});
-  });
+        res.status(201).send({id: result._id, requestCounterId: result.requestCounterId});
+    }, (err)=>{
+        console.log(' request.Controller::ERROR', JSON.stringify(err));
+        res.status(400).send({error:err.errmsg});
+    });
 };
 
 exports.insert_files = async (req, res) => {
