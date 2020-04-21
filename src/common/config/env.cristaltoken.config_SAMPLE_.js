@@ -51,6 +51,14 @@ module.exports = {
     {
       "api":{
           "endpoint"                  : "https://api.iugu.com/v1"
-      }
+      },
+      "accounts" : [
+        {
+          "key"                       : "<IUGU_ACCOUNT_NAME>"
+          , "token"                   : "<IUGU_ACCOUNT_RAW_TOKEN>"
+        }
+      ]
+      , "issuer_key"                  : "<ISSUER_WIF_PRIVATE_KEY>"
+      , "date_format"                 : "YYYY-MM-DDTHH:mm:ss-03:00"
     }
 };

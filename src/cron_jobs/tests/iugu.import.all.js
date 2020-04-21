@@ -1,12 +1,12 @@
 const config         = require('../../common/config/env.config.js');
-const iugu_config    = require('../../common/config/iugu.config.js');
 const IuguModel      = require('../../iugu/models/iugu.model');
 const UserModel      = require('../../users/models/users.model');
 const base64Helper   = require('../../iugu/services/base64-helper');
 const moment         = require('moment');
 const fetch          = require('node-fetch');
 
-const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
+const iugu_config       = config.iugu;
+const iugu_date_format = (config.iugu && config.iugu.date_format ) || 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
 
 const importAccountImpl = async (iugu_account) => {
 
@@ -85,7 +85,7 @@ const importAll = async () => {
   try{
     
     console.log('iugu.import.all.log#1')
-    const invoicesPromises = iugu_config.IUGU_ACCOUNTS.map( (iugu_account) => {
+    const invoicesPromises = iugu_config.iugu_accounts.map( (iugu_account) => {
       return importAccountImpl(iugu_account);  
     });
     console.log('iugu.import.all.log#2')
@@ -94,8 +94,8 @@ const importAll = async () => {
     console.log('iugu.import.all.log#3')
     const invoices = [...invoicesByAccount[0], ...invoicesByAccount[1]]
     
-    console.log(iugu_config.IUGU_ACCOUNTS[0].key, invoicesByAccount[0].length)
-    console.log(iugu_config.IUGU_ACCOUNTS[1].key, invoicesByAccount[1].length)
+    // console.log(iugu_config.iugu_accounts[0].key, invoicesByAccount[0].length)
+    // console.log(iugu_config.iugu_accounts[1].key, invoicesByAccount[1].length)
 
     console.log('iugu.import.all.log#4')
     const importedInvoicesPromises = invoices.map(invoice => IuguModel.byIuguIdOrNull(invoice.id) )

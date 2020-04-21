@@ -87,7 +87,7 @@ let the_config = {
       "api":{
           "endpoint":               "https://api.iugu.com/v1"
       },
-      "date_format" : 'YYYY-MM-DDTHH:mm:ss-03:00'
+      "date_format" :               "YYYY-MM-DDTHH:mm:ss-03:00"
     }
 };
 
@@ -100,7 +100,27 @@ const _local_config = (the_config.environment == PROD_ENV && local_prod_config)
                          ? local_dev_config
                          : the_config;
 
-// exports_config.jwt_secret = "myS33!!creeeT";
+let iugu_config = {};
+if(process.env.IUGU_INSTITUTO_TOKEN || process.env.IUGU_EMPRESA_TOKEN || process.env.IUGU_ISSUER_PRIVATE_KEY)
+{
+  iugu_config = {
+    "iugu":{
+      "accounts": [
+        {
+          "key"     :   "INSTITUTO"
+          , "token" :   process.env.IUGU_INSTITUTO_TOKEN
+        },
+        {
+          "key"     :   "EMPRESA"
+          , "token" :   process.env.IUGU_EMPRESA_TOKEN
+        }
+      ]
+      , "issuer_key":   process.env.IUGU_ISSUER_PRIVATE_KEY
+      , "date_format":  "YYYY-MM-DDTHH:mm:ss-03:00"
+    }
+  }
+}
+
 // console.log(exports_config.jwt_secret)
-const exports_config = {...the_config, ...(_local_config||{}) };
+const exports_config = {...the_config, ...(_local_config||{}), ...(iugu_config||{}) };
 module.exports       = exports_config;

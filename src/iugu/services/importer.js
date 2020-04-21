@@ -5,26 +5,7 @@ const config            = require('../../common/config/env.config.js');
 const base64Helper      = require('./base64-helper');
 var moment              = require('moment');
 
-var iugu_config         = null;
-try {
-    iugu_config         = require('../../common/config/iugu.config.js');
-} catch (ex) {
-    
-    iugu_config = {
-      IUGU_ACCOUNTS   : [
-        {
-          key     : "INSTITUTO"
-          , token : process.env.IUGU_INSTITUTO_TOKEN
-        },
-        {
-          key     : "EMPRESA"
-          , token : process.env.IUGU_EMPRESA_TOKEN
-        }
-      ]
-      , ISSUER_KEY      : process.env.IUGU_ISSUER_KEY
-    }
-    
-}
+const iugu_config       = config.iugu;
 
 const issuer           = require('./issuer');
 
@@ -132,7 +113,7 @@ exports.importAll = async () => {
   try{
     
     console.log('iugu.import.all.log#1')
-    const invoicesPromises = iugu_config.IUGU_ACCOUNTS.map( (iugu_account) => {
+    const invoicesPromises = iugu_config.accounts.map( (iugu_account) => {
       return importAccountImpl(iugu_account);  
     });
     console.log('iugu.import.all.log#2')
@@ -141,8 +122,8 @@ exports.importAll = async () => {
     console.log('iugu.import.all.log#3')
     const invoices = [...invoicesByAccount[0], ...invoicesByAccount[1]]
     
-    console.log(iugu_config.IUGU_ACCOUNTS[0].key, invoicesByAccount[0].length)
-    console.log(iugu_config.IUGU_ACCOUNTS[1].key, invoicesByAccount[1].length)
+    // console.log(iugu_config.accounts[0].key, invoicesByAccount[0].length)
+    // console.log(iugu_config.accounts[1].key, invoicesByAccount[1].length)
 
     console.log('iugu.import.all.log#4')
     const importedInvoicesPromises = invoices.map(invoice => IuguModel.byIuguIdOrNull(invoice.id) )

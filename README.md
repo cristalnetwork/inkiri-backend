@@ -1,3 +1,4 @@
+
 # CristalNetwork REST & GraphQL API
 This is a step by step guide to launch an instance of CristalNetwork Backend API. 
 This doc will try to guide you through:
@@ -97,13 +98,14 @@ Please copy sample configuration file `project_root_path/src/common/config/env.c
 cd project_root_full_path
 cp ./src/common/config/env.cristaltoken.config_SAMPLE_.js ./src/common/config/env.cristaltoken.config.js
 ```
+The following paragraphs will guide on hos to get configuration parameters and how to input them in the just created configuration file `project_root_full_path/src/common/config/env.cristaltoken.config.js`, by replacing certain string with your content.
 
 #### JWT secret string
 The API implements JWT (JSON Web Token) for users and requests authentication.
 When a user authenticates itself onto the platform, the backend server provides a token for the client to be used in further requests.
 **JWT is created with a secret key** and that secret key is private to the server instance. When the server instance receive a JWT from the client, the server verifies that JWT with the secret key. Any modification to the JWT will result into verification failure.
 
-Replace **<JWT_SECRET>** with your secret key in this file `project_root_full_path/src/common/config/env.cristaltoken.config.js`.
+Replace **<JWT_SECRET>** with your secret key.
 
 Please refer to the following links for further information [https://jwt.io](https://jwt.io/) and [https://github.com/auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken).
 
@@ -112,9 +114,9 @@ You will have to configure the blockchain currency symbol, the account name you 
 
 Replace **<BLOCKCHAIN_CURRENCY_SYMBOL>** in this file `project_root_full_path/src/common/config/env.cristaltoken.config.js` with the currency symbol of the blokchain. Use **TLOS** for TELOS blockchain, **EOS** for EOS blockchain, **EOS** for a Local Single-Node Testnet blockchain.
 
-Replace **<BLOCKCHAIN_ACCOUNT_NAME>** in this file `project_root_full_path/src/common/config/env.cristaltoken.config.js` with the EOSIO account name used [here](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment) to deploy the contract.
+Replace **<BLOCKCHAIN_ACCOUNT_NAME>** with the EOSIO account name used [here](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment) to deploy the contract.
 
-Replace **<BLOCKCHAIN_TOKEN_SYMBOL>** in this file `project_root_full_path/src/common/config/env.cristaltoken.config.js` with the token symbol used [here](https://github.com/cristalnetwork/inkiri-eos-contracts#4-create-the-bank-contract-token) for the currency you issue. 
+Replace **<BLOCKCHAIN_TOKEN_SYMBOL>** with the token symbol used [here](https://github.com/cristalnetwork/inkiri-eos-contracts#4-create-the-bank-contract-token) for the currency you issue. 
 
 You wil have to configure the blockchain endpoints too.
 ```json
@@ -145,7 +147,7 @@ You may take a look at this link for EOS and TELOS endpoints [https://tools.eosm
 You can also check the Hyperion Open History Endpoint List available at [https://t.me/EOSHyperion](https://t.me/EOSHyperion)
 
 #### Mongo DDBB
-Replace **<MONGOBD_CONNECTION_URI>** with your MongoDB connection URI in this file `project_root_full_path/src/common/config/env.cristaltoken.config.js`.
+Replace **<MONGOBD_CONNECTION_URI>** with your MongoDB connection URI.
 
 If you are running a local server the connection might be something like this
 ```bash
@@ -153,14 +155,122 @@ mongodb://localhost:27017,localhost:27017,localhost:27017/?replicaSet=rs&retryWr
 ```
 
 #### Google Drive Storage
-Replace **<GOOGLE_DRIVE_ID>** with your Google drive folder ID. This folder will be used to store private files will be located (files such as Invoices and Receipts).
-Please refer to [https://medium.com/@bretcameron/how-to-use-the-google-drive-api-with-javascript-57a6cc9e5262#7640](https://medium.com/@bretcameron/how-to-use-the-google-drive-api-with-javascript-57a6cc9e5262#7640) and save private key onto this file: `./src/common/config/drive.credentials.json`
+
+##### 1. Create a Google Project.
+You can check this link https://console.developers.google.com/apis
+
+##### 2. Enable Google Drive API and Google Sheets API. 
+You can [check this link](https://developers.google.com/drive/api/v3/enable-drive-api) to enable Drive API and [check this one](https://developers.google.com/sheets/api/quickstart/js) to enable Sheets API.
+
+##### 3. Create a credential
+The credential required is the **Service Account** type one.
+When doing this guide Google provided a 3 steps creation process:
+In the first step you provide identification data (names).
+The second step requires you to Grant access to the project. I granted full control access. 
+You can restrict the access at your convenience. Just keep in mind that the account must have permission to create folders and upload files to the drive, and modify their permissions, and permission to create sheets and modify their permissions.
+You can grant other users the permissions to administer this service account at the third step. This is optional.
+You must create a private key and download the file in JSON format. 
+This file will be used to configure the backend. 
+
+> You can check [this minified image-only step by step guide](https://docs.google.com/presentation/d/1rT788_nK6WMOyqIy1whPpO3ubLz-0Tq06Ll5Mtjjlfk/edit?usp=sharing) to configure the service account credential. You may also [check this guide ](https://medium.com/@bretcameron/how-to-use-the-google-drive-api-with-javascript-57a6cc9e5262#7640)
+
+The donwloaded credential JSON file has this structure:
+```json
+{
+  "type": "service_account",
+  "project_id": "ZZZZZ-YYYYYY",
+  "private_key_id": "XXXXX",
+  "private_key": "-----BEGIN PRIVATE KEY-----qwertyasdfgh-----END PRIVATE KEY-----",
+  "client_email": "cristaltoken@quickstart-YYYYYYY.iam.gserviceaccount.com",
+  "client_id": "114440422914790743876",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cristaltoken%40ZZZZZZ-YYYYYYY.iam.gserviceaccount.com"
+}
+```
+Move the file to `./src/common/config/drive.credentials.json`.
+
+##### 4. Create a Google Drive Folder
+Create a folder at Google Drive and grant write access to the email account created in the step before for the service account credential (*cristaltoken@quickstart-YYYYYYY.iam.gserviceaccount.com* in this guide)
+Replace **<GOOGLE_DRIVE_ID>** with the created folder id ID. This folder will be used to store private files (files such as Invoices and Receipts).
 
 #### IUGU: Payment Gateway
-`>>missing text<<`
+If you want the backend to issue money everytime a IUGU payment is received, you will have to create an API key for your IUGU account. It is basically an authentication token.
+Please [refer to this official IUGU guide](https://dev.iugu.com/reference#section-criando-suas-chaves-de-api-api-tokens).
+
+You will have to configure this fields/parameters: 
+```json
+{   
+  "iugu":
+    {
+      "accounts" : [
+        {
+          "key"                       : "<IUGU_ACCOUNT_NAME>"
+          , "token"                   : "<IUGU_ACCOUNT_RAW_TOKEN>"
+        }
+      ]
+      , "issuer_key"                  : "<ISSUER_WIF_PRIVATE_KEY>"
+    }
+}
+```
+
+Copy the created token and paste it by replacing **<IUGU_ACCOUNT_RAW_TOKEN>**.
+You may add a name or description to identifiy alter on the account through which the payment and the corresponding issue occurred. Replace **<IUGU_ACCOUNT_NAME>** with your preferred name.
+Finally paste issuer private key, for example the one used [in this step](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment), by replacing **<ISSUER_WIF_PRIVATE_KEY>**.
 
 #### Firebase Push Notification
-`>>missing text<<`
+Login into your gmail account and go to [https://console.firebase.google.com](https://console.firebase.google.com).
+Create a new project and configure `Cloud & Messaging` by adding a web app. 
+> You can follow [this minified image-only step by step guide](https://docs.google.com/presentation/d/1SMYwUNt9KfEH5H1Iw55O1ckwhWt0QXgzytKcdf8GSaw/edit?usp=sharing). 
+Register the app by setting a nickname.
+Copy and save in a temp file the script provided by the google service.
+
+It looks like:
+
+```javascript
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "XXXXXXXXXXXX",
+    authDomain: "test-cn-JJJJJJJJJ.firebaseapp.com",
+    databaseURL: "https://test-cn-JJJJJJJJJ.firebaseio.com",
+    projectId: "test-cn-JJJJJJJJJ",
+    storageBucket: "test-cn-JJJJJJJJJ.appspot.com",
+    messagingSenderId: "YYYYYYYYY",
+    appId: "1:YYYYYYYYY:web:XXXXXXXXXXXXX"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+```
+After saving the file, continue to the console and go to project setting and click on `Service Accounts`.
+
+You will get a service account credential to use Admin SDK and be able to send push notification from the backend.
+
+Create a new private key pair for `Node.js` platform and download the file onto `./src/common/config/firebase.credentials.json`.
+
+As you may noticed, the file structure is similar to the drive one.
+```json
+{
+  "type": "service_account",
+  "project_id": "test-cn-XXXXX",
+  "private_key_id": "f1a016153a6b8574a27304c1a1218dabaecb49f0",
+  "private_key": "-----BEGIN PRIVATE KEY-----XXXXXXXX\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-YYYYYYY@test-cn-XXXXX.iam.gserviceaccount.com",
+  "client_id": "ZZZZZZZZZZZZZZZ",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-YYYYYYY%40test-cn-XXXXX.iam.gserviceaccount.com"
+}
+```
 
 ## Usage
 To run the project, please use a command line the following:
@@ -169,4 +279,5 @@ IUGU_ISSUER_PRIVATE_KEY=<YOUR_ADMIN_ACCOUNT_PRIVATE_KEY> npm start
 ```
 > Please note the private key is the one generated [at this link](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment).
 
+If you already configured the WIF private key, just run `npm start`.
 It will run the server at port 3600.

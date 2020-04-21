@@ -6,12 +6,9 @@ const { TextEncoder, TextDecoder }             = require('util');
 const dfuse                                    = require('../../transactions/services/dfuse');
 const hyperion                                 = require('../../transactions/services/hyperion');
 
-var iugu_config         = null;
-try {
-    iugu_config         = require('../../common/config/iugu.config.js');
-} catch (ex) {}
+var iugu_config                                = config.iugu;
 
-const iugu_private_key  = process.env.IUGU_ISSUER_PRIVATE_KEY || iugu_config.prod.private_key;
+const iugu_private_key  = process.env.IUGU_ISSUER_PRIVATE_KEY || iugu_config.issuer_key;
 
 const rpc               = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
 const signatureProvider = new JsSignatureProvider([iugu_private_key]);
