@@ -6,12 +6,12 @@ This is a step by step guide to launch an instance of CristalNetwork Backend API
 This doc will try to guide you through:
 1. Setting up the dev environment, 
 2. Configuring parameters 
-  a. Blockchain parameters,
-  b. DDBB parmeters,
-  c. Google Drive Storage parmeters -_optional_-,
-  d. Payment Gateway parameters [https://iugu.com](https://iugu.com/) -_optional_-,
-  e. Firebase Push Notification service -_optional_-,
-  f. Configure cron jobs.
+    a. Blockchain parameters,
+    b. DDBB parmeters,
+    c. Google Drive Storage parmeters -_optional_-,
+    d. Payment Gateway parameters [https://iugu.com](https://iugu.com/) -_optional_-,
+    e. Firebase Push Notification service -_optional_-,
+    f. Configure cron jobs.
 3. Running a local Backend Instance.
 
 ## Intro
