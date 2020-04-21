@@ -1,4 +1,6 @@
 
+
+
 # CristalNetwork REST & GraphQL API
 This is a step by step guide to launch an instance of CristalNetwork Backend API. 
 This doc will try to guide you through:
@@ -9,6 +11,7 @@ This doc will try to guide you through:
   3. Google Drive Storage parmeters -_optional_-,
   4. Payment Gateway parameters [https://iugu.com](https://iugu.com/) -_optional_-,
   5. Firebase Push Notification service -_optional_-,
+  6. Configure cron jobs.
 3. Running a local Backend Instance.
 
 ## Intro
@@ -271,6 +274,47 @@ As you may noticed, the file structure is similar to the Google Drive one.
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-YYYYYYYYYYYY%40test-cn-XXXXXXXXXXXX.iam.gserviceaccount.com"
 }
 ```
+
+#### Cron jobs
+The backend uses 5 cron jobs:
+##### 1. Import blockchian transactions cron.
+This cron imports transactions querying since last imported to the configured hyperion API endpoint.  
+This is a **high priority** cron. You should run this cron every 15 or 30 seconds.
+The script is prepared to be configured to run every minute, it means you can schedule using crontab like this:
+```bash
+* * * * * node /path_to_cron
+```
+and the cron will run twice a minute, it is every 30 seconds.
+
+> File path: `src/cron_jobs/blockchain/import.transactions.js`
+
+##### 2. Import blockchian customers and account balances cron.
+This cron imports customers from the contract's table and imports every customer's balance. 
+This is a **low priority** cron. You may run this cron every 5 minutes.
+
+> File path: `src/cron_jobs/blockchain/import.accounts.js`
+
+##### 3. Import IUGU payments cron.
+This cron query IUGU API for all the payments updated the last day and store those transactions that are not stored yet. 
+
+This cron also tries to find the recipient account of the payment. To do so, the script extract the account's IUGU Alias set in the invoice description. 
+This text is expected to be between asterisks in the invoice description.
+If this text is not found ini the invoice description, the script check a custom variable named `projeto` configured by a third party invoice system. That variable contains the receipt account's IUGU Alias.
+
+This is a **medium priority** cron. You should run this cron every 5 minutes.
+File path: `src/cron_jobs/iugu/import.js`
+##### 4. Issue imported IUGU payments cron.
+This cron lists already imported IUGU payment transactions and issues corresponding amount of money to recipients if exists. Otherwise administrators will have to issue manually.
+
+This is a **medium priority** cron. You should run this cron every 5 minutes.
+File path: `src/cron_jobs/iugu/issue.js`
+##### 5. Push notifications cron.
+This cron lists a table named `push_notifications` where the modules store notifications to be send to users, such as requests transitions and operations imported from the blockchain and push them to the configured account's device(s).
+
+This is a **medium priority** cron. You should run this cron every 1 minutes.
+File path: `src/cron_jobs/push_notifications/send.all.js`
+
+> This is a usefull link that may help you to configure and schedule cron jobs directly frmo node [https://www.npmjs.com/package/node-cron](https://www.npmjs.com/package/node-cron)
 
 ## Usage
 To run the project, please use a command line the following:
