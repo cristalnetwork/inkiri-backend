@@ -10,6 +10,7 @@ var iugu_config                                = config.iugu;
 
 const iugu_private_key  = process.env.IUGU_ISSUER_PRIVATE_KEY || iugu_config.issuer_key;
 
+// console.log(' ++ iugu_private_key:', iugu_private_key)
 const rpc               = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
 const signatureProvider = new JsSignatureProvider([iugu_private_key]);
 const api               = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
