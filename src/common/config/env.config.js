@@ -74,20 +74,19 @@ let the_config = {
 
     },
     "google":{
-        // "root_folder_id":        "1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7" // tuti
-        "root_folder_id":             "1GErXOWh7WsTCRRG03qIhZRfKj34lPuTP" // inkiri
+        "root_folder_id"              : ""
     },
     "firebase":
     {
-      "sender_id"  : "",
-      "server_key" : ""
+      "sender_id"                     : ""
+      , "server_key"                  : ""
     },
     "iugu":
     {
       "api":{
-          "endpoint":               "https://api.iugu.com/v1"
+          "endpoint"                  : "https://api.iugu.com/v1"
       },
-      "date_format" :               "YYYY-MM-DDTHH:mm:ss-03:00"
+      "date_format"                   : "YYYY-MM-DDTHH:mm:ss-03:00"
     }
 };
 

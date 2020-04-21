@@ -178,21 +178,21 @@ The donwloaded credential JSON file has this structure:
 ```json
 {
   "type": "service_account",
-  "project_id": "ZZZZZ-YYYYYY",
-  "private_key_id": "XXXXX",
-  "private_key": "-----BEGIN PRIVATE KEY-----qwertyasdfgh-----END PRIVATE KEY-----",
-  "client_email": "cristaltoken@quickstart-YYYYYYY.iam.gserviceaccount.com",
-  "client_id": "114440422914790743876",
+  "project_id": "AAAAAAAAAAAA",
+  "private_key_id": "BBBBBBBBBBBB",
+  "private_key": "-----BEGIN PRIVATE KEY-----CCCCCCCCCC-----END PRIVATE KEY-----",
+  "client_email": "cristaltoken@quickstart-AAAAAAAAAAAA.iam.gserviceaccount.com",
+  "client_id": "ZZZZZZZZZZZZ",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cristaltoken%40ZZZZZZ-YYYYYYY.iam.gserviceaccount.com"
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cristaltoken%40YYYYYYYYYYYY-XXXXXXXXXXXX.iam.gserviceaccount.com"
 }
 ```
 Move the file to `./src/common/config/drive.credentials.json`.
 
 ##### 4. Create a Google Drive Folder
-Create a folder at Google Drive and grant write access to the email account created in the step before for the service account credential (*cristaltoken@quickstart-YYYYYYY.iam.gserviceaccount.com* in this guide)
+Create a folder at Google Drive and grant write access to the email account created in the step before for the service account credential (*cristaltoken@quickstart-AAAAAAAAAAAA.iam.gserviceaccount.com* in this guide)
 Replace **<GOOGLE_DRIVE_ID>** with the created folder id ID. This folder will be used to store private files (files such as Invoices and Receipts).
 
 #### IUGU: Payment Gateway
@@ -239,12 +239,12 @@ It looks like:
   // Your web app's Firebase configuration
   var firebaseConfig = {
     apiKey: "XXXXXXXXXXXX",
-    authDomain: "test-cn-JJJJJJJJJ.firebaseapp.com",
-    databaseURL: "https://test-cn-JJJJJJJJJ.firebaseio.com",
-    projectId: "test-cn-JJJJJJJJJ",
-    storageBucket: "test-cn-JJJJJJJJJ.appspot.com",
-    messagingSenderId: "YYYYYYYYY",
-    appId: "1:YYYYYYYYY:web:XXXXXXXXXXXXX"
+    authDomain: "JJJJJJJJJJJJ.firebaseapp.com",
+    databaseURL: "https://JJJJJJJJJJJJ.firebaseio.com",
+    projectId: "JJJJJJJJJJJJ",
+    storageBucket: "JJJJJJJJJJJJ.appspot.com",
+    messagingSenderId: "YYYYYYYYYYYY",
+    appId: "1:YYYYYYYYYYYY:web:XXXXXXXXXXXX"
   };
   // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
@@ -256,28 +256,28 @@ You will get a service account credential to use Admin SDK and be able to send p
 
 Create a new private key pair for `Node.js` platform and download the file onto `./src/common/config/firebase.credentials.json`.
 
-As you may noticed, the file structure is similar to the drive one.
+As you may noticed, the file structure is similar to the Google Drive one.
 ```json
 {
   "type": "service_account",
-  "project_id": "test-cn-XXXXX",
-  "private_key_id": "f1a016153a6b8574a27304c1a1218dabaecb49f0",
-  "private_key": "-----BEGIN PRIVATE KEY-----XXXXXXXX\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-YYYYYYY@test-cn-XXXXX.iam.gserviceaccount.com",
-  "client_id": "ZZZZZZZZZZZZZZZ",
+  "project_id": "JJJJJJJJJJJJ",
+  "private_key_id": "aaaaaaaaaaaa",
+  "private_key": "-----BEGIN PRIVATE KEY-----XXXXXXXXXXXX\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-YYYYYYYYYYYY@test-cn-XXXXXXXXXXXX.iam.gserviceaccount.com",
+  "client_id": "ZZZZZZZZZZZZ",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-YYYYYYY%40test-cn-XXXXX.iam.gserviceaccount.com"
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-YYYYYYYYYYYY%40test-cn-XXXXXXXXXXXX.iam.gserviceaccount.com"
 }
 ```
 
 ## Usage
 To run the project, please use a command line the following:
 ```bash
-IUGU_ISSUER_PRIVATE_KEY=<YOUR_ADMIN_ACCOUNT_PRIVATE_KEY> npm start
+IUGU_ISSUER_PRIVATE_KEY=<YOUR_ADMIN_EOSIO_ACCOUNT_PRIVATE_KEY> npm start
 ```
-> Please note the private key is the one generated [at this link](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment).
+> Please note the private key is [the one generated when deploying the smart contract at this link](https://github.com/cristalnetwork/inkiri-eos-contracts#setup-dev-environment).
 
 If you already configured the WIF private key, just run `npm start`.
 It will run the server at port 3600.
