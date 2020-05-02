@@ -3,8 +3,7 @@ const { JsonRpc } = require("@eoscafe/hyperion")
 const fetch                                    = require('node-fetch');
 // const { TextEncoder, TextDecoder }             = require('util');
 const config      = require('../../common/config/env.config.js');
-const endpoint    = config.eos.hyperion.history_endpoint;
-const rpc         = new JsonRpc(endpoint, { fetch })
+const rpc         = new JsonRpc(config.eos.history_endpoint, { fetch })
 
 var moment        = require('moment');
 
@@ -67,6 +66,7 @@ exports.queryTransactions = async (config, _contract, cursor, last_block_or_time
         ? moment(last_block_or_timestamp).toISOString() 
         : moment().subtract(1, 'days').toISOString()
     };
+    
     
     const response = await rpc.get_actions(contract, options);
     // console.log('========================== RAW');

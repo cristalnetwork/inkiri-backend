@@ -1,25 +1,64 @@
-var local_prod_config         = null;
-var local_dev_config          = null;
-
+var env_config         = null;
 try {
-  local_prod_config         = require('./env.cristaltoken.config.js');
+  // env_config             = require('./env.cristaltoken.config.js');
+  env_config             = require('./env.labis.config.js');
 } catch (ex) {
-  console.log(' ************* Loading env.cristaltoken.config ERROR:', JSON.stringify(ex))
+  console.log(' ************* Loading env.labis.config ERROR:', JSON.stringify(ex))
 }
 
-try {
-  local_dev_config          = require('./env.cristaltoken.config.js');
-  // local_dev_config          = require('./env.test.config.js');
-} catch (ex) {
-  console.log(' ************* Loading env.test.config ERROR:', JSON.stringify(ex))
-}
+const PROD_ENV           = "prod";
+const DEV_ENV            = "dev";
 
-const PROD_ENV  = "prod";
-const DEV_ENV   = "dev";
+const EOS_TESTNET        = 'eos_testnet';
+const TELOS_TESTNET      = 'telos_testnet';
+const TELOS_MAINNET      = 'telos_mainnet';
+const LOCAL_TESTNET      = 'local_testnet';
+
+const env                = DEV_ENV;
+const BLOCKCHAIN_NETWORK = EOS_TESTNET;
+
+const eosio_net = {
+  [EOS_TESTNET]:  {
+    endpoint                  : 'https://jungle2.cryptolions.io:443',
+    history_endpoint          : 'https://junglehistory.cryptolions.io/', 
+    info                      : 'EOS TESTNET',
+    currency_symbol           : 'EOS',
+
+  },
+  [TELOS_TESTNET]: {
+    endpoint                  : 'https://testnet.telosusa.io',
+    endpoint                  : 'https://testnet.telosusa.io',
+    endpoint_long_tx          : 'https://testnet.telosusa.io',
+    endpoint_scope            : 'https://testnet.telosusa.io',
+    history_endpoint          : 'https://testnet.telosusa.io',
+    info                      : 'TELOS TESTNET',
+    currency_symbol           : 'TLOS'
+  },
+  [TELOS_MAINNET]: {
+    endpoint                  : 'https://telos.caleos.io',
+    history_endpoint          : 'https://telos.eoscafeblock.com',
+
+    // endpoint                  : 'https://mainnet.telosusa.io',
+    // endpoint_long_tx          : 'https://mainnet.telosusa.io',
+    // endpoint_scope            : 'https://mainnet.telosusa.io',
+    // history_endpoint          : 'https://mainnet.telosusa.io',
+
+    // endpoint                  : 'https://telos.eoscafeblock.com',
+    // endpoint_long_tx          : 'https://telos.eoscafeblock.com',
+    // history_endpoint          : 'https://telos.eoscafeblock.com',
+    info                      : 'TELOS MAINNET',
+    currency_symbol           : 'TLOS'
+  },
+  [LOCAL_TESTNET]:  {
+    endpoint                  : 'http://localhost:8888',
+    history_endpoint          : 'http://localhost:8080',
+    info                      : 'EOS Local Single-Node Testnet',
+    currency_symbol           : 'EOS',
+  },
+}
 
 let the_config = {
-    "environment":                     PROD_ENV,
-    
+    "environment":                     env,
     "api_version":                     "/api/v1",
     "port":                            3600,
     "jwt_secret":                      "myS33!!creeeT",
@@ -27,25 +66,18 @@ let the_config = {
     "email_domain":                    "inkiri.com",
     "mongo" : {
       "useUnifiedTopology":            false,
-      "connection_uri":                "mongodb://localhost/cristal_dfuse?replicaSet=rs",
+      "connection_uri":                "mongodb://localhost/cristal_ddbb?replicaSet=rs",
     },
     "eos" : {
-        "history_provider":            "hyperion",
-        "blockchain_currency_symbol":  "TLOS",
-        // "blockchain_endpoint_prod":    "https://telos.caleos.io",
-        // "blockchain_endpoint_prod":    "https://mainnet.telosusa.io",
-        "blockchain_endpoint_prod":    "https://telos.eoscafeblock.com",
-        "blockchain_endpoint_dev":     "https://testnet.telosusa.io",
-
         "token": {
-            "contract":                "cristaltoken",
-            "account":                 "cristaltoken",
+            "contract":                "labisteste21",
+            "account":                 "labisteste21",
             "code":                    "INK"
         },
         "bank": {
-            "contract":                "cristaltoken",
-            "account":                 "cristaltoken",
-            "issuer":                  "cristaltoken",
+            "contract":                "labisteste21",
+            "account":                 "labisteste21",
+            "issuer":                  "labisteste21",
             "table_balances":          "accounts",
             "table_customers":         "customer",
             "table_customers_action":  "upsertcust",
@@ -54,13 +86,6 @@ let the_config = {
             "table_paps_action":       "upsertpap",
             "table_paps_delete":       "erasepap",
             "table_paps_charge":       "chargepap"
-        },
-        "hyperion" :{
-          // "history_endpoint_prod" :        "http://mainnet.telosusa.io",
-          "history_endpoint_prod":      "https://telos.caleos.io", 
-          // "history_endpoint_prod":      "https://telos.eoscafeblock.com", 
-          // "history_endpoint_prod":      "https://node1.us-east.telosglobal.io:8899", 
-          "history_endpoint_dev" :      "https://testnet.telosusa.io"
         },
         "dfuse" : {
           "api_key"                   : 'web_8a50f2bc42c1df1a41830c359ba74240',
@@ -90,14 +115,10 @@ let the_config = {
     }
 };
 
-the_config.eos.blockchain_endpoint       = the_config.eos['blockchain_endpoint_'+the_config.environment];
-the_config.eos.hyperion.history_endpoint = the_config.eos.hyperion['history_endpoint_'+the_config.environment];
-
-const _local_config = (the_config.environment == PROD_ENV && local_prod_config)
-                       ? local_prod_config 
-                       : (the_config.environment == DEV_ENV && local_dev_config)
-                         ? local_dev_config
-                         : the_config;
+the_config.eos      = {...the_config.eos, ...eosio_net[BLOCKCHAIN_NETWORK]}
+const _local_config = (env_config)
+                       ? env_config 
+                       : the_config;
 
 let iugu_config = {};
 if(process.env.IUGU_INSTITUTO_TOKEN || process.env.IUGU_EMPRESA_TOKEN || process.env.IUGU_ISSUER_PRIVATE_KEY)

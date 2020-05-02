@@ -1,7 +1,7 @@
 const config            = require('../../common/config/env.config.js');
 const { JsonRpc }       = require('eosjs');
 const fetch             = require('node-fetch');
-const rpc               = new JsonRpc(config.eos.blockchain_endpoint, { fetch });
+const rpc               = new JsonRpc(config.eos.endpoint, { fetch });
 const UserModel         = require('../../users/models/users.model');
 const ecc               = require('eosjs-ecc')
 const helper            = require('../helper/helper')
