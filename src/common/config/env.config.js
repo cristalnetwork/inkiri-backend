@@ -20,7 +20,8 @@ const BLOCKCHAIN_NETWORK = EOS_TESTNET;
 const eosio_net = {
   [EOS_TESTNET]:  {
     endpoint                  : 'https://jungle2.cryptolions.io:443',
-    history_endpoint          : 'https://junglehistory.cryptolions.io/', 
+    // history_endpoint          : 'https://junglehistory.cryptolions.io/', 
+    history_endpoint          : 'https://jungle.eossweden.org',
     info                      : 'EOS TESTNET',
     currency_symbol           : 'EOS',
 
@@ -57,6 +58,8 @@ const eosio_net = {
   },
 }
 
+const contract_account = 'labisteste21';
+
 let the_config = {
     "environment":                     env,
     "api_version":                     "/api/v1",
@@ -64,20 +67,25 @@ let the_config = {
     "jwt_secret":                      "myS33!!creeeT",
     "jwt_expiration_in_seconds":       2592000,
     "email_domain":                    "inkiri.com",
+    
+    "cron" :                           "auto", // "manual"
+
     "mongo" : {
       "useUnifiedTopology":            false,
       "connection_uri":                "mongodb://localhost/cristal_ddbb?replicaSet=rs",
     },
+    
     "eos" : {
+        "history_provider":            "hyperion", //"dfuse"
         "token": {
-            "contract":                "labisteste21",
-            "account":                 "labisteste21",
+            "contract":                contract_account,
+            "account":                 contract_account,
             "code":                    "INK"
         },
         "bank": {
-            "contract":                "labisteste21",
-            "account":                 "labisteste21",
-            "issuer":                  "labisteste21",
+            "contract":                contract_account,
+            "account":                 contract_account,
+            "issuer":                  contract_account,
             "table_balances":          "accounts",
             "table_customers":         "customer",
             "table_customers_action":  "upsertcust",
@@ -98,14 +106,17 @@ let the_config = {
         },
 
     },
+    
     "google":{
         "root_folder_id"              : ""
     },
+    
     "firebase":
     {
       "sender_id"                     : ""
       , "server_key"                  : ""
     },
+    
     "iugu":
     {
       "api":{

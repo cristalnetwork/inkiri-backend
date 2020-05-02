@@ -13,6 +13,8 @@ const ServicesRouter      = require('./src/services/routes.config');
 const ConfigurationRouter = require('./src/configuration/routes.config');
 const NotificationsRouter = require('./src/notifications/routes.config');
 
+const CronManager         = require('./src/cron_jobs/all_in_one');
+
 const ExpressGraphQL      = require("express-graphql");
 const { ApolloServer }    = require('apollo-server-express');
 const {schema, typeDefs, resolvers}      = require('./src/graphql/index');
@@ -85,3 +87,8 @@ apollo_server.applyMiddleware({ app , path});
 app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);
 });
+
+if(config.cron && config.cron=='auto')
+{
+  CronManager.runAllJobs();
+}

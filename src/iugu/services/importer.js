@@ -110,8 +110,12 @@ const findAlias = (raw_invoice_param) => {
 }
 
 exports.importAll = async () => {  
+  
+  if(!iugu_config.accounts || iugu_config.accounts.lenght==0)
+    return;
+  
   try{
-    
+   
     console.log('iugu.import.all.log#1')
     const invoicesPromises = iugu_config.accounts.map( (iugu_account) => {
       return importAccountImpl(iugu_account);  
@@ -206,6 +210,10 @@ exports.importAll = async () => {
 exports.reProcessInvoice = async (invoice_id) => reProcessInvoiceImpl(invoice_id);
 
 const reProcessInvoiceImpl = async (invoice_id) => {
+
+  if(!iugu_config.accounts || iugu_config.accounts.lenght==0)
+    return;
+
   console.log( ' importer::reProcessInvoiceImpl -> ', invoice_id )
   
   let invoice_obj = null;

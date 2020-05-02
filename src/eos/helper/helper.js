@@ -260,10 +260,11 @@ exports.listBankBalances = async (account_names_array) => {
         {  
           const promises  = account_names_array.map(account_name => exports.getAccountBalance(account_name))
           const responses = await Promise.all(promises);
-          console.log(responses)
+          
           return  responses.map((balance, idx)=>{
-            return { account_name : account_names_array[idx], 
-                    balance       : parseAmount(balance)
+            return { 
+                account_name : account_names_array[idx], 
+                balance      : parseAmount(balance)
               }
           } ) ;
         }
