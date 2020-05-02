@@ -88,7 +88,7 @@ app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);
 });
 
-if(config.cron && config.cron=='auto')
+if(config.cron && config.cron.mode=='auto')
 {
   CronManager.runAllJobs();
 }

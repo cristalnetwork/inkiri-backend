@@ -4,9 +4,9 @@ const hyperion        = require('./hyperion');
 
 exports.import = async () => {  
   
-  console.log(' =============================================================================');
-  console.log(' =====    START IMPORT    ====================================================');
-  console.log(' =============================================================================');
+  config.cron && config.cron.log && console.log(' =============================================================================');
+  config.cron && config.cron.log && console.log(' =====    START IMPORT    ====================================================');
+  config.cron && config.cron.log && console.log(' =============================================================================');
 
   // **********************************************************************
   // 0 debug -> deleteMany
@@ -30,13 +30,13 @@ exports.import = async () => {
     // console.log(' == lastImported:', lastImported)
   }
   catch(e){
-    console.log(' ******************** Error getting last imported :( ', e);
+    config.cron && config.cron.log && console.log(' ******************** Error getting last imported :( ', e);
   }
   
   //HACK!!!!!!!!!!!!!!!!
   // last_timestamp = '2020-03-01T01:18:51.500Z';
   // last_timestamp = '2020-03-06T00:35:24.500Z';
-  console.log(' =========== last_timestamp:', last_timestamp)
+  config.cron && config.cron.log && console.log(' =========== last_timestamp:', last_timestamp)
   
   let raw_txs = [];
 
@@ -64,8 +64,8 @@ exports.import = async () => {
   const not_to_insert     = await TxsModel.findTxIds(tx_ids_to_check);
   const not_to_insert_ids = await Promise.all(not_to_insert.map(tx=>tx.tx_id))
   
-  console.log(' =============================================================================');
-  console.log(' ===========not_to_insert_ids : ',not_to_insert_ids.join(' | '));
+  config.cron && config.cron.log && console.log(' =============================================================================');
+  config.cron && config.cron.log && console.log(' ===========not_to_insert_ids : ',not_to_insert_ids.join(' | '));
 
   const my_txs = txs.filter( tx => !not_to_insert_ids.includes(tx.tx_id) )
   
@@ -74,7 +74,7 @@ exports.import = async () => {
   // **********************************************************************
   if(!my_txs || my_txs.length==0)
   {
-    console.log(' ====== NOTHING TO SAVE! ');
+    config.cron && config.cron.log && console.log(' ====== NOTHING TO SAVE! ');
     // console.log(' =============================================================================');
     return;
   }
@@ -83,9 +83,9 @@ exports.import = async () => {
     // console.log('............INSERTARIA', JSON.stringify(my_txs));
   }
   catch(e){
-    console.log(' ******************** Error saving txs :( ', e);
+    console.log(' ******************** Error saving IMPORTED txs :( ', e);
   }
 
-  console.log(' =====    END    =============================================================');
-  console.log(' =============================================================================');
+  config.cron && config.cron.log && console.log(' =====    END    =============================================================');
+  config.cron && config.cron.log && console.log(' =============================================================================');
 };

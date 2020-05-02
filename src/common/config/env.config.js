@@ -68,7 +68,11 @@ let the_config = {
     "jwt_expiration_in_seconds":       2592000,
     "email_domain":                    "inkiri.com",
     
-    "cron" :                           "auto", // "manual"
+
+    "cron" :{
+      "mode":                          "auto", // "manual"
+      "log":                           true
+    }, 
 
     "mongo" : {
       "useUnifiedTopology":            false,
