@@ -32,9 +32,9 @@ let the_config = {
     "eos" : {
         "history_provider":            "hyperion",
         "blockchain_currency_symbol":  "TLOS",
-        // "blockchain_endpoint_prod":    "https://telos.caleos.io",
+        "blockchain_endpoint_prod":    "https://telos.caleos.io",
         // "blockchain_endpoint_prod":    "https://mainnet.telosusa.io",
-        "blockchain_endpoint_prod":    "https://telos.eoscafeblock.com",
+        // "blockchain_endpoint_prod":    "https://telos.eoscafeblock.com",
         "blockchain_endpoint_dev":     "https://testnet.telosusa.io",
 
         "token": {
