@@ -3,6 +3,7 @@ const IuguModel         = require('../models/iugu.model');
 const UserModel         = require('../../users/models/users.model');
 const config            = require('../../common/config/env.config.js');
 const base64Helper      = require('./base64-helper');
+const alreadyIssued     = require('./issued');
 var moment              = require('moment');
 
 var iugu_config         = null;
@@ -144,7 +145,9 @@ exports.importAll = async () => {
     const importedInvoices = await Promise.all(importedInvoicesPromises);
 
     console.log('iugu.import.all.log#6')
-    const newInvoices =  invoices.filter((invoice, idx)=>importedInvoices[idx]==null);
+    const newInvoices =  invoices.filter((invoice, idx)=>{
+      return importedInvoices[idx]==null && !alreadyIssued.includes(invoices[idx].id)
+    });
     
     // const oldInvoices =  invoices.filter((invoice, idx)=>importedInvoices[idx]!=null);
     // console.log(' ++++ ids to insert :', newInvoices.map(x=>x.id))
