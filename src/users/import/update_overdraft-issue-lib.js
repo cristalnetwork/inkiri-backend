@@ -4,7 +4,7 @@ const config        = require('../../common/config/env.config.js');
 const eosHelper     = require('../../eos/helper/helper.js');
 var   _             = require('lodash');
 
-const CURRENCY_SYMBOL = config.eos.blockchain_currency_symbol;
+const CURRENCY_SYMBOL = config.eos.currency_symbol;
 
 const formatAmount = (amount) => {
   return Number(amount).toFixed(4) + ' ' + config.eos.token.code;

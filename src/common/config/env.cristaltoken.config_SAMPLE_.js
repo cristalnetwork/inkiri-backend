@@ -7,12 +7,12 @@ module.exports = {
     },
     "eos" : {
         "history_provider":            "hyperion",
-        "blockchain_currency_symbol":  "<BLOCKCHAIN_CURRENCY_SYMBOL>", //TLOS for TELOS blockchain, EOS for EOS blockchain, SYS for local blockchain
-        "blockchain_endpoint_prod":    "http://localhost:8888", // http://localhost:8888 for Local Single Node testnet, https://telos.eoscafeblock.com for TELOS
-        "blockchain_endpoint_dev":     "http://localhost:8888", // http://localhost:8888 for Local Single Node testnet, https://testnet.telosusa.io
+        "blockchain_currency_symbol":  "<BLOCKCHAIN_CURRENCY_SYMBOL>",  //TLOS for TELOS blockchain, EOS for EOS blockchain, SYS for local blockchain
+        "blockchain_endpoint_prod":    "http://localhost:8888",         // http://localhost:8888 for Local Single Node testnet, https://telos.eoscafeblock.com for TELOS
+        "blockchain_endpoint_dev":     "http://localhost:8888",         // http://localhost:8888 for Local Single Node testnet, https://testnet.telosusa.io
         "hyperion" :{
-          "history_endpoint_prod":      "https://telos.caleos.io",  // http://localhost:8888 for Local Single Node testnet , https://telos.caleos.io for TELOS
-          "history_endpoint_dev" :      "https://testnet.telosusa.io" // http://localhost:8888 for Local Single Node testnet , https://testnet.telosusa.io for TELOS
+          "history_endpoint_prod":      "https://telos.caleos.io",      // http://localhost:8888 for Local Single Node testnet , https://telos.caleos.io for TELOS
+          "history_endpoint_dev" :      "https://testnet.telosusa.io"   // http://localhost:8888 for Local Single Node testnet , https://testnet.telosusa.io for TELOS
         },
         
         "token": {
@@ -51,6 +51,14 @@ module.exports = {
     {
       "api":{
           "endpoint"                  : "https://api.iugu.com/v1"
-      }
+      },
+      "accounts" : [
+        {
+          "key"                       : "<IUGU_ACCOUNT_NAME>"
+          , "token"                   : "<IUGU_ACCOUNT_RAW_TOKEN>"
+        }
+      ]
+      , "issuer_key"                  : "<ISSUER_WIF_PRIVATE_KEY>"
+      , "date_format"                 : "YYYY-MM-DDTHH:mm:ss-03:00"
     }
 };

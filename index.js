@@ -11,6 +11,9 @@ const IuguRouter          = require('./src/iugu/routes.config');
 const TeamsRouter         = require('./src/teams/routes.config');
 const ServicesRouter      = require('./src/services/routes.config');
 const ConfigurationRouter = require('./src/configuration/routes.config');
+const NotificationsRouter = require('./src/notifications/routes.config');
+
+const CronManager         = require('./src/cron_jobs/all_in_one');
 
 const ExpressGraphQL      = require("express-graphql");
 const { ApolloServer }    = require('apollo-server-express');
@@ -42,6 +45,7 @@ ConfigurationRouter.routesConfig(app);
 IuguRouter.routesConfig(app);
 TeamsRouter.routesConfig(app);
 ServicesRouter.routesConfig(app);
+NotificationsRouter.routesConfig(app);
 
 const PORT = process.env.PORT || config.port || 5000
 
@@ -83,3 +87,8 @@ apollo_server.applyMiddleware({ app , path});
 app.listen(PORT, function () {
     console.log('app listening at port %s', config.port);
 });
+
+if(config.cron && config.cron=='auto')
+{
+  CronManager.runAllJobs();
+}

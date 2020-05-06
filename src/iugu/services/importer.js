@@ -6,30 +6,11 @@ const base64Helper      = require('./base64-helper');
 const alreadyIssued     = require('./issued');
 var moment              = require('moment');
 
-var iugu_config         = null;
-try {
-    iugu_config         = require('../../common/config/iugu.config.js');
-} catch (ex) {
-    
-    iugu_config = {
-      IUGU_ACCOUNTS   : [
-        {
-          key     : "INSTITUTO"
-          , token : process.env.IUGU_INSTITUTO_TOKEN
-        },
-        {
-          key     : "EMPRESA"
-          , token : process.env.IUGU_EMPRESA_TOKEN
-        }
-      ]
-      , ISSUER_KEY      : process.env.IUGU_ISSUER_KEY
-    }
-    
-}
+const iugu_config       = config.iugu;
 
-const issuer           = require('./issuer');
+const issuer            = require('./issuer');
 
-const iugu_date_format = 'YYYY-MM-DDTHH:mm:ss-03:00';  // 2019-11-01T00:00:00-03:00
+const iugu_date_format = config.iugu.date_format || 'YYYY-MM-DDTHH:mm:ss-03:00';
 
 const LogModel = require('../../iugu_log/models/iugu_log.model');
 const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs) => {
@@ -42,23 +23,30 @@ const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs)
 
 const importAccountImpl = async (iugu_account) => {
 
-    let from = moment().subtract(5, 'days');
+    let from = moment().subtract(10, 'days');
 
-    const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
-    if(lastImported)
-      from = lastImported.paid_at;
+    // const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
+    // if(lastImported)
+    //   from = lastImported.paid_at;
     
-    // console.log(' ** import_account.log#2')
+    // const _from_query_param   = moment(from).format(iugu_date_format);
+    // console.log(' ** iugu-importer::importAccountImpl::', iugu_account.key, _from_query_param);
+    // const _now_query_param    = moment().format(iugu_date_format);
+    // const url     = config.iugu.api.endpoint + '/invoices';
+    // const method  = 'GET';
+    // const qs      = { limit :          100
+    //                   , start :        0
+    //                   , paid_at_from : _from_query_param
+    //                   , paid_at_to:    _now_query_param
+    //                   , status_filter: 'paid'
+    //                   , 'sortBy[paid_at]' : 'ASC'};
+
     const _from_query_param   = moment(from).format(iugu_date_format);
-    console.log(' ** iugu-importer::importAccountImpl::', iugu_account.key, _from_query_param);
-    const _now_query_param    = moment().format(iugu_date_format);
-    // console.log(' ** import_account.log#3')
     const url     = config.iugu.api.endpoint + '/invoices';
     const method  = 'GET';
     const qs      = { limit :          100
-                      , start :        0
-                      , paid_at_from : _from_query_param
-                      , paid_at_to:    _now_query_param
+                      , start :        1
+                      , updated_since : _from_query_param
                       , status_filter: 'paid'
                       , 'sortBy[paid_at]' : 'ASC'};
     
@@ -122,11 +110,19 @@ const findAlias = (raw_invoice_param) => {
   return null;
 }
 
-exports.importAll = async () => {  
+exports.importAndNotSave = async () => importImpl(false);
+
+exports.importAll = async () => importImpl(true);
+
+const importImpl = async (do_save) => {  
+  
+  if(!iugu_config.accounts || iugu_config.accounts.lenght==0)
+    return;
+  
   try{
-    
+   
     console.log('iugu.import.all.log#1')
-    const invoicesPromises = iugu_config.IUGU_ACCOUNTS.map( (iugu_account) => {
+    const invoicesPromises = iugu_config.accounts.map( (iugu_account) => {
       return importAccountImpl(iugu_account);  
     });
     console.log('iugu.import.all.log#2')
@@ -135,8 +131,11 @@ exports.importAll = async () => {
     console.log('iugu.import.all.log#3')
     const invoices = [...invoicesByAccount[0], ...invoicesByAccount[1]]
     
-    console.log(iugu_config.IUGU_ACCOUNTS[0].key, invoicesByAccount[0].length)
-    console.log(iugu_config.IUGU_ACCOUNTS[1].key, invoicesByAccount[1].length)
+    iugu_config.accounts.map((item, idx)=>{
+      console.log('#######', iugu_config.accounts[idx].key, invoicesByAccount[idx].length)
+    })
+    // console.log(iugu_config.accounts[0].key, invoicesByAccount[0].length)
+    // console.log(iugu_config.accounts[1].key, invoicesByAccount[1].length)
 
     console.log('iugu.import.all.log#4')
     const importedInvoicesPromises = invoices.map(invoice => IuguModel.byIuguIdOrNull(invoice.id) )
@@ -150,7 +149,7 @@ exports.importAll = async () => {
     });
     
     // const oldInvoices =  invoices.filter((invoice, idx)=>importedInvoices[idx]!=null);
-    // console.log(' ++++ ids to insert :', newInvoices.map(x=>x.id))
+    console.log(' ++++ ids to insert :', newInvoices.map(x=>x.id))
     // console.log(' ---- ids already inserted :', oldInvoices.map(x=>x.id))
 
     console.log('iugu.import.all.log#7')
@@ -192,9 +191,14 @@ exports.importAll = async () => {
     });
 
     console.log('iugu.import.all.log#10');
-    console.log('toInsert:', toInsert);
+    // console.log('toInsert:', toInsert);
+    
+    if(do_save===false)
+      return toInsert;
+
     const result = await IuguModel.model.create(toInsert);
     return result;
+    // return {};
   }
   catch(e){
     console.log('iugu-importer::importAndSave ERROR => ', e);
@@ -216,6 +220,10 @@ exports.importAll = async () => {
 exports.reProcessInvoice = async (invoice_id) => reProcessInvoiceImpl(invoice_id);
 
 const reProcessInvoiceImpl = async (invoice_id) => {
+
+  if(!iugu_config.accounts || iugu_config.accounts.lenght==0)
+    return;
+
   console.log( ' importer::reProcessInvoiceImpl -> ', invoice_id )
   
   let invoice_obj = null;

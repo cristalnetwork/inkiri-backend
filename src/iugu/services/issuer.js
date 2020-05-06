@@ -12,7 +12,7 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
 
       console.log(' >> issuer::issuePending #1');
       const invoices_ids = invoices.map( invoice => invoice.id );
-      IuguModel.updateMany(
+      const x = await IuguModel.updateMany(
                             {
                               state: exports.STATE_NOT_PROCESSED
                               ,  _id: { $in: invoices_ids }

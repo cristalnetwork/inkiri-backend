@@ -1,9 +1,9 @@
-const { JsonRpc } = require("@eoscafe/hyperion")
-// const fetch    = require("isomorphic-fetch")
-const fetch                                    = require('node-fetch');
+const { JsonRpc } = require('eosjs');
+const fetch       = require('node-fetch');
 // const { TextEncoder, TextDecoder }             = require('util');
 const config      = require('../../common/config/env.config.js');
-const rpc         = new JsonRpc(config.eos.history_endpoint, { fetch })
+const rpc         = new JsonRpc(config.eos.endpoint, { fetch })
+// const rpc         = new JsonRpc(config.eos.history_endpoint, { fetch })
 
 var moment        = require('moment');
 
@@ -58,17 +58,31 @@ exports.queryTransactions = async (config, _contract, cursor, last_block_or_time
   
   try {
     const options = {
-      filter: `${account}:*`,
-      skip: 0,
-      limit: 100,
+      account_name: `${account}`,
+      pos: 0,
+      offset: 100,
       sort: 'asc',
       after: last_block_or_timestamp 
         ? moment(last_block_or_timestamp).toISOString() 
         : moment().subtract(1, 'days').toISOString()
     };
     
-    
-    const response = await rpc.get_actions(contract, options);
+    const info = await rpc.get_info();
+    console.log('****info:',info)
+
+    const response = await rpc.history_get_actions(account);
+    /*
+      {
+        "account_name": "string",
+        "pos": 0,
+        "offset": 0,
+        "filter": "string",
+        "sort": "desc",
+        "after": "2020-05-01T13:26:57.919Z",
+        "before": "2020-05-01T13:26:57.919Z",
+        "parent": 0
+      }
+    */
     // console.log('========================== RAW');
     // console.log(JSON.stringify(response));
     const results = response.actions || []

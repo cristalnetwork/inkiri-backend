@@ -1,5 +1,5 @@
 const config             = require('../../common/config/env.config.js');
-const importer_dfuse     = require('./importer.dfuse');
+// const importer_dfuse     = require('./importer.dfuse');
 const importer_hyperion  = require('./importer.hyperion');
 
 exports.import = async () => {  
