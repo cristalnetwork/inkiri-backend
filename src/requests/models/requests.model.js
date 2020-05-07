@@ -320,7 +320,7 @@ exports.list = (perPage, page, query) => {
             .populate('wages.member')
             .limit(perPage)
             .skip(perPage * page)
-            .sort({requestCounterId: -1 })
+            .sort({updated_at:-1, requestCounterId: -1 })
             .exec(function (err, requests) {
               if (err) {
                   reject(err);
