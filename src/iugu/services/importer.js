@@ -23,7 +23,7 @@ const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs)
 
 const importAccountImpl = async (iugu_account) => {
 
-    let from = moment().subtract(10, 'days');
+    let from = moment().subtract(1, 'days');
 
     // const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
     // if(lastImported)
