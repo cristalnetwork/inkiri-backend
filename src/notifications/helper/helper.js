@@ -23,16 +23,11 @@ exports.createNotification      = async (request, transition, logged_account, se
     , notification:  { 
                       title                  : mega_title                 
                       , message              : mega_text
-                      , request_counter_id   : request.requestCounterId
-                      // , from                 : request.from
-                      // , requested_type       : request.requested_type
-                      , amount               : request.amount
-                      // , to                   : request.to
-                      // , state                : request.state
-                      
-
+                      // , request_counter_id   : request.requestCounterId
+                      // , amount               : request.amount
                      }
-    , state: NotificationModel.STATE_NOT_PROCESSED
+    , state:   NotificationModel.STATE_NOT_PROCESSED
+    , request: request
   }
   
   const x = await NotificationModel.createNotification(notification);

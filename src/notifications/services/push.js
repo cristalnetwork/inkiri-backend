@@ -15,6 +15,9 @@ try{
   serviceAccount            = require("../../common/config/firebase.credentials.json");
 }catch(ex){}
 
+const FIREBASE_CLIENT_EMAIL = process.env.FIREBASE_CLIENT_EMAIL || (serviceAccount && serviceAccount.client_email) || null;
+const FIREBASE_PRIVATE_KEY  = process.env.FIREBASE_PRIVATE_KEY || (serviceAccount && serviceAccount.private_key) || null;
+
 if(serviceAccount)
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -25,9 +28,9 @@ const getAccessToken = ()  => {
   return new Promise(function(resolve, reject) {
     var key = serviceAccount;
     var jwtClient = new google.auth.JWT(
-      key.client_email,
+      FIREBASE_CLIENT_EMAIL, // key.client_email,
       null,
-      key.private_key,
+      FIREBASE_PRIVATE_KEY, //key.private_key,
       SCOPES,
       null
     );
@@ -40,24 +43,6 @@ const getAccessToken = ()  => {
     });
   });
 }
-
-// const pushNotification = (token, data) => {
-//   // This registration token comes from the client FCM SDKs.
-//   var message = {
-//     data:  data,
-//     token: token
-//   };
-
-//   // Send a message to the device corresponding to the provided registration token.
-//   admin.messaging().send(message)
-//     .then((response) => {
-//       // Response is a message ID string.
-//       console.log('Successfully sent message:', response);
-//     })
-//     .catch((error) => {
-//       console.log('Error sending message:', error);
-//     });
-// }
 
 const pushNotifications = async (notification, userNotification) => new Promise((resolve, reject) => {
   
@@ -74,12 +59,12 @@ const pushNotifications = async (notification, userNotification) => new Promise(
     return;
   }
   const notif = {
-      account_name :         notification.account_name
+      ...notification.request.toJSON()
+      , account_name :       notification.account_name
+      // , created_at:          `${notification.created_at}`
       , title :              notification.notification.title
       , message :            notification.notification.message
       , body :               notification.notification.message
-      , request_counter_id : notification.notification.request_counter_id.toString()
-      , amount :             notification.notification.amount?notification.notification.amount.toString():''
       , image:               'https://cristalnetwork.org/images/favicon-32x32.png'
                       
     };
@@ -89,6 +74,7 @@ const pushNotifications = async (notification, userNotification) => new Promise(
   };
 
   console.log(' ************ SENDING PUSH NOTIF TO:', notification.account_name, message);
+  console.log(' ************ PUSH NOTIF JSON:', JSON.stringify(notif));
   // Send a message to the device corresponding to the provided
   // registration token.
   admin.messaging().sendMulticast(message)
