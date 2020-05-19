@@ -101,7 +101,7 @@ let the_config = {
     },
     
     "google":{
-        "root_folder_id"              : ""
+        "root_folder_id":        "1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7" // tuti
     },
     
     "firebase":
