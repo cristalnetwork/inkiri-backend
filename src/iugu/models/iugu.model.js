@@ -182,7 +182,7 @@ exports.list = (perPage, page, query) => {
             .populate('receipt')
             .limit(perPage)
             .skip(perPage * page)
-            .sort({paid_at : -1, iuguCounterId: -1 })
+            .sort({updated_at : -1, iuguCounterId: -1 })
             .exec(function (err, result) {
                 if (err) {
                     reject(err);

@@ -3,7 +3,7 @@ try {
   // env_config             = require('./env.cristaltoken.config.js');
   env_config             = require('./env.labis.config.js');
 } catch (ex) {
-  console.log(' ************* Loading env.labis.config ERROR:', JSON.stringify(ex))
+  console.log(' ************* Loading env.cristaltoken.config ERROR:', JSON.stringify(ex))
 }
 
 const PROD_ENV           = "prod";
@@ -14,7 +14,7 @@ const TELOS_TESTNET      = 'telos_testnet';
 const TELOS_MAINNET      = 'telos_mainnet';
 const LOCAL_TESTNET      = 'local_testnet';
 
-const env                = DEV_ENV;
+const env                = PROD_ENV;
 const BLOCKCHAIN_NETWORK = EOS_TESTNET;
 
 const eosio_net = {
@@ -28,25 +28,15 @@ const eosio_net = {
   },
   [TELOS_TESTNET]: {
     endpoint                  : 'https://testnet.telosusa.io',
-    endpoint                  : 'https://testnet.telosusa.io',
-    endpoint_long_tx          : 'https://testnet.telosusa.io',
-    endpoint_scope            : 'https://testnet.telosusa.io',
     history_endpoint          : 'https://testnet.telosusa.io',
     info                      : 'TELOS TESTNET',
     currency_symbol           : 'TLOS'
   },
   [TELOS_MAINNET]: {
     endpoint                  : 'https://telos.caleos.io',
-    history_endpoint          : 'https://telos.eoscafeblock.com',
-
-    // endpoint                  : 'https://mainnet.telosusa.io',
-    // endpoint_long_tx          : 'https://mainnet.telosusa.io',
-    // endpoint_scope            : 'https://mainnet.telosusa.io',
-    // history_endpoint          : 'https://mainnet.telosusa.io',
-
-    // endpoint                  : 'https://telos.eoscafeblock.com',
-    // endpoint_long_tx          : 'https://telos.eoscafeblock.com',
-    // history_endpoint          : 'https://telos.eoscafeblock.com',
+    history_endpoint          : 'https://telos.caleos.io',
+    // 'https://telos.eoscafeblock.com',
+    // 'https://mainnet.telosusa.io',
     info                      : 'TELOS MAINNET',
     currency_symbol           : 'TLOS'
   },
@@ -59,22 +49,21 @@ const eosio_net = {
 }
 
 const contract_account = 'labisteste21';
+// const contract_account = 'cristaltoken';
 
 let the_config = {
-    "environment":                     env,
-    "api_version":                     "/api/v1",
-    "port":                            3600,
-    "jwt_secret":                      "myS33!!creeeT",
-    "jwt_expiration_in_seconds":       2592000,
-    "email_domain":                    "inkiri.com",
+    "environment":                     env
+    , "api_version":                     "/api/v1"
+    , "port":                            3600
+    , "jwt_secret":                      "myS33!!creeeT"
+    , "jwt_expiration_in_seconds":       2592000
+    , "email_domain":                    "inkiri.com"
     
-
-    "cron" :{
+    , "cron" :{
       "mode":                          "auto", // "manual"
-      "log":                           true
-    }, 
-
-    "mongo" : {
+      "log":                           false
+    }
+    , "mongo" : {
       "useUnifiedTopology":            false,
       "connection_uri":                "mongodb://localhost/cristal_ddbb?replicaSet=rs",
     },
@@ -141,14 +130,14 @@ if(process.env.IUGU_INSTITUTO_TOKEN || process.env.IUGU_EMPRESA_TOKEN || process
   iugu_config = {
     "iugu":{
       "accounts": [
-        {
-          "key"     :   "INSTITUTO"
-          , "token" :   process.env.IUGU_INSTITUTO_TOKEN
-        },
-        {
-          "key"     :   "EMPRESA"
-          , "token" :   process.env.IUGU_EMPRESA_TOKEN
-        }
+        // {
+        //   "key"     :   "INSTITUTO"
+        //   , "token" :   process.env.IUGU_INSTITUTO_TOKEN
+        // },
+        // {
+        //   "key"     :   "EMPRESA"
+        //   , "token" :   process.env.IUGU_EMPRESA_TOKEN
+        // }
       ]
       , "issuer_key":   process.env.IUGU_ISSUER_PRIVATE_KEY
       , "date_format":  "YYYY-MM-DDTHH:mm:ss-03:00"

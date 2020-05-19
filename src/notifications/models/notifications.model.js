@@ -26,6 +26,7 @@ const notificationSchema = new Schema({
                               ]
 
                     },
+    request:        { type: Schema.Types.ObjectId, ref: 'Requests', required : true},
     error:          { type: String }, 
    },
    { timestamps:
@@ -90,6 +91,7 @@ exports.createNotification = (notificationData) => {
 exports.list = (perPage, page, query) => {
     return new Promise((resolve, reject) => {
         Notification.find(query)
+            .populate('request')
             .limit(perPage)
             .skip(perPage * page)
             .sort({notificationCounterId: -1 })
