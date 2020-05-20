@@ -50,7 +50,7 @@ exports.uploadFiles = async(req, res, next) => {
     try {
       folder_id = await GoogleDriveHelper.createFolder(account);
     } catch (e) {
-      console.log('********CANT CREATE FOLDER:', JSON.stringify(e));
+      // console.log('********CANT CREATE FOLDER:', JSON.stringify(e));
       return res.status(404).send({error:' unable to create folder at Google Drive.', message:JSON.stringify(e)});
       return;
     }

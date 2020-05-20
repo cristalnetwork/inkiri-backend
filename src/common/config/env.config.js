@@ -99,7 +99,7 @@ let the_config = {
     },
     
     "google":{
-        "root_folder_id"              : ""
+        "root_folder_id"              : process.env.GDRIVE_FOLDER_ID || ""
     },
     
     "firebase":
@@ -143,6 +143,7 @@ if(process.env.IUGU_INSTITUTO_TOKEN || process.env.IUGU_EMPRESA_TOKEN || process
   }
 }
 
-// console.log(exports_config.jwt_secret)
+
 const exports_config = {...the_config, ...(_local_config||{}), ...(iugu_config||{}) };
+// console.log(exports_config.google)
 module.exports       = exports_config;
