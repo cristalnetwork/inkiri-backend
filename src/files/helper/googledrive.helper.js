@@ -28,8 +28,8 @@ const auth = (GDRIVE_CLIENT_EMAIL && GDRIVE_PRIVATE_KEY)
     )
   :{};
 
-console.log('GDRIVE_CLIENT_EMAIL:', GDRIVE_CLIENT_EMAIL);
-console.log('GDRIVE_PRIVATE_KEY:', GDRIVE_PRIVATE_KEY);
+// console.log('GDRIVE_CLIENT_EMAIL:', GDRIVE_CLIENT_EMAIL);
+// console.log('GDRIVE_PRIVATE_KEY:', GDRIVE_PRIVATE_KEY);
 (!GDRIVE_CLIENT_EMAIL && !GDRIVE_PRIVATE_KEY) && console.log('GOOGLE DRIVE API ALERT! App might not work correctly if Google Drive Credentials are misconfigured.')
 exports.auth = auth;
 // console.log(' ** process.env.GDRIVE_CLIENT_EMAIL ** >> ', process.env.GDRIVE_CLIENT_EMAIL);
