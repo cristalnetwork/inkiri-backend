@@ -139,6 +139,9 @@ if(process.env.IUGU_INSTITUTO_TOKEN || process.env.IUGU_EMPRESA_TOKEN || process
       ]
       , "issuer_key":   process.env.IUGU_ISSUER_PRIVATE_KEY
       , "date_format":  "YYYY-MM-DDTHH:mm:ss-03:00"
+      , "api":{
+          "endpoint"    : "https://api.iugu.com/v1"
+      }
     }
   }
 }
