@@ -1,14 +1,14 @@
-const config         = require('../../common/config/env.config.js');
-const mongoose = require('../../common/ddbb/mongo_connection.js');
+const config               = require('../../common/config/env.config.js');
+const mongoose             = require('../../common/ddbb/mongo_connection.js');
 
-const dfuse          = require('./dfuse');
-const TxsModel       = require('../models/transactions.model');
-const UserModel      = require('../../users/models/users.model');
-const TeamModel      = require('../../teams/models/teams.model');
-const IuguModel      = require('../../iugu/models/iugu.model');
-const RequestModel   = require('../../requests/models/requests.model');
-const ServiceModel   = require('../../services/models/services.model');
-const helper         = require('./txs-helper.js');
+const dfuse                = require('./dfuse');
+const TxsModel             = require('../models/transactions.model');
+const UserModel            = require('../../users/models/users.model');
+const TeamModel            = require('../../teams/models/teams.model');
+const IuguModel            = require('../../iugu/models/iugu.model');
+const RequestModel         = require('../../requests/models/requests.model');
+const ServiceModel         = require('../../services/models/services.model');
+const helper               = require('./txs-helper.js');
 
 const NotificationHelper   = require('../../notifications/helper/helper');
 

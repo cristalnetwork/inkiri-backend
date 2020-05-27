@@ -191,8 +191,8 @@ const requestSchema = new Schema({
     
     // *********************************************************************************
     // IUGU payment & issuing
-    iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu' },
-
+    iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu'  },
+    //iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu', index: true, unique: true, sparse: true}
 
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
