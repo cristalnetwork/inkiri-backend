@@ -19,10 +19,10 @@ const _do = async () => {
 } 
 
 const tick  = 30000;
-// const loops = 10 * 60 * 1000 / tick; 
-const loops = config.environment == 'prod'
-    ? 2
-    : 10 * 60 * 1000 / tick;
+const loops = 2; 
+// const loops = config.environment == 'prod'
+//     ? 2
+//     : 10 * 60 * 1000 / tick;
      
 (async () => {
   

@@ -1,7 +1,7 @@
 const config = require('../../common/config/env.config.js');
 
 const mongoose = require('../../common/ddbb/mongo_connection.js');
-
+const moment   = require('moment');
 // const mongoose = require('mongoose');
 // mongoose.set('useCreateIndex', true);
 // mongoose.set('useFindAndModify', false);
@@ -174,10 +174,13 @@ const listUnprocessedImpl = async (limit=100, skip=0) => {
   
 }
 
-exports.listProcessing = async (limit=100, skip=0) => listProcessingImpl(limit, skip);
+exports.listProcessing = async (limit=100, skip=0, since=null) => listProcessingImpl(limit, skip, since);
 
-const listProcessingImpl = async (limit=100, skip=0) => {
-  const query = {state : exports.STATE_PROCESSING};
+const listProcessingImpl = async (limit=100, skip=0, since=null) => {
+  
+  const _since = (since!=null)?since:moment().subtract(12, 'hours');
+
+  const query = {state : exports.STATE_PROCESSING, block_timestamp: { $lt : _since }};
   return Transaction.find(query)
             .limit(limit)
             .skip(skip)
