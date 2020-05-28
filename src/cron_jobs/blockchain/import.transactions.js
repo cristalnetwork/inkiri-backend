@@ -14,7 +14,7 @@ const _do = async () => {
   console.log (' ====== BEGIN Process transactions')
   const z = await processor.process();
   console.log (' ====== END Process transactions')
-  // console.log('END o_O');
+  
 
 } 
 
