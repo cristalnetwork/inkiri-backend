@@ -1,12 +1,12 @@
 const TxsModel     = require('../models/transactions.model');
 const config       = require('../../common/config/env.config.js');
-const hyperion        = require('./hyperion');
+const hyperion     = require('./hyperion');
 
 exports.import = async () => {  
   
-  console.log(' =============================================================================');
-  console.log(' =====    START IMPORT    ====================================================');
-  console.log(' =============================================================================');
+  // console.log(' =============================================================================');
+  // console.log(' =====    START IMPORT    ====================================================');
+  // console.log(' =============================================================================');
 
   // **********************************************************************
   // 0 debug -> deleteMany
@@ -64,17 +64,19 @@ exports.import = async () => {
   const not_to_insert     = await TxsModel.findTxIds(tx_ids_to_check);
   const not_to_insert_ids = await Promise.all(not_to_insert.map(tx=>tx.tx_id))
   
-  console.log(' =============================================================================');
-  console.log(' ===========not_to_insert_ids : ',not_to_insert_ids.join(' | '));
-
   const my_txs = txs.filter( tx => !not_to_insert_ids.includes(tx.tx_id) )
+  
+  // console.log(' =============================================================================');
+  console.log(' == new transactions : ', my_txs.length);
+  console.log(' == old transactions : ', not_to_insert_ids.length); 
+  // console.log(' == not_to_insert_ids : ', not_to_insert_ids.join(' | '));
   
   // **********************************************************************
   // 3rd: Store transactions en ddbb for later processing.
   // **********************************************************************
   if(!my_txs || my_txs.length==0)
   {
-    console.log(' ====== NOTHING TO SAVE! ');
+    // console.log(' ====== NOTHING TO SAVE! ');
     // console.log(' =============================================================================');
     return;
   }
@@ -86,6 +88,6 @@ exports.import = async () => {
     console.log(' ******************** Error saving txs :( ', e);
   }
 
-  console.log(' =====    END    =============================================================');
-  console.log(' =============================================================================');
+  // console.log(' =====    END    =============================================================');
+  // console.log(' =============================================================================');
 };

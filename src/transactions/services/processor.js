@@ -18,9 +18,9 @@ const TX_CONTEXT      = 'tx';
 
 exports.process = async (reprocess) => {  
 
-  console.log(' =============================================================================');
-  console.log(' =====    START PROCESS    ===================================================');
-  console.log(' =============================================================================');
+  // console.log(' =============================================================================');
+  // console.log(' =====    START PROCESS    ===================================================');
+  // console.log(' =============================================================================');
 
   // 1.- Get unprocessed txs 
   let txs = []
@@ -31,7 +31,7 @@ exports.process = async (reprocess) => {
   
   if(!txs || txs.length==0)
   {
-    console.log('Nothing to process!');
+    console.log('== 0 txs to process');
     return;
   }
 
@@ -41,8 +41,8 @@ exports.process = async (reprocess) => {
       async (tx) => {
         const operation      = tx.trace.topLevelActions[0];
         const operation_data = helper.expand(operation)
-        console.log('++ tx >>', JSON.stringify(tx) );
-        console.log('>>', operation_data);
+        // console.log('++ tx >>', JSON.stringify(tx) );
+        // console.log('>>', operation_data);
         let action = await getAction(operation, operation_data, tx);
         if(!action || Object.keys(action).length === 0)
         {
@@ -71,13 +71,15 @@ exports.process = async (reprocess) => {
   if(!actions || !Array.isArray(actions) || actions.length==0)
     return null;
 
+  console.log('== ', actions.length, ' txs to process...');
+  
   const contexts = { REQUEST_CONTEXT : RequestModel.model 
                     , USER_CONTEXT   : UserModel.model
                     , TX_CONTEXT     : TxsModel.model}
 
   const session = await mongoose.startSession();
 
-  console.log(` == About to process ${actions.length} actions.`);
+  // console.log(` == About to process ${actions.length} actions.`);
 
   for(var i = 0; i<actions.length;i++)
   { 
@@ -86,8 +88,8 @@ exports.process = async (reprocess) => {
 
     if(!action || !action.context)
     {
-      console.log(` == Action ${i}/${actions.length} is not configured. Continuing...`);
-      console.log(' ====================================================================') 
+      // console.log(` == Action ${i}/${actions.length} is not configured. Continuing...`);
+      // console.log(' ====================================================================') 
       continue;
     }
 
@@ -96,10 +98,8 @@ exports.process = async (reprocess) => {
       , {state: TxsModel.STATE_PROCESSING}
     );
 
-    console.log(` == RUNNING action ${action.operation_data.tx_type} ${i}/${actions.length}...`);
+    // console.log(` == RUNNING action ${action.operation_data.tx_type} ${i}/${actions.length}...`);
     const context    = contexts[action.context];
-    // session.withTransaction(() => {
-    // })
     session.startTransaction()
     const opts    = { session: session };
     
@@ -108,7 +108,7 @@ exports.process = async (reprocess) => {
       let update_tx = null;
       if(action.action)
       {
-        console.log(' == Trying to process: ', action.action, ' ==== with params: ', toLog(action.params), ' ==== query:', action.query);
+        // console.log(' == Trying to process: ', action.action, ' ==== with params: ', toLog(action.params), ' ==== query:', action.query);
         
         if(action.query)
         {
@@ -134,17 +134,17 @@ exports.process = async (reprocess) => {
       // const push_notif = await NotificationHelper.onBlockchainTx(res, null, session);
 
       const tx_res = await session.commitTransaction()
-      console.log(' ====================================================================') 
+      // console.log(' ====================================================================') 
     } catch (err) {
-      console.log(' +++ error:', err)
+      console.log(' TXS.SERVICE.PROCESSOR: +++ error:', err)
       await session.abortTransaction();
       // throw err
     }
   }
 
   await session.endSession()
-  console.log(' =====    END PROCESS    =====================================================');
-  console.log(' =============================================================================');
+  // console.log(' =====    END PROCESS    =====================================================');
+  // console.log(' =============================================================================');
 
   return actions;
 }
@@ -473,7 +473,7 @@ const getAction = async (operation, operation_data, tx) => {
                       
                     }]
         }
-        console.log(ret)
+        // console.log(ret)
         return ret;
       break;
     case helper.KEY_ERASE_PAP:

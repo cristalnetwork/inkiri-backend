@@ -5,16 +5,16 @@ const config         = require('../../common/config/env.config.js');
 
 const _do = async () => {
   // Import transactions
-  console.log (' ====== Import transactions')
+  console.log (' ====== BEGIN Import transactions')
   const y = await importer.import();
-  console.log (' == Transactions imported!!')
+  console.log (' ====== END Import transactions')
 
   
   // Process imported transactions
-  console.log (' ====== Process transactions')
+  console.log (' ====== BEGIN Process transactions')
   const z = await processor.process();
-  console.log (' == Transactions processed!!')
-  console.log('END o_O');
+  console.log (' ====== END Process transactions')
+  // console.log('END o_O');
 
 } 
 
