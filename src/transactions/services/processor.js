@@ -41,7 +41,6 @@ exports.process = async (reprocess) => {
       async (tx) => {
         const operation      = tx.trace.topLevelActions[0];
         const operation_data = helper.expand(operation)
-        // if(operation_data && operation_data.tx_type)
         console.log('++ tx >>', JSON.stringify(tx) );
         console.log('>>', operation_data);
         let action = await getAction(operation, operation_data, tx);
@@ -132,17 +131,13 @@ exports.process = async (reprocess) => {
             , {state: TxsModel.STATE_PROCESSED, request: action.tx.request||res._id}
             , { session: session });
       }
-      const push_notif = await NotificationHelper.onBlockchainTx(res, null, session);
+      // const push_notif = await NotificationHelper.onBlockchainTx(res, null, session);
 
-      // console.log(' ...........res:', res)
-      // console.log(' ...........update_tx:', update_tx)
-      // console.log(' ...........about to commit')
       const tx_res = await session.commitTransaction()
-      // console.log(' commit tx')
       console.log(' ====================================================================') 
     } catch (err) {
       console.log(' +++ error:', err)
-      await session.abortTransaction()
+      await session.abortTransaction();
       // throw err
     }
   }
