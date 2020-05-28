@@ -389,7 +389,7 @@ exports.typeDefs = `
     iuguLog(id:String):   IuguLog
     iuguLogs(page:String!, limit:String!, id:String):  [IuguLog]
     
-    transactions(page:String, limit:String, tx_id:String, from_account_name:String, to_account_name:String, amount:Float, block_num_max:Int, block_num_min:Int):  [Transaction]
+    transactions(page:String, limit:String, tx_id:String, from_account_name:String, to_account_name:String, amount:Float, block_num_max:Int, block_num_min:Int, state:String):  [Transaction]
     
     notifications(_id:String, account_name:String): [Notification]
 

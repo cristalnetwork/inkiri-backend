@@ -29,7 +29,7 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
       try {
         _issue           = await Promise.all(_issue_p);
       } catch (e) {
-        console.log(' == IUGU.SERVICES.ISSUER::issuePending() ERROR: ', JSON.stringify(e))
+        console.log(' == IUGU.SERVICES.ISSUER::issuePending() ERROR#1: ', invoice.id, JSON.stringify(e))
       }
 
       const issued_ok    = _issue.filter(resp => !resp.error && resp.invoice && resp.invoice.issued_tx_id)
@@ -39,7 +39,9 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
                                  , false)
       // console.log(' ** Issue Response: ', _issue)
       res(_issue)
+      return;
     }, (err)=>{
+      console.log(' == IUGU.SERVICES.ISSUER::issuePending() ERROR#2: ', err);
       IuguLogModel.logIssue(JSON.stringify(err), 0, null, null,0,    null,    null, false)
       rej({error:err});
       return;
@@ -63,13 +65,14 @@ const issueOneImpl = async (invoice) => new Promise(async(res, rej) => {
       return;
     }
     tx = null;
+    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#2: ', invoice.error, invoice.id);
     rej({error:invoice.error, invoice:invoice});
     return;
   }
 
   if(!tx)
   {
-    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#2: ', invoice.id);
+    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#3: ', invoice.id);
     rej({error:'Something went wrong', invoice:invoice});
     return;
   }
@@ -84,7 +87,7 @@ const issueOneImpl = async (invoice) => new Promise(async(res, rej) => {
   try {
     const x = await IuguModel.patchById(invoice.id, invoice);
   } catch (e) {
-    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#3: ', JSON.stringify(e), invoice.id);
+    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#4: ', JSON.stringify(e), invoice.id);
     rej({error:'Money issued!!! But something went wrong saving tx result. '+JSON.stringify(e), invoice:invoice});
     return;
   }
