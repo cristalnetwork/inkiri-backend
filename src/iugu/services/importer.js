@@ -45,15 +45,15 @@ const importAccountImpl = async (iugu_account, days_before) => {
     const _from_query_param          = moment(from).format(iugu_date_format);
     const paid_at_from_query_param   = '2020-03-03T00:00:00-03:00';
     
-    // console.log('IUGU:IMPORTER::paid_at_from_query_param:', paid_at_from_query_param);
-    // console.log('IUGU:IMPORTER::_from_query_param:', _from_query_param);
-    // console.log('IUGU:IMPORTER::_days_before:', _days_before);
+    console.log('IUGU:IMPORTER::paid_at_from_query_param:', paid_at_from_query_param);
+    console.log('IUGU:IMPORTER::_from_query_param:', _from_query_param);
+    console.log('IUGU:IMPORTER::_days_before:', _days_before);
 
 
     const url     = config.iugu.api.endpoint + '/invoices';
     const method  = 'GET';
     const qs      = { limit :          100
-                      , start :        1
+                      , start :        0
                       , updated_since : _from_query_param
                       , status_filter: 'paid'
                       , paid_at_from: paid_at_from_query_param
