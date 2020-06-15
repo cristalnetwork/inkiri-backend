@@ -313,7 +313,7 @@ const getAction = async (operation, operation_data, tx) => {
       }
       break;
     case helper.KEY_TRANSFER_PAY:
-      // MEMO:   'pay|' + request_id + '|' + memo)
+      // MEMO:   'pay|' + requestCounterId + '|' + memo)
       // ACTION: UPDATE ref payment request
       // const pay_account = await UserModel.byAccountNameOrNull(operation.data.to);
       if(helper._at(memo_parts, 1)!=undefined && helper._at(memo_parts, 1)!='undefined')
@@ -323,7 +323,7 @@ const getAction = async (operation, operation_data, tx) => {
           , query:    { requestCounterId:  parseInt(helper._at(memo_parts, 1)) }
           , params: { 
                       amount:         tx.amount
-                      // , state:        RequestModel.STATE_ACCEPTED
+                      , state:        RequestModel.STATE_ACCEPTED
                       , tx_id:        tx.tx_id
                     }
         }

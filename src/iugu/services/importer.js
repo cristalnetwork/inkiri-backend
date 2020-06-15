@@ -57,8 +57,8 @@ const importAccountImpl = async (iugu_account, days_before) => {
                       , updated_since : _from_query_param
                       , status_filter: 'paid'
                       , paid_at_from: paid_at_from_query_param
-                      , 'sortBy[created_at]' : 'ASC'};
-                      // , 'sortBy[paid_at]' : 'ASC'};
+                      // , 'sortBy[created_at]' : 'ASC'};
+                      , 'sortBy[paid_at]' : 'ASC'};
     
     //sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
     //https://dev.iugu.com/reference#listar-faturas
