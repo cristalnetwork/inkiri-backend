@@ -16,6 +16,7 @@ const LOCAL_TESTNET      = 'local_testnet';
 
 const env                = PROD_ENV;
 const BLOCKCHAIN_NETWORK = EOS_TESTNET;
+// const BLOCKCHAIN_NETWORK = TELOS_MAINNET;
 
 const eosio_net = {
   [EOS_TESTNET]:  {
@@ -102,6 +103,7 @@ let the_config = {
     
     "google":{
         "root_folder_id":        "1rMKCZUv5KHXv4pfL-Mhx492L2Qkb32d7" // tuti
+        // "root_folder_id"              : process.env.GDRIVE_FOLDER_ID || ""
     },
     
     "firebase":
@@ -141,10 +143,14 @@ if(process.env.IUGU_INSTITUTO_TOKEN || process.env.IUGU_EMPRESA_TOKEN || process
       ]
       , "issuer_key":   process.env.IUGU_ISSUER_PRIVATE_KEY
       , "date_format":  "YYYY-MM-DDTHH:mm:ss-03:00"
+      , "api":{
+          "endpoint"    : "https://api.iugu.com/v1"
+      }
     }
   }
 }
 
-// console.log(exports_config.jwt_secret)
+
 const exports_config = {...the_config, ...(_local_config||{}), ...(iugu_config||{}) };
+// console.log(exports_config.google)
 module.exports       = exports_config;

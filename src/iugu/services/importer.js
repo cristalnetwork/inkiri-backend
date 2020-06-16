@@ -21,9 +21,10 @@ const log      = (ok_count, ok_ids, ok_logs, error_count, error_ids, error_logs)
 /* *************************************************************** */
 /* MULTI ACCOUNT IMPORTER **************************************** */
 
-const importAccountImpl = async (iugu_account) => {
+const importAccountImpl = async (iugu_account, days_before) => {
 
-    let from = moment().subtract(1, 'days');
+    const _days_before = isNaN(days_before)?1:days_before;
+    let from = moment().subtract(_days_before, 'days');  
 
     // const lastImported = await IuguModel.lastImportedOrNull(iugu_account.key);
     // if(lastImported)
@@ -41,15 +42,27 @@ const importAccountImpl = async (iugu_account) => {
     //                   , status_filter: 'paid'
     //                   , 'sortBy[paid_at]' : 'ASC'};
 
-    const _from_query_param   = moment(from).format(iugu_date_format);
+    const _from_query_param          = moment(from).format(iugu_date_format);
+    const paid_at_from_query_param   = '2020-03-03T00:00:00-03:00';
+    
+    console.log('IUGU:IMPORTER::paid_at_from_query_param:', paid_at_from_query_param);
+    console.log('IUGU:IMPORTER::_from_query_param:', _from_query_param);
+    console.log('IUGU:IMPORTER::_days_before:', _days_before);
+
+
     const url     = config.iugu.api.endpoint + '/invoices';
     const method  = 'GET';
     const qs      = { limit :          100
-                      , start :        1
+                      , start :        0
                       , updated_since : _from_query_param
                       , status_filter: 'paid'
+                      , paid_at_from: paid_at_from_query_param
+                      // , 'sortBy[created_at]' : 'ASC'};
                       , 'sortBy[paid_at]' : 'ASC'};
     
+    //sortBy[created_at]=ASC ex2: sortBy[paid_at]=DESC ex3: sortBy[due_date]=ASC
+    //https://dev.iugu.com/reference#listar-faturas
+
     const qs_string = '?' + Object.keys(qs).map(key => `${key}=${qs[key]}`).join('&')
     // console.log(' ** import_account.log#4')
     const auth = base64Helper.toBase64(iugu_account.token);
@@ -110,49 +123,54 @@ const findAlias = (raw_invoice_param) => {
   return null;
 }
 
-exports.importAndNotSave = async () => importImpl(false);
+exports.importAndNotSave = async (days_before) => importImpl(false, days_before);
+
+exports.importAllSince = async (days_before) => importImpl(true, days_before);
 
 exports.importAll = async () => importImpl(true);
 
-const importImpl = async (do_save) => {  
+const importImpl = async (do_save, days_before) => {  
   
   if(!iugu_config.accounts || iugu_config.accounts.lenght==0)
     return;
-  
+  const _days_before = isNaN(days_before)?1:days_before;
+
   try{
    
-    console.log('iugu.import.all.log#1')
+    // console.log('iugu.import.all.log#1')
     const invoicesPromises = iugu_config.accounts.map( (iugu_account) => {
-      return importAccountImpl(iugu_account);  
+      return importAccountImpl(iugu_account, _days_before);  
     });
-    console.log('iugu.import.all.log#2')
+    // console.log('iugu.import.all.log#2')
     const invoicesByAccount = await Promise.all(invoicesPromises);
 
-    console.log('iugu.import.all.log#3')
+    // console.log('iugu.import.all.log#3')
     const invoices = [...invoicesByAccount[0], ...invoicesByAccount[1]]
     
-    iugu_config.accounts.map((item, idx)=>{
-      console.log('#######', iugu_config.accounts[idx].key, invoicesByAccount[idx].length)
-    })
+    // iugu_config.accounts.map((item, idx)=>{
+    //   console.log('#######', iugu_config.accounts[idx].key, invoicesByAccount[idx].length)
+    // })
     // console.log(iugu_config.accounts[0].key, invoicesByAccount[0].length)
     // console.log(iugu_config.accounts[1].key, invoicesByAccount[1].length)
 
-    console.log('iugu.import.all.log#4')
+    // console.log('iugu.import.all.log#4')
     const importedInvoicesPromises = invoices.map(invoice => IuguModel.byIuguIdOrNull(invoice.id) )
 
-    console.log('iugu.import.all.log#5')
+    // console.log('iugu.import.all.log#5')
     const importedInvoices = await Promise.all(importedInvoicesPromises);
 
-    console.log('iugu.import.all.log#6')
+    // console.log('iugu.import.all.log#6')
     const newInvoices =  invoices.filter((invoice, idx)=>{
       return importedInvoices[idx]==null && !alreadyIssued.includes(invoices[idx].id)
     });
     
-    // const oldInvoices =  invoices.filter((invoice, idx)=>importedInvoices[idx]!=null);
-    console.log(' ++++ ids to insert :', newInvoices.map(x=>x.id))
-    // console.log(' ---- ids already inserted :', oldInvoices.map(x=>x.id))
-
-    console.log('iugu.import.all.log#7')
+    if(newInvoices.length>0)
+      console.log(' == IUGU.SERVICES.IMPORTER::importImpl() About to insert: ', newInvoices.length)
+    else
+      console.log(' == IUGU.SERVICES.IMPORTER::importImpl() NOTHING to insert. ')
+    
+    // console.log(' ++++ ids to insert :', newInvoices.map(x=>x.id))
+    // console.log('iugu.import.all.log#7')
     const invoicesUserPromises = newInvoices.map(invoice=>{
           // 1 get receiver by alias or project
           const alias = findAlias(invoice);
@@ -161,10 +179,10 @@ const importImpl = async (do_save) => {
           return UserModel.byAliasOrBizNameOrNull(alias);      
         });
 
-    console.log('iugu.import.all.log#8')
+    // console.log('iugu.import.all.log#8')
     const invoicesUser = await Promise.all(invoicesUserPromises);
 
-    console.log('iugu.import.all.log#9')
+    // console.log('iugu.import.all.log#9')
     
     const toInsert = invoicesUser.map((user, idx)=>{
       // console.log('*****************************', user?user.account_name:'user', idx)
@@ -190,7 +208,7 @@ const importImpl = async (do_save) => {
         
     });
 
-    console.log('iugu.import.all.log#10');
+    // console.log('iugu.import.all.log#10');
     // console.log('toInsert:', toInsert);
     
     if(do_save===false)
@@ -201,10 +219,11 @@ const importImpl = async (do_save) => {
     // return {};
   }
   catch(e){
-    console.log('iugu-importer::importAndSave ERROR => ', e);
+    console.log(' == IUGU.SERVICES.IMPORTER::importImpl() ERROR#1: ', e)
+    // console.log('iugu-importer::importAndSave ERROR => ', e);
     //rej({error:err2, qs:result.qs});
     // rej({error:err});
-    return {error:err};
+    return {error:e};
   }
 }
 

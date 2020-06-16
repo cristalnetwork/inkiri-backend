@@ -6,11 +6,11 @@ var  moment             = require('moment');
 
 exports.issuePending = async () => issuePendingImpl();
 const issuePendingImpl = async () => new Promise(async(res, rej) => {
-  console.log(' >> llamarin a issuePending');
+  // console.log(' >> llamarin a issuePending');
   IuguModel.listUnprocessed()
     .then( async (invoices) => {
 
-      console.log(' >> issuer::issuePending #1');
+      // console.log(' >> issuer::issuePending #1');
       const invoices_ids = invoices.map( invoice => invoice.id );
       const x = await IuguModel.updateMany(
                             {
@@ -29,7 +29,7 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
       try {
         _issue           = await Promise.all(_issue_p);
       } catch (e) {
-        console.log('Promise.all ERROR: ', JSON.stringify(e))
+        console.log(' == IUGU.SERVICES.ISSUER::issuePending() ERROR#1: ', invoice.id, JSON.stringify(e))
       }
 
       const issued_ok    = _issue.filter(resp => !resp.error && resp.invoice && resp.invoice.issued_tx_id)
@@ -37,9 +37,11 @@ const issuePendingImpl = async () => new Promise(async(res, rej) => {
       IuguLogModel.logIssue('', issued_ok.length, issued_ok.map(obj => obj.invoice.id), null,
                                  issued_error.length,    issued_error.map(obj => obj.invoice.id),    issued_error.map(obj => obj.error)
                                  , false)
-      console.log(' ** Issue Response: ', _issue)
+      // console.log(' ** Issue Response: ', _issue)
       res(_issue)
+      return;
     }, (err)=>{
+      console.log(' == IUGU.SERVICES.ISSUER::issuePending() ERROR#2: ', err);
       IuguLogModel.logIssue(JSON.stringify(err), 0, null, null,0,    null,    null, false)
       rej({error:err});
       return;
@@ -58,21 +60,24 @@ const issueOneImpl = async (invoice) => new Promise(async(res, rej) => {
     try {
       const x = await IuguModel.patchById(invoice.id, invoice);
     } catch (e) {
+      console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#1: ', JSON.stringify(e), invoice.id);
       rej({error:'An error occurred while saving process result error. Error: '+JSON.stringify(e), invoice:invoice});
       return;
     }
     tx = null;
+    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#2: ', invoice.error, invoice.id);
     rej({error:invoice.error, invoice:invoice});
     return;
   }
 
   if(!tx)
   {
+    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#3: ', invoice.id);
     rej({error:'Something went wrong', invoice:invoice});
     return;
   }
 
-  console.log(' ISSUED!! invoice.id->', invoice.id);
+  console.log(' == IUGU.SERVICES.ISSUER::issueOneImpl Issued invoice.id->', invoice.id);
   // console.log(JSON.stringify(tx));
   invoice.issued_at     = moment();
   invoice.issued_tx_id  = tx.transaction_id;;
@@ -82,6 +87,7 @@ const issueOneImpl = async (invoice) => new Promise(async(res, rej) => {
   try {
     const x = await IuguModel.patchById(invoice.id, invoice);
   } catch (e) {
+    console.log('== IUGU.SERVICES.ISSUER::issueOneImpl() Error#4: ', JSON.stringify(e), invoice.id);
     rej({error:'Money issued!!! But something went wrong saving tx result. '+JSON.stringify(e), invoice:invoice});
     return;
   }

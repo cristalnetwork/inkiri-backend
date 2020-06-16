@@ -1,6 +1,6 @@
 const TxsModel     = require('../models/transactions.model');
 const config       = require('../../common/config/env.config.js');
-const hyperion        = require('./hyperion');
+const hyperion     = require('./hyperion');
 
 exports.import = async () => {  
   
@@ -68,6 +68,11 @@ exports.import = async () => {
   config.cron && config.cron.log && console.log(' ===========not_to_insert_ids : ',not_to_insert_ids.join(' | '));
 
   const my_txs = txs.filter( tx => !not_to_insert_ids.includes(tx.tx_id) )
+  
+  // console.log(' =============================================================================');
+  console.log(' == new transactions : ', my_txs.length);
+  console.log(' == old transactions : ', not_to_insert_ids.length); 
+  // console.log(' == not_to_insert_ids : ', not_to_insert_ids.join(' | '));
   
   // **********************************************************************
   // 3rd: Store transactions en ddbb for later processing.

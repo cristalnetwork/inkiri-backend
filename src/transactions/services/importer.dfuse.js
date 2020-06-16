@@ -5,9 +5,9 @@ const dfuse        = require('./dfuse');
 
 exports.import = async () => {  
   
-  console.log(' =============================================================================');
-  console.log(' =====    START IMPORT    ====================================================');
-  console.log(' =============================================================================');
+  // console.log(' =============================================================================');
+  // console.log(' =====    START IMPORT    ====================================================');
+  // console.log(' =============================================================================');
 
   // **********************************************************************
   // 0 debug -> deleteMany
@@ -33,7 +33,7 @@ exports.import = async () => {
   catch(e){
     console.log(' ******************** Error getting last imported :( ', e);
   }
-  console.log(' =========== last_block:', last_block)
+  // console.log(' =========== last_block:', last_block)
   // return;
 
   const server_key     = config.eos.dfuse.server_api_key || process.env.DFUSE_SERVER_API_KEY;
@@ -86,46 +86,46 @@ exports.import = async () => {
   const not_to_insert     = await TxsModel.findTxIds(tx_ids_to_check);
   const not_to_insert_ids = await Promise.all(not_to_insert.map(tx=>tx.tx_id))
   
-  console.log(' =============================================================================');
-  console.log(' ===========not_to_insert_ids : ',not_to_insert_ids.join(' | '));
+  // console.log(' =============================================================================');
+  // console.log(' ===========not_to_insert_ids : ',not_to_insert_ids.join(' | '));
 
   const my_txs = txs.filter( tx => !not_to_insert_ids.includes(tx.tx_id) )
   
   // console.log(not_to_insert_ids)
-  console.log(' =============================================================================');
-  console.log(' =========== txs.length:', txs.length);
-  console.log(' =========== not_to_insert_ids.length:', not_to_insert_ids.length);
-  console.log(' =============================================================================');
+  // console.log(' =============================================================================');
+  // console.log(' =========== txs.length:', txs.length);
+  // console.log(' =========== not_to_insert_ids.length:', not_to_insert_ids.length);
+  // console.log(' =============================================================================');
 
-  // console.log(' =========== raw_txs[0]:', raw_txs[0]);
-  console.log(' =============================================================================');
-  console.log(' =========== txs.length:', txs.length);
-  console.log(' =============================================================================');
-  console.log(' =========== txs[0]:', (txs&&txs.length>0)
-      ?txs[0].tx_id
-      :'N/A');
-  console.log(' =============================================================================');
-  console.log(' =========== txs[x]:', (txs&&txs.length>0)
-      ?txs.slice(-1)[0].tx_id 
-      :'N/A');
+  // // console.log(' =========== raw_txs[0]:', raw_txs[0]);
+  // console.log(' =============================================================================');
+  // console.log(' =========== txs.length:', txs.length);
+  // console.log(' =============================================================================');
+  // console.log(' =========== txs[0]:', (txs&&txs.length>0)
+  //     ?txs[0].tx_id
+  //     :'N/A');
+  // console.log(' =============================================================================');
+  // console.log(' =========== txs[x]:', (txs&&txs.length>0)
+  //     ?txs.slice(-1)[0].tx_id 
+  //     :'N/A');
   
   // **********************************************************************
   // 3rd: Store transactions en ddbb for later processing.
   // **********************************************************************
   if(!my_txs || my_txs.length==0)
   {
-    console.log(' ====== NOTHING TO SAVE! ');
-    console.log(' =============================================================================');
+    // console.log(' ====== NOTHING TO SAVE! ');
+    // console.log(' =============================================================================');
     return;
   }
   try{
     const res = await TxsModel.insertMany(my_txs);
-    console.log(' ====== txs Saved[0] ', res[0]._id);
+    // console.log(' ====== txs Saved[0] ', res[0]._id);
   }
   catch(e){
     console.log(' ******************** Error saving txs :( ', e);
   }
 
-  console.log(' =====    END    =============================================================');
-  console.log(' =============================================================================');
+  // console.log(' =====    END    =============================================================');
+  // console.log(' =============================================================================');
 };

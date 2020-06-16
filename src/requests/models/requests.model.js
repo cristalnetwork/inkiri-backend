@@ -68,7 +68,7 @@ const requestSchema = new Schema({
                                       exports.STATE_REVERTED
                                     ]
     },
-    tx_id:                { type: String },
+    tx_id:                { type: String , index: true, unique: true, sparse: true},
     refund_tx_id:         { type: String ,
       required: function() {
         // return ([exports.STATE_REJECTED, exports.STATE_REVERTED, exports.STATE_REFUNDED].includes(this.requested_type));
@@ -191,8 +191,8 @@ const requestSchema = new Schema({
     
     // *********************************************************************************
     // IUGU payment & issuing
-    iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu' },
-
+    // iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu'  },
+    iugu:                 { type: Schema.Types.ObjectId, ref: 'Iugu', index: true, unique: true, sparse: true}
 
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
