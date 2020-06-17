@@ -70,7 +70,7 @@ let the_config = {
     , "email_domain":                  "inkiri.com"
     
     , "cron" :{
-      "mode":                          "manual", // "auto"
+      "mode":                          "auto", // "manual"
       "log":                           false
     }
     , "mongo" : {
