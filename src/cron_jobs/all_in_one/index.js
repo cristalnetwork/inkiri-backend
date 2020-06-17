@@ -36,7 +36,7 @@ const cron_jobs = [
   },
   {
     key:      'BALANCES_IMPORTER'
-    , time:   '0 */5 * * * *'
+    , time:   '0 */1 * * * *'
     , tasks:  [ {context:UserService, function:'balances'}]
   },
   {
