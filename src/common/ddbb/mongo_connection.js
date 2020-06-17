@@ -6,8 +6,12 @@ mongoose.set('useFindAndModify', false);
 
 // mongoose.connect(process.env.MONGODB_URI || config.mongo.connection_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
 
+const my_conn = process.env.MONGODB_URI || config.mongo.connection_uri;
+
+// console.log(my_conn);
+
 exports.getConnection = () => {
-  mongoose.connect(process.env.MONGODB_URI || config.mongo.connection_uri , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
+  mongoose.connect(my_conn , {useNewUrlParser: true, useUnifiedTopology: config.mongo.useUnifiedTopology }); 
   return mongoose;  
 }
 

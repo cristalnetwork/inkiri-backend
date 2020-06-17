@@ -10,6 +10,7 @@ const PROD_ENV           = "prod";
 const DEV_ENV            = "dev";
 
 const EOS_TESTNET        = 'eos_testnet';
+const EOS_TESTNET3       = 'eos_testnet3';
 const TELOS_TESTNET      = 'telos_testnet';
 const TELOS_MAINNET      = 'telos_mainnet';
 const LOCAL_TESTNET      = 'local_testnet';
@@ -19,11 +20,19 @@ const BLOCKCHAIN_NETWORK = EOS_TESTNET;
 // const BLOCKCHAIN_NETWORK = TELOS_MAINNET;
 
 const eosio_net = {
+  [EOS_TESTNET3]:  {
+    endpoint                  : 'http://jungle3.cryptolions.io',
+    // history_endpoint          : 'https://junglehistory.cryptolions.io/', 
+    history_endpoint          : 'http://jungle.eosn.io',
+    info                      : 'EOS JUNGLE3 TESTNET ',
+    currency_symbol           : 'EOS',
+
+  },
   [EOS_TESTNET]:  {
     endpoint                  : 'https://jungle2.cryptolions.io:443',
     // history_endpoint          : 'https://junglehistory.cryptolions.io/', 
     history_endpoint          : 'https://jungle.eossweden.org',
-    info                      : 'EOS TESTNET',
+    info                      : 'EOS JUNGLE2 TESTNET',
     currency_symbol           : 'EOS',
 
   },
@@ -54,14 +63,14 @@ const contract_account = 'labisteste21';
 
 let the_config = {
     "environment":                     env
-    , "api_version":                     "/api/v1"
-    , "port":                            3600
-    , "jwt_secret":                      "myS33!!creeeT"
-    , "jwt_expiration_in_seconds":       2592000
-    , "email_domain":                    "inkiri.com"
+    , "api_version":                   "/api/v1"
+    , "port":                          3600
+    , "jwt_secret":                    "myS33!!creeeT"
+    , "jwt_expiration_in_seconds":     2592000
+    , "email_domain":                  "inkiri.com"
     
     , "cron" :{
-      "mode":                          "auto", // "manual"
+      "mode":                          "manual", // "auto"
       "log":                           false
     }
     , "mongo" : {
