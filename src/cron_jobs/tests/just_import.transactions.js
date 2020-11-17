@@ -13,7 +13,7 @@ const rpc_v1       = require('../../transactions/services/rpc_v1');
 
   // **********************************************************************
   // 1st: Get last imported block.
-  let last_timestamp = '2020-03-01T01:18:51.500Z';
+  let last_timestamp = '2020-11-17T01:18:51.500Z';
   let lastImported   = null;
   try{
     lastImported = await TxsModel.lastImported()

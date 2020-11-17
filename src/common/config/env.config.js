@@ -34,9 +34,9 @@ const eosio_net = {
   },
   [TELOS_MAINNET]: {
     endpoint                  : 'https://telos.caleos.io',
-    history_endpoint          : 'https://telos.caleos.io',
-    // 'https://telos.eoscafeblock.com',
-    // 'https://mainnet.telosusa.io',
+    // history_endpoint          : 'https://telos.caleos.io',
+    // history_endpoint          : 'https://telos.eoscafeblock.com',
+    history_endpoint          : 'https://mainnet.telosusa.io',
     info                      : 'TELOS MAINNET',
     currency_symbol           : 'TLOS'
   },
