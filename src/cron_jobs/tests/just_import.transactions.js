@@ -10,7 +10,8 @@ const rpc_v1       = require('../../transactions/services/rpc_v1');
   console.log(' =====    START IMPORT    ====================================================');
   console.log(' =============================================================================');
 
-
+  console.log(' -- endpoint:', config.eos.endpoint)
+  console.log(' -- history_endpoint:', config.eos.history_endpoint)
   // **********************************************************************
   // 1st: Get last imported block.
   let last_timestamp = '2020-11-17T01:18:51.500Z';
