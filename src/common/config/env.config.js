@@ -17,6 +17,14 @@ const LOCAL_TESTNET      = 'local_testnet';
 const env                = PROD_ENV;
 const BLOCKCHAIN_NETWORK = TELOS_MAINNET;
 
+
+/*
+  HISTORY ENDPOINT
+    -- https://docs.telos.net/essentials
+    -- https://hyperion.docs.eosrio.io/endpoint/
+    -- https://validate.eosnation.io/telos/reports/endpoints.html
+*/
+
 const eosio_net = {
   [EOS_TESTNET]:  {
     endpoint                  : 'https://jungle2.cryptolions.io:443',
@@ -34,8 +42,10 @@ const eosio_net = {
   },
   [TELOS_MAINNET]: {
     endpoint                  : 'https://mainnet.telosusa.io',
+    // history_endpoint          : 'http://telos.teleology.one',
+    history_endpoint          : 'https://telos.teleology.one',
     // history_endpoint          : 'https://telos.caleos.io',
-    history_endpoint          : 'http://telos.caleos.io',
+    // history_endpoint          : 'http://telos.caleos.io',
     // history_endpoint          : 'https://telos.eoscafeblock.com',
     // history_endpoint          : 'https://mainnet.telosusa.io',
     // history_endpoint          : 'https://telos.greymass.com',

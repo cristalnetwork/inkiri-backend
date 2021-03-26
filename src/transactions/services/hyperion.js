@@ -67,10 +67,22 @@ exports.queryTransactions = async (config, _contract, cursor, last_block_or_time
         : moment().subtract(1, 'days').toISOString()
     };
     
+    // /v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
     
+    // https://telos.eosrio.io/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+    // https://mainnet.telosusa.io/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+    // https://telos.eosphere.io/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+    // https://api-telos-21zephyr.maltablock.org/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+    // https://telos.caleos.io/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+    // https://hyperion.telos.eosdetroit.io/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+    // http://telos.eosdublin.io/v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z
+
     const response = await rpc.get_actions(contract, options);
+    
     // console.log('========================== RAW');
+    // console.log(JSON.stringify(options));
     // console.log(JSON.stringify(response));
+    
     const results = response.actions || []
     
     const groupActions = (_txs) => {
