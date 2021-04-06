@@ -56,6 +56,7 @@ const actionsToTx = (actions) => {
 
 exports.queryTransactions = async (config, _contract, cursor, last_block_or_timestamp) => new Promise(async(res,rej)=> {
   
+  // last_block_or_timestamp=null;
   try {
     const options = {
       filter: `${account}:*`,
@@ -65,6 +66,7 @@ exports.queryTransactions = async (config, _contract, cursor, last_block_or_time
       after: last_block_or_timestamp 
         ? moment(last_block_or_timestamp).toISOString() 
         : moment().subtract(1, 'days').toISOString()
+        // : moment().subtract(4, 'hours').toISOString()
     };
     
     // /v2/history/get_actions?filter=cristaltoken:*&sort=asc&skip=0&limit=100&after=2021-03-25T02:20:34.000Z

@@ -43,8 +43,8 @@ const eosio_net = {
   [TELOS_MAINNET]: {
     endpoint                  : 'https://mainnet.telosusa.io',
     // history_endpoint          : 'http://telos.teleology.one',
-    history_endpoint          : 'https://telos.teleology.one',
-    // history_endpoint          : 'https://telos.caleos.io',
+    // history_endpoint          : 'https://telos.teleology.one',
+    history_endpoint          : 'https://telos.caleos.io',
     // history_endpoint          : 'http://telos.caleos.io',
     // history_endpoint          : 'https://telos.eoscafeblock.com',
     // history_endpoint          : 'https://mainnet.telosusa.io',
