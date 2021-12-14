@@ -42,15 +42,28 @@ exports.auth = async(req, res) => {
   }
 
   const user = await UserModel.byAccountNameOrNull(req.body.account_name);
+  
+  // console.log('user:', user)
+  // // console.log('account:', accountInfo)
+  // console.log('permissions:', JSON.stringify(accountInfo))
 
   const active_perm = accountInfo.permissions.filter( perm => perm.perm_name == 'active' )[0];
   // const valid_perm =active_perm.required_auth.keys.filter((key) => ecc.verify(req.body.signature, req.body.challenge, key.key))
-  const valid_perm =active_perm.required_auth.keys.filter((key) => ecc.verify(req.body.signature, user.to_sign, key.key))
+  
+  let pub_key = ecc.recover(req.body.signature, user.to_sign);
+  console.log('pub_key:', pub_key)
+  const valid_perm =active_perm.required_auth.keys.filter((key) => {
+    let verification = ecc.verify(req.body.signature, user.to_sign, key.key)
+    console.log('key:', key.key)
+    return verification;
+  })
 
+  // console.log('active_perm:', JSON.stringify(active_perm))
+  // console.log('valid_perm:', JSON.stringify(valid_perm))
   // 4.- Did we find a valid pub key? Shoul we give the token?
   if(!valid_perm || valid_perm.length==0)
   {
-    console.log('============= eos::auth::error#2', e)
+    console.log('============= eos::auth::error#2')
     res.status(400).send({errors: ['Something went wrong my dear friend!']});
     return;
   }

@@ -62,7 +62,7 @@ const apollo_server = new ApolloServer({ typeDefs, resolvers ,
       jwt = ValidationMiddleware.getLoggedUser(req);
     }
     catch(ex){
-      console.log(ex)
+      // console.log(ex)
       // throw ex; 
       console.log('.... apollo returning null name')
       return {account_name:'', is_admin:false}

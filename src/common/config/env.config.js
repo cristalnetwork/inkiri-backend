@@ -41,7 +41,8 @@ const eosio_net = {
     currency_symbol           : 'TLOS'
   },
   [TELOS_MAINNET]: {
-    endpoint                  : 'https://mainnet.telosusa.io',
+    // endpoint                  : 'https://mainnet.telosusa.io',
+    endpoint                  : 'https://telos.caleos.io',
     // history_endpoint          : 'http://telos.teleology.one',
     // history_endpoint          : 'https://telos.teleology.one',
     history_endpoint          : 'https://telos.caleos.io',
