@@ -21,7 +21,7 @@
     "@dfuse/client": "^0.3.5",
     "@eoscafe/hyperion": "^3.2.4",
     "apollo-server-express": "^2.9.14",
-    "body-parser": "1.7.0",
+    "body-parser": "1.20.3",
     "cron": "^1.8.2",
     "eosjs": "^20.0.0",
     "eosjs-ecc": "^4.0.7",
